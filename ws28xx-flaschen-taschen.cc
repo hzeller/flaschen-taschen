@@ -1,23 +1,15 @@
 // -*- mode: c++; c-basic-offset: 4; indent-tabs-mode: nil; -*-
 
+#include "flaschen-taschen.h"
+
 #include <stdint.h>
 #include <assert.h>
 
-#include "clk.h"
-#include "gpio.h"
-#include "dma.h"
-#include "pwm.h"
-
 #include "ws2811.h"
-
-#include "flaschen-taschen.h"
 
 #define TARGET_FREQ   WS2811_TARGET_FREQ
 #define GPIO_PIN      18
 #define DMA_CHANNEL    5
-
-#define WIDTH         8
-#define HEIGHT        8
 
 static ws2811_t ledstrings = {0};
 

@@ -104,7 +104,7 @@ static void handle_connection(int fd, FlaschenTaschen *display) {
             - ((int64_t)start.tv_sec * 1000000 + start.tv_usec);
         printf("\b\b\b\b\b\b\b\b%6.1fHz", 1e6 / usec);
     }
-    fprintf(stderr, "Done.\n");
+    fprintf(stderr, "[connection closed]\n");
 }
 
 static void run_server(int listen_socket, FlaschenTaschen *display) {

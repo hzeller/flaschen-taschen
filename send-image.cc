@@ -18,6 +18,8 @@
 
 #define FLASCHEN_TASCHEN_WIDTH 10
 
+#define LPD_STRIP_GPIO 11
+
 // Read line, skip comments.
 char *ReadLine(FILE *f, char *buffer, size_t len) {
     char *result;
@@ -75,7 +77,9 @@ int main(int argc, char *argv[]) {
     }
 
     // TODO(hzeller): remove hardcodedness.
-    WS2811FlaschenTaschen display(10, 5);
+    WS2811FlaschenTaschen top_display(10, 5);
+    LPD6803FlaschenTaschen bottom_display(LPD_STRIP_GPIO, 10, 5);
+    StackedFlaschenTaschen display(&top_display, &bottom_display);
 
     const int images = argc - 1;
     std::vector<Color> *image;
@@ -92,7 +96,7 @@ int main(int argc, char *argv[]) {
     fprintf(stderr, "Got image (width=%d)\n", image_width);
 
     const int direction = 1;
-    const int sleep_ms = 200;
+    const int sleep_ms = 100;
     int scroll_start = 0;
 
     for (;;) {

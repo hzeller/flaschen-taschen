@@ -4,7 +4,6 @@
 #define FLASCHEN_TASCHEN_H_
 
 #include <stdint.h>
-#include "ws2811.h"
 
 struct Color {
     Color() {}
@@ -55,7 +54,7 @@ private:
     FlaschenTaschen *const bottom_;
 };
 
-
+// Needs to be connected to GPIO 18 (pin 12 on RPi header)
 class WS2811FlaschenTaschen : public FlaschenTaschen {
 public:
     WS2811FlaschenTaschen(int width, int height);
@@ -68,6 +67,24 @@ public:
     void Send();
 
 private:
+    const int width_;
+    const int height_;
+};
+
+// CLK is GPIO 17 (RPI header pin 11). Rest of pin user chosen.
+class LPD6803FlaschenTaschen : public FlaschenTaschen {
+public:
+    LPD6803FlaschenTaschen(int gpio, int width, int height);
+    virtual ~LPD6803FlaschenTaschen();
+
+    int width() const { return width_; }
+    int height() const { return height_; }
+
+    void SetPixel(int x, int y, const Color &col);
+    void Send();
+
+private:
+    const int gpio_pin_;
     const int width_;
     const int height_;
 };
