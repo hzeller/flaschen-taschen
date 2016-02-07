@@ -13,7 +13,7 @@
 #include <arpa/inet.h>
 #include <sys/time.h>
 
-#include "opc-server.h"
+#include "servers.h"
 
 struct Header {
     uint8_t y_pos;
@@ -125,8 +125,11 @@ static void run_server(int listen_socket, FlaschenTaschen *display) {
 }
 
 // public interface
-void run_opc_server(int port, FlaschenTaschen *display) {
-    int server_socket = open_server(NULL, port);
-    fprintf(stderr, "OPC Listening on %d\n", port);
+static int server_socket = -1;
+void opc_server_init(int port) {
+    server_socket = open_server(NULL, port);
+}
+
+void opc_server_run(FlaschenTaschen *display) {
     run_server(server_socket, display);
 }
