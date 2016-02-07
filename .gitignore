@@ -1,0 +1,5 @@
+*.o
+*.a
+*~
+ft-server
+send-image
