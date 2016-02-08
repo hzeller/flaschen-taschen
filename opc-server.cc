@@ -64,7 +64,7 @@ static int open_server(const char *bind_addr, int port) {
 }
 
 static void handle_connection(int fd, FlaschenTaschen *display,
-                              pthread_mutex_t *mutex) {
+                              ft::Mutex *mutex) {
     bool any_error = false;
     while (!any_error) {
         struct timeval start, end;
@@ -79,7 +79,7 @@ static void handle_connection(int fd, FlaschenTaschen *display,
             any_error = true;
         int leds = size / 3;
         uint8_t *pixel_pos = buffer;
-        pthread_mutex_lock(mutex);
+        mutex->Lock();
         for (int x = 0; x < leds; ++x) {
             Color c;
             c.r = *pixel_pos++;
@@ -100,7 +100,7 @@ static void handle_connection(int fd, FlaschenTaschen *display,
                               row, c);
         }
         display->Send();
-        pthread_mutex_unlock(mutex);
+        mutex->Unlock();
         delete [] buffer;
 
         gettimeofday(&end, NULL);
@@ -112,7 +112,7 @@ static void handle_connection(int fd, FlaschenTaschen *display,
 }
 
 static void run_server(int listen_socket,
-                       FlaschenTaschen *display, pthread_mutex_t *mutex) {
+                       FlaschenTaschen *display, ft::Mutex *mutex) {
     if (listen(listen_socket, 2) < 0) {
         fprintf(stderr, "listen() failed: %s", strerror(errno));
         return;
@@ -141,6 +141,6 @@ bool opc_server_init(int port) {
     return true;
 }
 
-void opc_server_run(FlaschenTaschen *display, pthread_mutex_t *mutex) {
+void opc_server_run_blocking(FlaschenTaschen *display, ft::Mutex *mutex) {
     run_server(server_socket, display, mutex);
 }

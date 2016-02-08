@@ -34,7 +34,7 @@ bool udp_server_init(int port) {
     return true;
 }
 
-void udp_server_run(FlaschenTaschen *display, pthread_mutex_t *mutex) {
+void udp_server_run_blocking(FlaschenTaschen *display, ft::Mutex *mutex) {
     int frame_buffer_size = display->width() * display->height() * 3;
     uint8_t *packet_buffer = new uint8_t[frame_buffer_size];
     bzero(packet_buffer, frame_buffer_size);
@@ -48,7 +48,7 @@ void udp_server_run(FlaschenTaschen *display, pthread_mutex_t *mutex) {
             break;
         }
 
-        pthread_mutex_lock(mutex);
+        mutex->Lock();
         uint8_t *pixel_pos = packet_buffer;
         for (int y = 0; y < display->height(); ++y) {
             for (int x = 0; x < display->width(); ++x) {
@@ -60,6 +60,6 @@ void udp_server_run(FlaschenTaschen *display, pthread_mutex_t *mutex) {
             }
         }
         display->Send();
-        pthread_mutex_unlock(mutex);
+        mutex->Unlock();
     }
 }

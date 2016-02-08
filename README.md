@@ -20,7 +20,8 @@ privileges to daemon:daemon). Kill the hard way with `sudo killall ft-server`
 
  * Runs http://openpixelcontrol.org/ server on standard port 7890
  * Receives UDP packet on port 1337 interpreted as framebuffer.
-
+ * Provides pixel pusher control via standard beacon.
+ 
 Within noisebridge, the name is `flaschen-taschen.local`.
 
 So, for instance you can send a raw image to the service like this; each pixel

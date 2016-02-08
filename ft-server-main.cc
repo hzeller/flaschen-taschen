@@ -37,24 +37,18 @@ bool drop_privs() {
     return true;
 }
 
-typedef void (*ServerRunFun)(FlaschenTaschen *, pthread_mutex_t *);
-struct ServerClosure {
-    ServerRunFun fun;
-    FlaschenTaschen *display;
-    pthread_mutex_t *mutex;
-};
+class OPCThread : public ft::Thread {
+public:
+    OPCThread(FlaschenTaschen *display, ft::Mutex *mutex)
+        : display_(display), mutex_(mutex) {}
+    virtual void Run() {
+        opc_server_run_blocking(display_, mutex_);
+    }
 
-static void *ThreadRunner(void *data) {
-    ServerClosure *closure = (ServerClosure*) data;
-    closure->fun(closure->display, closure->mutex);
-    return NULL;
-}
-static void StartServerThread(ServerRunFun fun, FlaschenTaschen *display,
-                              pthread_mutex_t *mutex) {
-    ServerClosure closure = { fun, display, mutex };
-    pthread_t thread;
-    pthread_create(&thread, NULL, &ThreadRunner, &closure);
-}
+private:
+    FlaschenTaschen *const display_;
+    ft::Mutex *const mutex_;
+};
 
 int main(int argc, const char *argv[]) {
     // TODO(hzeller): remove hardcodedness, provide flags
@@ -68,6 +62,7 @@ int main(int argc, const char *argv[]) {
     display.Send();  // Initialize with some black background.
 
     opc_server_init(7890);
+    pixel_pusher_init(&display);
     udp_server_init(1337);
 
     // After hardware is set up and all servers are listening, we can
@@ -79,9 +74,11 @@ int main(int argc, const char *argv[]) {
         fprintf(stderr, "Failed to become daemon");
     }
 
-    pthread_mutex_t mutex;
-    pthread_mutex_init(&mutex, NULL);
+    ft::Mutex mutex;
 
-    StartServerThread(&opc_server_run, &display, &mutex);
-    udp_server_run(&display, &mutex);  // last server blocks.
+    OPCThread opc_thread(&display, &mutex);
+    opc_thread.Start();
+    pixel_pusher_run_threads(&display, &mutex);
+
+    udp_server_run_blocking(&display, &mutex);  // last server blocks.
 }
