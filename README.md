@@ -65,6 +65,12 @@ represented by a red/green/blue byte.
 ```
 cat raw-image.bytes | socat STDIO UDP-SENDTO:flaschen-taschen.local:1337
 ```
+
+Or, if you are using bash, it is even simpler
+```
+cat raw-image.bytes > /dev/udp/flaschen-taschen.local/1337
+```
+
 The current display is 10x10 pixels, so it would be 3 * 100 bytes.
 
 [FlaschenTaschen]: https://noisebridge.net/wiki/Flaschen_Taschen

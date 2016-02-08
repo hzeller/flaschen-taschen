@@ -1,126 +1,246 @@
-// -*- mode: cc; c-basic-offset: 4; indent-tabs-mode: nil; -*-
-// quick hack.
-// strip data output on stdout, so use in a pipe with socat
-// ./send-image foo.ppm | socat STDIO /dev/ttyUSB1,raw,echo=0,crtscts=0,b115200
+// -*- mode: c++; c-basic-offset: 4; indent-tabs-mode: nil; -*-
+// Copyright (C) 2015 Henner Zeller <h.zeller@acm.org>
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation version 2.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://gnu.org/licenses/gpl-2.0.txt>
 
-// BSD-source for usleep()
-#define _BSD_SOURCE
+// To use this image viewer, first get image-magick development files
+// $ sudo aptitude install libmagick++-dev
 
-#include <unistd.h>
-#include <stdint.h>
+#include <math.h>
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
+#include <unistd.h>
 
 #include <vector>
+#include <Magick++.h>
+#include <magick/image.h>
 
-#include "flaschen-taschen.h"
+namespace {
+class PreprocessedFrame {
+public:
+    PreprocessedFrame(const Magick::Image &img) {
+        buffer_.resize(3 * img.rows() * img.columns());
+        int delay_time = img.animationDelay();  // in 1/100s of a second.
+        if (delay_time < 1) delay_time = 1;
+        delay_micros_ = delay_time * 10000;
 
-#define FLASCHEN_TASCHEN_WIDTH 10
-
-#define LPD_STRIP_GPIO 11
-
-// Read line, skip comments.
-char *ReadLine(FILE *f, char *buffer, size_t len) {
-    char *result;
-    do {
-        result = fgets(buffer, len, f);
-    } while (result != NULL && result[0] == '#');
-    return result;
-}
-
-// Load PPM and return strip-data as one-dimensional vector (right now, we expect
-// this to be exactly height=5 like in our test-setup).
-std::vector<Color> *LoadPPM(FILE *f, int expected_height) {
-#define EXIT_WITH_MSG(m) { fprintf(stderr, "%s: |%s", m, line); \
-        fclose(f); return NULL; }
-
-    if (f == NULL)
-        return NULL;
-    char header_buf[256];
-    // Header contains widht and height.
-    const char *line = ReadLine(f, header_buf, sizeof(header_buf));
-    if (sscanf(line, "P6 ") == EOF)
-        EXIT_WITH_MSG("Can only handle P6 as PPM type.");
-    line = ReadLine(f, header_buf, sizeof(header_buf));
-    int width, height;
-    if (!line || sscanf(line, "%d %d ", &width, &height) != 2)
-        EXIT_WITH_MSG("Width/height expected");
-    int value;
-    line = ReadLine(f, header_buf, sizeof(header_buf));
-    if (!line || sscanf(line, "%d ", &value) != 1 || value != 255)
-        EXIT_WITH_MSG("Only 255 for maxval allowed.");
-
-    // Hardcoded pixel mapping
-    if (height != expected_height) {
-        EXIT_WITH_MSG("Must match expected height");
-    }
-
-    std::vector<Color> *result = new std::vector<Color>();
-    for (int y = 0; y < height; ++y) {
-        for (int x = 0; x < width; ++x) {
-            Color c;
-            if (fread(&c, 3, 1, f) != 1) {
-                EXIT_WITH_MSG("was lazy using fread(), and this happened :)");
+        std::string::iterator write_pos = result.begin();
+        for (size_t y = 0; y < img.rows(); ++y) {
+            for (size_t x = 0; x < img.columns(); ++x) {
+                const Magick::Color &c = img.pixelColor(x, y);
+                if (c.alphaQuantum() < 256) {
+                    *(write_pos + 0) = ScaleQuantumToChar(c.redQuantum());
+                    *(write_pos + 1) = ScaleQuantumToChar(c.greenQuantum());
+                    *(write_pos + 2) = ScaleQuantumToChar(c.blueQuantum());
+                }
+                write_pos += 3;
             }
-            result->push_back(c);
         }
     }
-#undef EXIT_WITH_MSG
-    return result;
+
+    const std::string &data() const { return buffer_; }
+
+    int delay_micros() const {
+        return delay_micros_;
+    }
+
+private:
+    std::string buffer_;
+    int delay_micros_;
+};
+}  // end anonymous namespace
+
+// Load still image or animation.
+// Scale, so that it fits in "width" and "height" and store in "image_sequence".
+// If this is a still image, "image_sequence" will contain one image, otherwise
+// all animation frames.
+static bool LoadAnimation(const char *filename, int width, int height,
+                          std::vector<Magick::Image> *image_sequence) {
+    std::vector<Magick::Image> frames;
+    fprintf(stderr, "Read image...\n");
+    readImages(&frames, filename);
+    if (frames.size() == 0) {
+        fprintf(stderr, "No image found.");
+        return false;
+    }
+
+    // Put together the animation from single frames. GIFs can have nasty
+    // disposal modes, but they are handled nicely by coalesceImages()
+    if (frames.size() > 1) {
+        fprintf(stderr, "Assembling animation with %d frames.\n",
+                (int)frames.size());
+        Magick::coalesceImages(image_sequence, frames.begin(), frames.end());
+    } else {
+        image_sequence->push_back(frames[0]);   // just a single still image.
+    }
+
+    fprintf(stderr, "Scale ... %dx%d -> %dx%d\n",
+            (int)(*image_sequence)[0].columns(),
+            (int)(*image_sequence)[0].rows(),
+            width, height);
+    for (size_t i = 0; i < image_sequence->size(); ++i) {
+        (*image_sequence)[i].scale(Magick::Geometry(width, height));
+    }
+    return true;
+}
+
+// Preprocess buffers: create readily filled frame-buffers.
+static void PrepareBuffers(const std::vector<Magick::Image> &images,
+                           std::vector<PreprocessedFrame*> *frames) {
+    fprintf(stderr, "Preprocess for display.\n");
+    for (size_t i = 0; i < images.size(); ++i) {
+        FrameCanvas *canvas = matrix->CreateFrameCanvas();
+        frames->push_back(new PreprocessedFrame(images[i]));
+    }
+}
+
+static void DisplayAnimation(const std::vector<PreprocessedFrame*> &frames) {
+    fprintf(stderr, "Display.\n");
+    for (unsigned int i = 0; !interrupt_received; ++i) {
+        const PreprocessedFrame *frame = frames[i % frames.size()];
+        matrix->SwapOnVSync(frame->canvas());
+        if (frames.size() == 1) {
+            sleep(86400);  // Only one image. Nothing to do.
+        } else {
+            usleep(frame->delay_micros());
+        }
+    }
+}
+
+static int usage(const char *progname) {
+    fprintf(stderr, "usage: %s [options] <image>\n", progname);
+    fprintf(stderr, "Options:\n"
+            "\t-r <rows>     : Panel rows. '16' for 16x32 (1:8 multiplexing),\n"
+            "\t                '32' for 32x32 (1:16), '8' for 1:4 multiplexing; "
+            "Default: 32\n"
+            "\t-P <parallel> : For Plus-models or RPi2: parallel chains. 1..3. "
+            "Default: 1\n"
+            "\t-c <chained>  : Daisy-chained boards. Default: 1.\n"
+            "\t-L            : Large 64x64 display made from four 32x32 in a chain\n"
+            "\t-d            : Run as daemon.\n"
+            "\t-b <brightnes>: Sets brightness percent. Default: 100.\n");
+    return 1;
 }
 
 int main(int argc, char *argv[]) {
-    if (argc != 2) {  // Limit to one picture right now.
-        fprintf(stderr, "Expected picture.\n");
+    Magick::InitializeMagick(*argv);
+
+    int rows = 32;
+    int chain = 1;
+    int parallel = 1;
+    int pwm_bits = -1;
+    int brightness = 100;
+    bool large_display = false;  // example for using Transformers
+    bool as_daemon = false;
+
+    int opt;
+    while ((opt = getopt(argc, argv, "r:P:c:p:b:dL")) != -1) {
+        switch (opt) {
+        case 'r': rows = atoi(optarg); break;
+        case 'P': parallel = atoi(optarg); break;
+        case 'c': chain = atoi(optarg); break;
+        case 'p': pwm_bits = atoi(optarg); break;
+        case 'd': as_daemon = true; break;
+        case 'b': brightness = atoi(optarg); break;
+        case 'L':
+            chain = 4;
+            rows = 32;
+            large_display = true;
+            break;
+        default:
+            return usage(argv[0]);
+        }
+    }
+
+    if (rows != 8 && rows != 16 && rows != 32) {
+        fprintf(stderr, "Rows can one of 8, 16 or 32 "
+                "for 1:4, 1:8 and 1:16 multiplexing respectively.\n");
         return 1;
     }
 
-    // TODO(hzeller): remove hardcodedness.
-    WS2811FlaschenTaschen top_display(10, 5);
-    LPD6803FlaschenTaschen bottom_display(LPD_STRIP_GPIO, 10, 5);
-    StackedFlaschenTaschen display(&top_display, &bottom_display);
-
-    const int images = argc - 1;
-    std::vector<Color> *image;
-    // Read images, store strip compatible data.
-    for (int i = 0; i < images; ++i) {
-        FILE *f = fopen(argv[i + 1], "r");
-        if (!(image = LoadPPM(f, display.height()))) {
-            fprintf(stderr, "Too bad, couldn't read everything\n");
-            return 1;
-        }
-        fclose(f);
+    if (chain < 1) {
+        fprintf(stderr, "Chain outside usable range\n");
+        return usage(argv[0]);
     }
-    const int image_width = image->size() / display.height();
-    fprintf(stderr, "Got image (width=%d)\n", image_width);
+    if (chain > 8) {
+        fprintf(stderr, "That is a long chain. Expect some flicker.\n");
+    }
+    if (parallel < 1 || parallel > 3) {
+        fprintf(stderr, "Parallel outside usable range.\n");
+        return usage(argv[0]);
+    }
 
-    const int direction = 1;
-    const int sleep_ms = 100;
-    int scroll_start = 0;
+    if (brightness < 1 || brightness > 100) {
+        fprintf(stderr, "Brightness is outside usable range.\n");
+        return usage(argv[0]);
+    }
 
-    for (;;) {
-        // Copy a part of our larger image, starting at scroll_start x-pos
-        // into our display sized window.
-        for (int x = 0; x < display.width(); ++x) {
-            for (int y = 0; y < display.height(); ++y) {
-                // The x-position in our image changes while we scroll.
-                const int img_x = (scroll_start + image_width + x) % image_width;
-                const Color &pixel_color = (*image)[img_x + y * image_width];
-                // Our display is upside down. Lets mirror.
-                display.SetPixel(x, y, pixel_color);
-            }
-        }
+    if (optind >= argc) {
+        fprintf(stderr, "Expected image filename.\n");
+        return usage(argv[0]);
+    }
 
-        display.Send();  // ... and show it.
+    const char *filename = argv[optind];
 
-        if (image_width == display.width()) {
-            // Image fits. No scrolling needed.
+    /*
+     * Set up GPIO pins. This fails when not running as root.
+     */
+    GPIO io;
+    if (!io.Init())
+        return 1;
+
+    // Start daemon before we start any threads.
+    if (as_daemon) {
+        if (fork() != 0)
             return 0;
-        }
-        usleep(sleep_ms * 1000);
-        scroll_start = (scroll_start + direction) % image_width;
+        close(STDIN_FILENO);
+        close(STDOUT_FILENO);
+        close(STDERR_FILENO);
     }
+
+    RGBMatrix *const matrix = new RGBMatrix(&io, rows, chain, parallel);
+    if (pwm_bits >= 0 && !matrix->SetPWMBits(pwm_bits)) {
+        fprintf(stderr, "Invalid range of pwm-bits\n");
+        return 1;
+    }
+
+    matrix->SetBrightness(brightness);
+
+    // Here is an example where to add your own transformer. In this case, we
+    // just to the chain-of-four-32x32 => 64x64 transformer, but just use any
+    // of the transformers in transformer.h or write your own.
+    if (large_display) {
+        // Mapping the coordinates of a 32x128 display mapped to a square of 64x64
+        matrix->SetTransformer(new rgb_matrix::LargeSquare64x64Transformer());
+    }
+
+    std::vector<Magick::Image> sequence_pics;
+    if (!LoadAnimation(filename, matrix->width(), matrix->height(),
+                       &sequence_pics)) {
+        return 0;
+    }
+
+    std::vector<PreprocessedFrame*> frames;
+    PrepareBuffers(sequence_pics, matrix, &frames);
+
+    DisplayAnimation(frames, matrix);
+
+    fprintf(stderr, "Caught signal. Exiting.\n");
+
+    // Animation finished. Shut down the RGB matrix.
+    matrix->Clear();
+    delete matrix;
 
     return 0;
 }
