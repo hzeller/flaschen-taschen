@@ -60,6 +60,10 @@ int main(int argc, const char *argv[]) {
     // TODO(hzeller): remove hardcodedness, provide flags
     WS2811FlaschenTaschen top_display(10, 5);
     LPD6803FlaschenTaschen bottom_display(LPD_STRIP_GPIO, 10, 5);
+
+    // Our LPD6803 look a little blue-greenish.
+    bottom_display.SetColorCorrect(1.0, 0.8, 0.8);
+
     StackedFlaschenTaschen display(&top_display, &bottom_display);
     display.Send();  // Initialize with some black background.
 

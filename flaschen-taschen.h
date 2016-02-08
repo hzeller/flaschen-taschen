@@ -83,10 +83,14 @@ public:
     void SetPixel(int x, int y, const Color &col);
     void Send();
 
+    void SetColorCorrect(float r, float g, float b) {
+        r_correct = r; g_correct = g; b_correct = b;
+    }
 private:
     const int gpio_pin_;
     const int width_;
     const int height_;
+    float r_correct, g_correct, b_correct;
 };
 
 #endif // FLASCHEN_TASCHEN_H_

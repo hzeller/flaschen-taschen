@@ -80,7 +80,8 @@ private:
 static MultiSPI *multi_spi = NULL;
 
 LPD6803FlaschenTaschen::LPD6803FlaschenTaschen(int gpio, int width, int height)
-    : gpio_pin_(gpio), width_(width), height_(height) {
+    : gpio_pin_(gpio), width_(width), height_(height),
+      r_correct(1), g_correct(1), b_correct(1) {
     // 2 byts per pixel, 4 bytes start sequence, 4 bytes end-sequence
     const size_t bytes_needed = 4 + 2 * width * height + 4;
     if (multi_spi == NULL) {
@@ -124,11 +125,14 @@ void LPD6803FlaschenTaschen::SetPixel(int x, int y, const Color &col) {
     int y_off = y % height_;
     int pos = (x * height_) + ((x % 2 == 0) ? y_off : (height_-1) - y_off);
     
+    const int r = r_correct * col.r;
+    const int g = g_correct * col.g;
+    const int b = b_correct * col.b;
     uint16_t data = 0;
     data |= (1<<15);  // start bit
-    data |= ((col.r >> 3) & 0x1F) << 10;
-    data |= ((col.g >> 3) & 0x1F) <<  5;
-    data |= ((col.b >> 3) & 0x1F) <<  0;
+    data |= ((r >> 3) & 0x1F) << 10;
+    data |= ((g >> 3) & 0x1F) <<  5;
+    data |= ((b >> 3) & 0x1F) <<  0;
 
     multi_spi->SetSerialBits(gpio_pin_, 2 * pos + 4 + 0, data >> 8);
     multi_spi->SetSerialBits(gpio_pin_, 2 * pos + 4 + 1, data & 0xFF);
