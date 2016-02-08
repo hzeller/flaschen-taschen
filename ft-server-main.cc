@@ -15,19 +15,19 @@
 #define DROP_PRIV_USER "daemon"
 #define DROP_PRIV_GROUP "daemon"
 
-bool drop_privs() {
-    struct group *g = getgrnam(DROP_PRIV_GROUP);
+bool drop_privs(const char *priv_user, const char *priv_group) {
+    struct group *g = getgrnam(priv_group);
     if (g == NULL) {
-        perror("group lookup");
+        perror("group lookup.");
         return false;
     }
     if (setresgid(g->gr_gid, g->gr_gid, g->gr_gid) != 0) {
         perror("setresgid()");
         return false;
     }
-    struct passwd *p = getpwnam(DROP_PRIV_USER);
+    struct passwd *p = getpwnam(priv_user);
     if (p == NULL) {
-        perror("user lookup");
+        perror("user lookup.");
         return false;
     }
     if (setresuid(p->pw_uid, p->pw_uid, p->pw_uid) != 0) {
@@ -67,7 +67,7 @@ int main(int argc, const char *argv[]) {
 
     // After hardware is set up and all servers are listening, we can
     // drop the privileges.
-    if (!drop_privs())
+    if (!drop_privs(DROP_PRIV_USER, DROP_PRIV_GROUP))
         return 1;
 
     if (daemon(0, 0) != 0) {  // Become daemon. TODO: maybe dependent on flag.
