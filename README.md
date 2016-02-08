@@ -3,6 +3,11 @@ Noisebridge Flaschen Taschen Project
 
 Server for [FlaschenTaschen].
 
+Current hardware setup:
+
+ * Top Display: *WS2811* strip to GPIO 18 (pin 12)
+ * Bottom Display: *LPD6803* strip: clk on GPIO 17 (pin 11); data on GPIO 11 (pin 23)
+ 
 ```
 $ git clone --recursive https://github.com/hzeller/flaschen-taschen.git
 $ cd flaschen-taschen
