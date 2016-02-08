@@ -1,4 +1,4 @@
-// -*- mode: c++; c-basic-offset: 2; indent-tabs-mode: nil; -*-
+// -*- mode: c++; c-basic-offset: 4; indent-tabs-mode: nil; -*-
 // Copyright (C) 2013 Henner Zeller <h.zeller@acm.org>
 //
 // This program is free software; you can redistribute it and/or modify
@@ -52,79 +52,80 @@ namespace ft {
    // support for A+/B+ and RPi2 with additional GPIO pins.
    (1 <<  5) | (1 <<  6) | (1 << 12) | (1 << 13) | (1 << 16) |
    (1 << 19) | (1 << 20) | (1 << 21) | (1 << 26)
-);
+   );
 
 GPIO::GPIO() : output_bits_(0), gpio_port_(NULL) {
 }
 
 bool GPIO::AddOutput(int bit) {
-  if (gpio_port_ == NULL) {
-    fprintf(stderr, "Attempt to init outputs but not yet Init()-ialized.\n");
-    return 0;
-  }
+    if (gpio_port_ == NULL) {
+        fprintf(stderr, "Attempt to init outputs but not yet Init()-ialized.\n");
+        return 0;
+    }
 
-  const uint32_t gpio_mask = 1 << bit;
-  if ((gpio_mask & kValidBits) == 0)
-    return false;
-  INP_GPIO(bit);   // for writing, we first need to set as input.
-  OUT_GPIO(bit);
+    const uint32_t gpio_mask = 1 << bit;
+    if ((gpio_mask & kValidBits) == 0)
+        return false;
+    INP_GPIO(bit);   // for writing, we first need to set as input.
+    OUT_GPIO(bit);
 
-  output_bits_ |= gpio_mask;
-  return true;
+    output_bits_ |= gpio_mask;
+    return true;
 }
 
 static bool IsRaspberryPi2() {
-  // TODO: there must be a better, more robust way. Can we ask the processor ?
-  char buffer[2048];
-  const int fd = open("/proc/cmdline", O_RDONLY);
-  ssize_t r = read(fd, buffer, sizeof(buffer) - 1); // returns all in one read.
-  buffer[r >= 0 ? r : 0] = '\0';
-  close(fd);
-  const char *mem_size_key;
-  uint64_t mem_size = 0;
-  if ((mem_size_key = strstr(buffer, "mem_size=")) != NULL
-      && (sscanf(mem_size_key + strlen("mem_size="), "%" PRIx64, &mem_size) == 1)
-      && (mem_size == 0x3F000000)) {
-    return true;
-  }
-  return false;
+    // TODO: there must be a better, more robust way. Can we ask the processor ?
+    char buffer[2048];
+    const int fd = open("/proc/cmdline", O_RDONLY);
+    ssize_t r = read(fd, buffer, sizeof(buffer) - 1); // returns all in one read.
+    buffer[r >= 0 ? r : 0] = '\0';
+    close(fd);
+    const char *mem_size_key;
+    uint64_t mem_size = 0;
+    if ((mem_size_key = strstr(buffer, "mem_size=")) != NULL
+        && (sscanf(mem_size_key + strlen("mem_size="),
+                   "%" PRIx64, &mem_size) == 1)
+        && (mem_size == 0x3F000000)) {
+        return true;
+    }
+    return false;
 }
 
 static uint32_t *mmap_bcm_register(bool isRPi2, off_t register_offset) {
-  const off_t base = (isRPi2 ? BCM2709_PERI_BASE : BCM2708_PERI_BASE);
+    const off_t base = (isRPi2 ? BCM2709_PERI_BASE : BCM2708_PERI_BASE);
 
-  int mem_fd;
-  if ((mem_fd = open("/dev/mem", O_RDWR|O_SYNC) ) < 0) {
-    perror("can't open /dev/mem: ");
-    return NULL;
-  }
+    int mem_fd;
+    if ((mem_fd = open("/dev/mem", O_RDWR|O_SYNC) ) < 0) {
+        perror("can't open /dev/mem: ");
+        return NULL;
+    }
 
-  uint32_t *result =
-    (uint32_t*) mmap(NULL,                  // Any adddress in our space will do
-                     REGISTER_BLOCK_SIZE,   // Map length
-                     PROT_READ|PROT_WRITE,  // Enable r/w on GPIO registers.
-                     MAP_SHARED,
-                     mem_fd,                // File to map
-                     base + register_offset // Offset to bcm register
-                     );
-  close(mem_fd);
+    uint32_t *result =
+        (uint32_t*) mmap(NULL,                  // Any adddress will do
+                         REGISTER_BLOCK_SIZE,   // Map length
+                         PROT_READ|PROT_WRITE,  // Enable r/w on GPIO registers.
+                         MAP_SHARED,
+                         mem_fd,                // File to map
+                         base + register_offset // Offset to bcm register
+                         );
+    close(mem_fd);
 
-  if (result == MAP_FAILED) {
-    fprintf(stderr, "mmap error %p\n", result);
-    return NULL;
-  }
-  return result;
+    if (result == MAP_FAILED) {
+        fprintf(stderr, "mmap error %p\n", result);
+        return NULL;
+    }
+    return result;
 }
 
 // Based on code example found in http://elinux.org/RPi_Low-level_peripherals
 bool GPIO::Init() {
-  gpio_port_ = mmap_bcm_register(IsRaspberryPi2(), GPIO_REGISTER_OFFSET);
-  if (gpio_port_ == NULL) {
-    return false;
-  }
-  gpio_set_bits_ = gpio_port_ + (0x1C / sizeof(uint32_t));
-  gpio_clr_bits_ = gpio_port_ + (0x28 / sizeof(uint32_t));
-  return true;
+    gpio_port_ = mmap_bcm_register(IsRaspberryPi2(), GPIO_REGISTER_OFFSET);
+    if (gpio_port_ == NULL) {
+        return false;
+    }
+    gpio_set_bits_ = gpio_port_ + (0x1C / sizeof(uint32_t));
+    gpio_clr_bits_ = gpio_port_ + (0x28 / sizeof(uint32_t));
+    return true;
 }
 
 } // namespace ft
