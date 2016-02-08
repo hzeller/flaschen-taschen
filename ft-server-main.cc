@@ -36,17 +36,43 @@ bool drop_privs() {
     return true;
 }
 
+typedef void (*ServerRunFun)(FlaschenTaschen *, pthread_mutex_t *);
+struct ServerClosure {
+    ServerRunFun fun;
+    FlaschenTaschen *display;
+    pthread_mutex_t *mutex;
+};
+
+static void *ThreadRunner(void *data) {
+    ServerClosure *closure = (ServerClosure*) data;
+    closure->fun(closure->display, closure->mutex);
+    return NULL;
+}
+static void StartServerThread(ServerRunFun fun, FlaschenTaschen *display,
+                              pthread_mutex_t *mutex) {
+    ServerClosure closure = { fun, display, mutex };
+    pthread_t thread;
+    pthread_create(&thread, NULL, &ThreadRunner, &closure);
+}
+
 int main(int argc, const char *argv[]) {
     // TODO(hzeller): remove hardcodedness, provide flags
     WS2811FlaschenTaschen top_display(10, 5);
     LPD6803FlaschenTaschen bottom_display(LPD_STRIP_GPIO, 10, 5);
     StackedFlaschenTaschen display(&top_display, &bottom_display);
-    display.Send();  // Initialize.
+    display.Send();  // Initialize with some black background.
 
     opc_server_init(7890);
+    udp_server_init(1337);
 
+    // After hardware is set up and all servers are listening, we can
+    // drop the privileges.
     if (!drop_privs())
         return 1;
 
-    opc_server_run(&display);
+    pthread_mutex_t mutex;
+    pthread_mutex_init(&mutex, NULL);
+
+    StartServerThread(&opc_server_run, &display, &mutex);
+    udp_server_run(&display, &mutex);  // last server blocks.
 }

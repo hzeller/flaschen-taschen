@@ -63,7 +63,8 @@ static int open_server(const char *bind_addr, int port) {
     return s;
 }
 
-static void handle_connection(int fd, FlaschenTaschen *display) {
+static void handle_connection(int fd, FlaschenTaschen *display,
+                              pthread_mutex_t *mutex) {
     bool any_error = false;
     while (!any_error) {
         struct timeval start, end;
@@ -73,13 +74,18 @@ static void handle_connection(int fd, FlaschenTaschen *display) {
         if (!reliable_read(fd, &h, sizeof(h)))
             break;  // lazily assume that we get enough.
         uint16_t size = (uint16_t) h.size_hi << 8 | h.size_lo;
+        uint8_t *buffer = new uint8_t[ size ];
+        if (!reliable_read(fd, buffer, size))
+            any_error = true;
         int leds = size / 3;
-        Color c;
+        uint8_t *pixel_pos = buffer;
+        pthread_mutex_lock(mutex);
         for (int x = 0; x < leds; ++x) {
-            if (!reliable_read(fd, &c, 3)) {
-                any_error = true;
-                break;
-            }
+            Color c;
+            c.r = *pixel_pos++;
+            c.g = *pixel_pos++;
+            c.b = *pixel_pos++;
+
             // Ideally, we'd think that we can have the channel denote the
             // y-axis, then x-axis is the pixel.
             //display->SetPixel(x, h.y_pos, c);
@@ -93,12 +99,10 @@ static void handle_connection(int fd, FlaschenTaschen *display) {
             display->SetPixel(row % 2 == 0 ? col : display->width() - col - 1,
                               row, c);
         }
-        if (size % 3 != 0) {
-            fprintf(stderr, "Discarding wrongly sized data "
-                    "y-pos=%d cmd=%d size=%d\n", h.y_pos, h.command, size);
-            reliable_read(fd, &c, size % 3);
-        }
         display->Send();
+        pthread_mutex_unlock(mutex);
+        delete [] buffer;
+
         gettimeofday(&end, NULL);
         int64_t usec = ((uint64_t)end.tv_sec * 1000000 + end.tv_usec)
             - ((int64_t)start.tv_sec * 1000000 + start.tv_usec);
@@ -107,7 +111,8 @@ static void handle_connection(int fd, FlaschenTaschen *display) {
     fprintf(stderr, "[connection closed]\n");
 }
 
-static void run_server(int listen_socket, FlaschenTaschen *display) {
+static void run_server(int listen_socket,
+                       FlaschenTaschen *display, pthread_mutex_t *mutex) {
     if (listen(listen_socket, 2) < 0) {
         fprintf(stderr, "listen() failed: %s", strerror(errno));
         return;
@@ -118,7 +123,7 @@ static void run_server(int listen_socket, FlaschenTaschen *display) {
         socklen_t socklen = sizeof(client);
         int fd = accept(listen_socket, (struct sockaddr*) &client, &socklen);
         if (fd < 0) return;
-        handle_connection(fd, display);
+        handle_connection(fd, display, mutex);
     }
 
     close(listen_socket);
@@ -126,10 +131,16 @@ static void run_server(int listen_socket, FlaschenTaschen *display) {
 
 // public interface
 static int server_socket = -1;
-void opc_server_init(int port) {
+bool opc_server_init(int port) {
     server_socket = open_server(NULL, port);
+    if (server_socket < 0) {
+        perror("Listening on opc socket");
+        return false;
+    }
+    fprintf(stderr, "OPC server ready to listen on %d\n", port);
+    return true;
 }
 
-void opc_server_run(FlaschenTaschen *display) {
-    run_server(server_socket, display);
+void opc_server_run(FlaschenTaschen *display, pthread_mutex_t *mutex) {
+    run_server(server_socket, display, mutex);
 }
