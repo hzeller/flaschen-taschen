@@ -8,6 +8,7 @@
 #include <grp.h>
 #include <pwd.h>
 #include <stdio.h>
+#include <unistd.h>
 
 #define LPD_STRIP_GPIO 11
 
@@ -69,6 +70,10 @@ int main(int argc, const char *argv[]) {
     // drop the privileges.
     if (!drop_privs())
         return 1;
+
+    if (daemon(0, 0) != 0) {  // Become daemon. TODO: maybe dependent on flag.
+        fprintf(stderr, "Failed to become daemon");
+    }
 
     pthread_mutex_t mutex;
     pthread_mutex_init(&mutex, NULL);
