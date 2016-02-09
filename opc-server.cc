@@ -1,6 +1,18 @@
 // -*- mode: cc; c-basic-offset: 4; indent-tabs-mode: nil; -*-
-// Read http://openpixelcontrol.org/ and spit out our format.
-// Currently: outputs stuff to tty, to be called with socat.
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation version 2.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://gnu.org/licenses/gpl-2.0.txt>
+
+// Receives http://openpixelcontrol.org/ and updates display.
 
 #include <errno.h>
 #include <stdint.h>
