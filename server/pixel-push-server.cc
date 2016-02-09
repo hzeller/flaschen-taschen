@@ -41,6 +41,9 @@
 
 using namespace ft;
 
+// PixelPushPrefix :) for our logs.
+#define PXP "PixelPush: "
+
 static const char kNetworkInterface[] = "eth0";
 static const uint16_t kPixelPusherDiscoveryPort = 7331;
 static const uint16_t kPixelPusherListenPort = 5078;
@@ -104,7 +107,7 @@ bool DetermineNetwork(const char *interface, DiscoveryPacketHeader *header) {
     // Let's print what we're sending.
     char buf[256];
     inet_ntop(AF_INET, header->ip_address, buf, sizeof(buf));
-    fprintf(stderr, "%s: IP: %s; MAC: ", interface, buf);
+    fprintf(stderr, PXP "%s: IP: %s; MAC: ", interface, buf);
     for (int i = 0; i < 6; ++i) {
         fprintf(stderr, "%s%02x", (i == 0) ? "" : ":", header->mac_address[i]);
     }
@@ -146,7 +149,8 @@ public:
                                  + sizeof(pixel_pusher_.ext)),
           discovery_packet_buffer_(new uint8_t[discovery_packet_size_]),
         previous_sequence_(-1) {
-        fprintf(stderr, "discovery packet size: %zd\n", discovery_packet_size_);
+        fprintf(stderr, PXP "discovery packet size: %zd\n",
+                discovery_packet_size_);
     }
   
     virtual ~Beacon() {
@@ -184,7 +188,7 @@ public:
         addr.sin_addr.s_addr = htonl(INADDR_BROADCAST);
         addr.sin_port = htons(kPixelPusherDiscoveryPort);
 
-        fprintf(stderr, "Starting PixelPusher discovery beacon "
+        fprintf(stderr, PXP "Starting PixelPusher discovery beacon "
                 "broadcasting to port %d\n", kPixelPusherDiscoveryPort);
         struct timespec sleep_time = { 1, 0 };  // todo: tweak.
         while (running()) {
@@ -256,7 +260,7 @@ public:
             perror("bind");
             exit(1);
         }
-        fprintf(stderr, "Listening for pixels pushed to port %d\n",
+        fprintf(stderr, PXP "Listening for pixels pushed to port %d\n",
                 kPixelPusherListenPort);
         while (running()) {
             ssize_t buffer_bytes = recvfrom(s, packet_buffer, kMaxUDPPacketSize,
@@ -269,8 +273,8 @@ public:
                 continue;
             }
             if (buffer_bytes <= 4) {
-                fprintf(stderr, "weird, no sequence number ? Got %zd bytes\n",
-                        buffer_bytes);
+                fprintf(stderr, PXP "weird, no sequence number ? "
+                        "Got %zd bytes\n", buffer_bytes);
             }
 
             // TODO: maybe continue when data same as before.
@@ -283,7 +287,7 @@ public:
             buf_pos += 4;
 
             if (buffer_bytes % strip_data_len != 0) {
-                fprintf(stderr, "Expecting multiple of {1 + (rgb)*%d} = %d, "
+                fprintf(stderr, PXP "Expecting multiple of {1 + (rgb)*%d} = %d, "
                         "but got %zd bytes (leftover: %zd)\n", matrix_->width(),
                         strip_data_len, buffer_bytes,
                         buffer_bytes % strip_data_len);
@@ -327,7 +331,8 @@ bool pixel_pusher_init(FlaschenTaschen *canvas) {
     memset(&header, 0, sizeof(header));
 
     if (!DetermineNetwork(interface, &header)) {
-        fprintf(stderr, "Couldn't listen on network interface %s.\n", interface);
+        fprintf(stderr, PXP "Couldn't listen on network interface %s.\n",
+                interface);
         return 1;
     }
     header.device_type = PIXELPUSHER;
@@ -351,7 +356,7 @@ bool pixel_pusher_init(FlaschenTaschen *canvas) {
     pixel_pusher_container.base->max_strips_per_packet
         = std::min(kUsablePacketSize / (1 + 3 * pixels_per_strip),
                    number_of_strips);
-    fprintf(stderr, "Display: %dx%d (%d pixels each on %d strips)\n"
+    fprintf(stderr, PXP "Display: %dx%d (%d pixels each on %d strips)\n"
             "Accepting max %d strips per packet.\n",
             pixels_per_strip, number_of_strips,
             pixels_per_strip, number_of_strips, 

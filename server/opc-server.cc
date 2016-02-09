@@ -47,12 +47,12 @@ static bool reliable_read(int fd, void *buf, size_t count) {
 // Bind to "bind_addr" (can be NULL, then it is 0.0.0.0) and "port".
 static int open_server(const char *bind_addr, int port) {
     if (port > 65535) {
-        fprintf(stderr, "Invalid port %d\n", port);
+        fprintf(stderr, "OPC: Invalid port %d\n", port);
         return -1;
     }
     int s = socket(AF_INET, SOCK_STREAM, 0);
     if (s < 0) {
-        fprintf(stderr, "creating socket: %s", strerror(errno));
+        fprintf(stderr, "OPC: creating socket: %s", strerror(errno));
         return -1;
     }
 
@@ -60,14 +60,14 @@ static int open_server(const char *bind_addr, int port) {
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_addr.s_addr = INADDR_ANY;
     if (bind_addr && !inet_pton(AF_INET, bind_addr, &serv_addr.sin_addr.s_addr)) {
-        fprintf(stderr, "Invalid bind IP address %s\n", bind_addr);
+        fprintf(stderr, "OPC: Invalid bind IP address %s\n", bind_addr);
         return -1;
     }
     serv_addr.sin_port = htons(port);
     int on = 1;
     setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
     if (bind(s, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) {
-        fprintf(stderr, "Trouble binding to %s:%d: %s",
+        fprintf(stderr, "OPC: Trouble binding to %s:%d: %s",
                 bind_addr ? bind_addr : "0.0.0.0", port,
                 strerror(errno));
         return -1;
@@ -120,13 +120,13 @@ static void handle_connection(int fd, FlaschenTaschen *display,
             - ((int64_t)start.tv_sec * 1000000 + start.tv_usec);
         printf("\b\b\b\b\b\b\b\b%6.1fHz", 1e6 / usec);
     }
-    fprintf(stderr, "[connection closed]\n");
+    fprintf(stderr, "OPC:[conn closed]\n");
 }
 
 static void run_server(int listen_socket,
                        FlaschenTaschen *display, ft::Mutex *mutex) {
     if (listen(listen_socket, 2) < 0) {
-        fprintf(stderr, "listen() failed: %s", strerror(errno));
+        fprintf(stderr, "OPC: listen() failed: %s", strerror(errno));
         return;
     }
     

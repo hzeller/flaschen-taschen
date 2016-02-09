@@ -42,7 +42,7 @@ bool udp_server_init(int port) {
         return false;
     }
 
-    fprintf(stderr, "UDP ready to listen on %d\n", port);
+    fprintf(stderr, "UDP-server: ready to listen on %d\n", port);
     return true;
 }
 
