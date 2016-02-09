@@ -3,7 +3,7 @@ Noisebridge Flaschen Taschen Project
 
 Software for [FlaschenTaschen].
 
-Current hardware setup:
+Current hardware setup on the Raspberry Pi (should work on Pi-1 or Pi-2).
 
  * Top Display: *WS2811* strip to GPIO 18 (pin 12)
  * Bottom Display: *LPD6803* strip: clk on GPIO 17 (pin 11); data on GPIO 11 (pin 23)
@@ -11,14 +11,16 @@ Current hardware setup:
 Build Instructions
 ==================
 
-Note: This project uses a git submodule for raspberry pi software from [jgarf](https://github.com/jgarff/rpi_ws281x)
+Note: This project uses a git submodule for controlling ws28xx from the Raspberry Pi software by [jgarf](https://github.com/jgarff/rpi_ws281x)
 
-```
+```bash
 $ git clone --recursive https://github.com/hzeller/flaschen-taschen.git
-$ sudo aptitude install libmagick++-dev
 $ cd flaschen-taschen
-$ make
-$ sudo ./ft-server
+$ make -C server
+$ sudo ./server/ft-server   # runs as daemon on a Raspberry Pi.
+# Clients to send content to the display can be found in the client/ dir
+$ sudo aptitude install libmagick++-dev
+$ make -C client
 ```
 
 If you are reading this after cloning and forget to clone recursively, you can just run the following git command to update the submodule:
@@ -74,7 +76,7 @@ cat raw-image.bytes > /dev/udp/flaschen-taschen.local/1337
 
 The current display is 10x10 pixels, so it would be 3 * 100 bytes.
 
-There is a client `send-image`, that reads an arbitrary image (including
-animated *.gifs), scales it and sends to the server via UDP.
+You find more in the [client/ directory](./client) to directly send
+content to the server.
 
 [FlaschenTaschen]: https://noisebridge.net/wiki/Flaschen_Taschen
