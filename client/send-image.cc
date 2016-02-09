@@ -24,6 +24,7 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <assert.h>
 
 #include <vector>
 #include <Magick++.h>
@@ -35,8 +36,9 @@ namespace {
 // animation delay.
 class PreprocessedFrame {
 public:
-    PreprocessedFrame(const Magick::Image &img) {
-        buffer_.resize(3 * img.rows() * img.columns());
+    PreprocessedFrame(const Magick::Image &img, int width, int height) {
+        buffer_.resize(3 * height * width);
+        assert(width >= (int) img.columns() && height >= (int) img.rows());
         int delay_time = img.animationDelay();  // in 1/100s of a second.
         if (delay_time < 1) delay_time = 1;
         delay_micros_ = delay_time * 10000;
@@ -201,7 +203,8 @@ int main(int argc, char *argv[]) {
 
     std::vector<PreprocessedFrame*> frames;
     for (size_t i = 0; i < sequence_pics.size(); ++i) {
-        frames.push_back(new PreprocessedFrame(sequence_pics[i]));
+        frames.push_back(new PreprocessedFrame(sequence_pics[i],
+                                               width, height));
     }
 
     DisplayAnimation(frames, fd);
