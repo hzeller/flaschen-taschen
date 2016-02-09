@@ -8,13 +8,7 @@ CFLAGS=-Wall -O3 $(INCLUDES)
 CXXFLAGS=$(CFLAGS)
 LIBS=-lpthread
 
-MAGICK_CXXFLAGS=`GraphicsMagick++-config --cppflags --cxxflags`
-MAGICK_LDFLAGS=`GraphicsMagick++-config --ldflags --libs`
-
-all : send-image ft-server
-
-send-image : send-image.cc
-	$(CXX) $(MAGICK_CXXFLAGS) -o $@ $^ $(MAGICK_LDFLAGS)
+all : ft-server
 
 ft-server: ft-server-main.o $(SERVER_OBJECTS) $(OBJECTS) libws281x.a
 	$(CXX) -o $@ $^ $(LIBS)
@@ -24,4 +18,4 @@ libws281x.a : $(WS2812LIB_OBJECTS)
 	ar rcs $@ $^
 
 clean:
-	rm -f libws281x.a send-image send-image.o ft-server ft-server-main.o$(OBJECTS) $(SERVER_OBJECTS) $(WS2812LIB_OBJECTS)
+	rm -f libws281x.a ft-server ft-server-main.o$(OBJECTS) $(SERVER_OBJECTS) $(WS2812LIB_OBJECTS)
