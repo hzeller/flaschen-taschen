@@ -1,5 +1,5 @@
 // -*- mode: c++; c-basic-offset: 4; indent-tabs-mode: nil; -*-
-// Copyright (C) 2015 Henner Zeller <h.zeller@acm.org>
+// Copyright (C) 2016 Henner Zeller <h.zeller@acm.org>
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,9 +17,12 @@
 // $ sudo aptitude install libmagick++-dev
 
 #include <math.h>
-#include <signal.h>
+#include <netdb.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <sys/types.h>
 #include <unistd.h>
 
 #include <vector>
@@ -27,6 +30,9 @@
 #include <magick/image.h>
 
 namespace {
+// Frame already prepared as the buffer to be sent over so that animation
+// and re-sizing operations don't have to be done online. Also knows about the
+// animation delay.
 class PreprocessedFrame {
 public:
     PreprocessedFrame(const Magick::Image &img) {
@@ -35,7 +41,7 @@ public:
         if (delay_time < 1) delay_time = 1;
         delay_micros_ = delay_time * 10000;
 
-        std::string::iterator write_pos = result.begin();
+        std::string::iterator write_pos = buffer_.begin();
         for (size_t y = 0; y < img.rows(); ++y) {
             for (size_t x = 0; x < img.columns(); ++x) {
                 const Magick::Color &c = img.pixelColor(x, y);
@@ -65,8 +71,8 @@ private:
 // Scale, so that it fits in "width" and "height" and store in "image_sequence".
 // If this is a still image, "image_sequence" will contain one image, otherwise
 // all animation frames.
-static bool LoadAnimation(const char *filename, int width, int height,
-                          std::vector<Magick::Image> *image_sequence) {
+static bool LoadAnimationAndScale(const char *filename, int width, int height,
+                                  std::vector<Magick::Image> *image_sequence) {
     std::vector<Magick::Image> frames;
     fprintf(stderr, "Read image...\n");
     readImages(&frames, filename);
@@ -95,94 +101,84 @@ static bool LoadAnimation(const char *filename, int width, int height,
     return true;
 }
 
-// Preprocess buffers: create readily filled frame-buffers.
-static void PrepareBuffers(const std::vector<Magick::Image> &images,
-                           std::vector<PreprocessedFrame*> *frames) {
-    fprintf(stderr, "Preprocess for display.\n");
-    for (size_t i = 0; i < images.size(); ++i) {
-        FrameCanvas *canvas = matrix->CreateFrameCanvas();
-        frames->push_back(new PreprocessedFrame(images[i]));
-    }
-}
-
-static void DisplayAnimation(const std::vector<PreprocessedFrame*> &frames) {
+static void DisplayAnimation(const std::vector<PreprocessedFrame*> &frames,
+                             int fd) {
     fprintf(stderr, "Display.\n");
-    for (unsigned int i = 0; !interrupt_received; ++i) {
+    for (unsigned int i = 0; /*forever*/; ++i) {
         const PreprocessedFrame *frame = frames[i % frames.size()];
-        matrix->SwapOnVSync(frame->canvas());
+        if (write(fd, frame->data().data(), frame->data().size())
+            != (ssize_t)frame->data().size()) {
+            fprintf(stderr, "Couldn't send full image.");
+        }
         if (frames.size() == 1) {
-            sleep(86400);  // Only one image. Nothing to do.
+            return;  // We are done.
         } else {
             usleep(frame->delay_micros());
         }
     }
 }
 
+static int OpenUDPSocket(const char *host) {
+    struct addrinfo addr_hints = {0};
+    addr_hints.ai_family = AF_UNSPEC;
+    addr_hints.ai_socktype = SOCK_DGRAM;
+
+    struct addrinfo *addr_result = NULL;
+    int rc;
+    if ((rc = getaddrinfo(host, "1337", &addr_hints, &addr_result)) != 0) {
+        fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rc));
+        return -1;
+    }
+    if (addr_result == NULL)
+        return -1;
+    int fd = socket(addr_result->ai_family,
+                    addr_result->ai_socktype,
+                    addr_result->ai_protocol);
+    if (fd >= 0 &&
+        connect(fd, addr_result->ai_addr, addr_result->ai_addrlen) < 0) {
+        perror("connect()");
+        close(fd);
+        fd = -1;
+    }
+
+    freeaddrinfo(addr_result);
+    return fd;
+}
+
 static int usage(const char *progname) {
     fprintf(stderr, "usage: %s [options] <image>\n", progname);
     fprintf(stderr, "Options:\n"
-            "\t-r <rows>     : Panel rows. '16' for 16x32 (1:8 multiplexing),\n"
-            "\t                '32' for 32x32 (1:16), '8' for 1:4 multiplexing; "
-            "Default: 32\n"
-            "\t-P <parallel> : For Plus-models or RPi2: parallel chains. 1..3. "
-            "Default: 1\n"
-            "\t-c <chained>  : Daisy-chained boards. Default: 1.\n"
-            "\t-L            : Large 64x64 display made from four 32x32 in a chain\n"
-            "\t-d            : Run as daemon.\n"
-            "\t-b <brightnes>: Sets brightness percent. Default: 100.\n");
+            "\t-D <width>x<height> : Output dimension. Default 10x10\n"
+            "\t-h <host>           : host (default: flaschen-taschen.local\n");
     return 1;
 }
 
 int main(int argc, char *argv[]) {
     Magick::InitializeMagick(*argv);
 
-    int rows = 32;
-    int chain = 1;
-    int parallel = 1;
-    int pwm_bits = -1;
-    int brightness = 100;
-    bool large_display = false;  // example for using Transformers
-    bool as_daemon = false;
+    int width = 10;
+    int height = 10;
+    const char *host = "flaschen-taschen.local";
 
     int opt;
-    while ((opt = getopt(argc, argv, "r:P:c:p:b:dL")) != -1) {
+    while ((opt = getopt(argc, argv, "D:h:")) != -1) {
         switch (opt) {
-        case 'r': rows = atoi(optarg); break;
-        case 'P': parallel = atoi(optarg); break;
-        case 'c': chain = atoi(optarg); break;
-        case 'p': pwm_bits = atoi(optarg); break;
-        case 'd': as_daemon = true; break;
-        case 'b': brightness = atoi(optarg); break;
-        case 'L':
-            chain = 4;
-            rows = 32;
-            large_display = true;
+        case 'D':
+            if (sscanf(optarg, "%dx%d", &width, &height) != 2) {
+                fprintf(stderr, "Invalid size spec '%s'", optarg);
+                return usage(argv[0]);
+            }
+            break;
+        case 'h':
+            host = strdup(optarg); // leaking. Ignore.
             break;
         default:
             return usage(argv[0]);
         }
     }
-
-    if (rows != 8 && rows != 16 && rows != 32) {
-        fprintf(stderr, "Rows can one of 8, 16 or 32 "
-                "for 1:4, 1:8 and 1:16 multiplexing respectively.\n");
-        return 1;
-    }
-
-    if (chain < 1) {
-        fprintf(stderr, "Chain outside usable range\n");
-        return usage(argv[0]);
-    }
-    if (chain > 8) {
-        fprintf(stderr, "That is a long chain. Expect some flicker.\n");
-    }
-    if (parallel < 1 || parallel > 3) {
-        fprintf(stderr, "Parallel outside usable range.\n");
-        return usage(argv[0]);
-    }
-
-    if (brightness < 1 || brightness > 100) {
-        fprintf(stderr, "Brightness is outside usable range.\n");
+    
+    if (width < 1 || height < 1) {
+        fprintf(stderr, "%dx%d is a rather unusual size\n", width, height);
         return usage(argv[0]);
     }
 
@@ -191,56 +187,25 @@ int main(int argc, char *argv[]) {
         return usage(argv[0]);
     }
 
+    int fd = OpenUDPSocket(host);
+    if (fd < 0) {
+        fprintf(stderr, "Cannot connect.");
+        return 1;
+    }
     const char *filename = argv[optind];
 
-    /*
-     * Set up GPIO pins. This fails when not running as root.
-     */
-    GPIO io;
-    if (!io.Init())
-        return 1;
-
-    // Start daemon before we start any threads.
-    if (as_daemon) {
-        if (fork() != 0)
-            return 0;
-        close(STDIN_FILENO);
-        close(STDOUT_FILENO);
-        close(STDERR_FILENO);
-    }
-
-    RGBMatrix *const matrix = new RGBMatrix(&io, rows, chain, parallel);
-    if (pwm_bits >= 0 && !matrix->SetPWMBits(pwm_bits)) {
-        fprintf(stderr, "Invalid range of pwm-bits\n");
-        return 1;
-    }
-
-    matrix->SetBrightness(brightness);
-
-    // Here is an example where to add your own transformer. In this case, we
-    // just to the chain-of-four-32x32 => 64x64 transformer, but just use any
-    // of the transformers in transformer.h or write your own.
-    if (large_display) {
-        // Mapping the coordinates of a 32x128 display mapped to a square of 64x64
-        matrix->SetTransformer(new rgb_matrix::LargeSquare64x64Transformer());
-    }
-
     std::vector<Magick::Image> sequence_pics;
-    if (!LoadAnimation(filename, matrix->width(), matrix->height(),
-                       &sequence_pics)) {
-        return 0;
+    if (!LoadAnimationAndScale(filename, width, height, &sequence_pics)) {
+        return 1;
     }
 
     std::vector<PreprocessedFrame*> frames;
-    PrepareBuffers(sequence_pics, matrix, &frames);
+    for (size_t i = 0; i < sequence_pics.size(); ++i) {
+        frames.push_back(new PreprocessedFrame(sequence_pics[i]));
+    }
 
-    DisplayAnimation(frames, matrix);
+    DisplayAnimation(frames, fd);
 
-    fprintf(stderr, "Caught signal. Exiting.\n");
-
-    // Animation finished. Shut down the RGB matrix.
-    matrix->Clear();
-    delete matrix;
-
+    close(fd);
     return 0;
 }
