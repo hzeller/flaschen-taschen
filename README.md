@@ -15,6 +15,7 @@ Note: This project uses a git submodule for raspberry pi software from [jgarf](h
 
 ```
 $ git clone --recursive https://github.com/hzeller/flaschen-taschen.git
+$ sudo aptitude install libmagick++-dev
 $ cd flaschen-taschen
 $ make
 $ sudo ./ft-server
@@ -72,5 +73,8 @@ cat raw-image.bytes > /dev/udp/flaschen-taschen.local/1337
 ```
 
 The current display is 10x10 pixels, so it would be 3 * 100 bytes.
+
+There is a client `send-image`, that reads an arbitrary image (including
+animated *.gifs), scales it and sends to the server via UDP.
 
 [FlaschenTaschen]: https://noisebridge.net/wiki/Flaschen_Taschen
