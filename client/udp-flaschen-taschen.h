@@ -15,9 +15,10 @@
 #ifndef UDP_FLASCHEN_TASCHEN_H
 #define UDP_FLASCHEN_TASCHEN_H
 
+#include "flaschen-taschen.h"
+
 #include <stdint.h>
 #include <stddef.h>
-#include "flaschen-taschen.h"
 
 // Open a FlaschenTaschen Socket to the flaschen-taschen server.
 int OpenFlaschenTaschenSocket(const char *host);
@@ -27,32 +28,33 @@ int OpenFlaschenTaschenSocket(const char *host);
 class UDPFlaschenTaschen : public FlaschenTaschen {
 public:
     // Create a canvas that can be sent to a FlaschenTaschen server.
-    // Socket can be -1, but then you have to use Send(int fd).
+    // Socket can be -1, but then you have to use the explicit Send(int fd).
     UDPFlaschenTaschen(int socket, int width, int height);
     ~UDPFlaschenTaschen();
 
-    // -- FlaschenTaschen interface
+    // -- FlaschenTaschen interface implementation
     virtual int width() const { return width_; }
     virtual int height() const { return height_; }
 
     virtual void SetPixel(int x, int y, const Color &col);
+
     // Send to file-descriptor given in constructor.
     virtual void Send() { Send(fd_); } 
 
-    // -- additional features.
-    void Clear();
-
-    // Get pixel at given position. Coordinates outside the range are
-    // wrapped around.
-    const Color &GetPixel(int x, int y);
+    // -- Additional features.
     void Send(int fd);     // Send to given file-descriptor.
+    void Clear();          // Clear screen (fill with black).
+
+    // Get pixel color at given position. Coordinates outside the range
+    // are wrapped around.
+    const Color &GetPixel(int x, int y);
 
 private:
     const int fd_;
     const int width_;
     const int height_;
     const size_t buf_size_;
-    Color *buffer_;
+    Color *const buffer_;
 };
 
 #endif  // UDP_FLASCHEN_TASCHEN_H

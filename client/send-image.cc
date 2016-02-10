@@ -14,8 +14,9 @@
 // along with this program.  If not, see <http://gnu.org/licenses/gpl-2.0.txt>
 
 // To use this image viewer, first get image-magick development files
-// $ sudo aptitude install libmagick++-dev
+// $ sudo aptitude install libgraphicsmagick++-dev
 
+#include <assert.h>
 #include <math.h>
 #include <netdb.h>
 #include <stdio.h>
@@ -24,11 +25,11 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <assert.h>
 
-#include <vector>
 #include <Magick++.h>
 #include <magick/image.h>
+#include <vector>
+
 #include "udp-flaschen-taschen.h"
 
 namespace {
@@ -81,8 +82,8 @@ private:
 }  // end anonymous namespace
 
 // Load still image or animation.
-// Scale, so that it fits in "width" and "height" and store in "image_sequence".
-// If this is a still image, "image_sequence" will contain one image, otherwise
+// Scale, so that it fits in "width" and "height" and store in "result".
+// If this is a still image, "result" will contain one image, otherwise
 // all animation frames.
 static bool LoadAnimationAndScale(const char *filename,
                                   int target_width, int target_height,
@@ -115,6 +116,7 @@ static bool LoadAnimationAndScale(const char *filename,
     const int img_width = (int)image_sequence[0].columns();
     const int img_height = (int)image_sequence[0].rows();
     if (scroll) {
+        // In case of scrolling, we only want to scale down to height
         target_width = (int) (1.0*img_width * target_height / img_height);
     }
     fprintf(stderr, "Scale ... %dx%d -> %dx%d\n",
