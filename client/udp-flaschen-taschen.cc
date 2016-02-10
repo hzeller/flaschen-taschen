@@ -14,13 +14,14 @@
 
 #include "udp-flaschen-taschen.h"
 
+#include <assert.h>
 #include <netdb.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
 
 int OpenFlaschenTaschenSocket(const char *host) {
     struct addrinfo addr_hints = {0};
@@ -51,17 +52,27 @@ int OpenFlaschenTaschenSocket(const char *host) {
 
 UDPFlaschenTaschen::UDPFlaschenTaschen(int socket, int width, int height) 
     : fd_(socket), width_(width), height_(height),
-      buf_size_(width * height * 3), buffer_(new uint8_t [ buf_size_ ]) {
+      buf_size_(width * height * sizeof(Color)),
+      buffer_(new Color [ buf_size_ ]) {
     bzero(buffer_, buf_size_);
 }
 UDPFlaschenTaschen::~UDPFlaschenTaschen() { delete [] buffer_; }
 
-void UDPFlaschenTaschen::SetPixel(int x, int y, const Color &col) {
-    if (x < 0 || x >= width_ || y < 0 || y >= height_) return;
-    memcpy(buffer_ + 3 * (x + y * width_), &col, 3);
+void UDPFlaschenTaschen::Clear() {
+    bzero(buffer_, buf_size_);
 }
 
-void UDPFlaschenTaschen::UDPFlaschenTaschen::Send() {
-    if (write(fd_, buffer_, buf_size_) < 0) return;
+void UDPFlaschenTaschen::SetPixel(int x, int y, const Color &col) {
+    if (x < 0 || x >= width_ || y < 0 || y >= height_) return;
+    memcpy(buffer_ + x + y * width_, &col, sizeof(Color));
+}
+
+const Color &UDPFlaschenTaschen::GetPixel(int x, int y) {
+    return buffer_[(x % width_) + (y % height_) * width_];
+}
+
+void UDPFlaschenTaschen::UDPFlaschenTaschen::Send(int fd) {
+    // Some fudging to make the compiler shut up about non-used return value
+    if (write(fd, buffer_, buf_size_) < 0) return;
 }
 

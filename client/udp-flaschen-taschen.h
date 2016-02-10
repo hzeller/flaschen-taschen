@@ -26,21 +26,32 @@ int OpenFlaschenTaschenSocket(const char *host);
 // simple.
 class UDPFlaschenTaschen : public FlaschenTaschen {
 public:
+    // Create a canvas that can be sent to a FlaschenTaschen server.
+    // Socket can be -1, but then you have to use Send(int fd).
     UDPFlaschenTaschen(int socket, int width, int height);
     ~UDPFlaschenTaschen();
 
+    // -- FlaschenTaschen interface
     virtual int width() const { return width_; }
     virtual int height() const { return height_; }
 
     virtual void SetPixel(int x, int y, const Color &col);
-    virtual void Send();
+    // Send to file-descriptor given in constructor.
+    virtual void Send() { Send(fd_); } 
+
+    // -- additional features.
+    // Get pixel at given position. Coordinates outside the range are
+    // wrapped around.
+    void Clear();
+    const Color &GetPixel(int x, int y);
+    void Send(int fd);     // Send to given file-descriptor.
 
 private:
     const int fd_;
     const int width_;
     const int height_;
     const size_t buf_size_;
-    uint8_t *buffer_;
+    Color *buffer_;
 };
 
 #endif  // UDP_FLASCHEN_TASCHEN_H

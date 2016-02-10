@@ -24,7 +24,7 @@ struct Color {
     uint8_t r;
     uint8_t g;
     uint8_t b;
-};
+} __attribute((packed));
 
 // We have multiple implementations for FlaschenTaschen, using the
 // same general interface on server and client. Essentially a canvas.
