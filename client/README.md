@@ -28,6 +28,7 @@ The [simple-example.cc](./simple-example.cc) helps to get started.
 #define DISPLAY_HEIGHT 10
 
 int main() {
+    // Open socket and create our canvas.
     const int socket = OpenFlaschenTaschenSocket("flaschen-taschen.local");
     UDPFlaschenTaschen canvas(socket, DISPLAY_WIDTH, DISPLAY_HEIGHT);
 
