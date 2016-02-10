@@ -13,4 +13,4 @@ simple-example : simple-example.cc $(OBJECTS)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
 clean:
-	rm -f send-image
+	rm -f send-image simple-example
