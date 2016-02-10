@@ -14,6 +14,7 @@
 // Flaschen Taschen Server
 
 #include "servers.h"
+#include "led-flaschen-taschen.h"
 
 #include <unistd.h>
 #include <sys/types.h>

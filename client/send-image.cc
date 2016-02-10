@@ -29,6 +29,7 @@
 #include <vector>
 #include <Magick++.h>
 #include <magick/image.h>
+#include "udp-flaschen-taschen.h"
 
 namespace {
 // Frame already prepared as the buffer to be sent over so that animation
@@ -36,35 +37,35 @@ namespace {
 // animation delay.
 class PreprocessedFrame {
 public:
-    PreprocessedFrame(const Magick::Image &img, int width, int height) {
-        buffer_.resize(3 * height * width);
+    PreprocessedFrame(int socket, const Magick::Image &img,
+                      int width, int height)
+        : content_(socket, width, height) {
         assert(width >= (int) img.columns() && height >= (int) img.rows());
         int delay_time = img.animationDelay();  // in 1/100s of a second.
         if (delay_time < 1) delay_time = 1;
         delay_micros_ = delay_time * 10000;
 
-        std::string::iterator write_pos = buffer_.begin();
         for (size_t y = 0; y < img.rows(); ++y) {
             for (size_t x = 0; x < img.columns(); ++x) {
                 const Magick::Color &c = img.pixelColor(x, y);
-                if (c.alphaQuantum() < 256) {
-                    *(write_pos + 0) = ScaleQuantumToChar(c.redQuantum());
-                    *(write_pos + 1) = ScaleQuantumToChar(c.greenQuantum());
-                    *(write_pos + 2) = ScaleQuantumToChar(c.blueQuantum());
-                }
-                write_pos += 3;
+                if (c.alphaQuantum() >= 255)
+                    continue;
+                const ::Color ft_col(ScaleQuantumToChar(c.redQuantum()),
+                                     ScaleQuantumToChar(c.greenQuantum()),
+                                     ScaleQuantumToChar(c.blueQuantum()));
+                content_.SetPixel(x, y, ft_col);
             }
         }
     }
-
-    const std::string &data() const { return buffer_; }
+ 
+    void Send() { content_.Send(); }
 
     int delay_micros() const {
         return delay_micros_;
     }
 
 private:
-    std::string buffer_;
+    UDPFlaschenTaschen content_;
     int delay_micros_;
 };
 }  // end anonymous namespace
@@ -107,11 +108,8 @@ static void DisplayAnimation(const std::vector<PreprocessedFrame*> &frames,
                              int fd) {
     fprintf(stderr, "Display.\n");
     for (unsigned int i = 0; /*forever*/; ++i) {
-        const PreprocessedFrame *frame = frames[i % frames.size()];
-        if (write(fd, frame->data().data(), frame->data().size())
-            != (ssize_t)frame->data().size()) {
-            fprintf(stderr, "Couldn't send full image.");
-        }
+        PreprocessedFrame *frame = frames[i % frames.size()];
+        frame->Send();
         if (frames.size() == 1) {
             return;  // We are done.
         } else {
@@ -120,32 +118,6 @@ static void DisplayAnimation(const std::vector<PreprocessedFrame*> &frames,
     }
 }
 
-static int OpenUDPSocket(const char *host) {
-    struct addrinfo addr_hints = {0};
-    addr_hints.ai_family = AF_UNSPEC;
-    addr_hints.ai_socktype = SOCK_DGRAM;
-
-    struct addrinfo *addr_result = NULL;
-    int rc;
-    if ((rc = getaddrinfo(host, "1337", &addr_hints, &addr_result)) != 0) {
-        fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rc));
-        return -1;
-    }
-    if (addr_result == NULL)
-        return -1;
-    int fd = socket(addr_result->ai_family,
-                    addr_result->ai_socktype,
-                    addr_result->ai_protocol);
-    if (fd >= 0 &&
-        connect(fd, addr_result->ai_addr, addr_result->ai_addrlen) < 0) {
-        perror("connect()");
-        close(fd);
-        fd = -1;
-    }
-
-    freeaddrinfo(addr_result);
-    return fd;
-}
 
 static int usage(const char *progname) {
     fprintf(stderr, "usage: %s [options] <image>\n", progname);
@@ -189,7 +161,7 @@ int main(int argc, char *argv[]) {
         return usage(argv[0]);
     }
 
-    int fd = OpenUDPSocket(host);
+    int fd = OpenFlaschenTaschenSocket(host);
     if (fd < 0) {
         fprintf(stderr, "Cannot connect.");
         return 1;
@@ -203,7 +175,7 @@ int main(int argc, char *argv[]) {
 
     std::vector<PreprocessedFrame*> frames;
     for (size_t i = 0; i < sequence_pics.size(); ++i) {
-        frames.push_back(new PreprocessedFrame(sequence_pics[i],
+        frames.push_back(new PreprocessedFrame(fd, sequence_pics[i],
                                                width, height));
     }
 

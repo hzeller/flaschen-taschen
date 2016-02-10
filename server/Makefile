@@ -1,5 +1,5 @@
 
-INCLUDES=-I./rpi_ws281x
+INCLUDES=-I./rpi_ws281x -I../common
 WS2812LIB_OBJECTS=$(addprefix rpi_ws281x/, dma.o mailbox.o pwm.o rpihw.o ws2811.o)
 OBJECTS=ws28xx-flaschen-taschen.o lpd6803-flaschen-taschen.o ft-gpio.o thread.o
 SERVER_OBJECTS=opc-server.o udp-server.o pixel-push-server.o

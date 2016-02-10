@@ -1,4 +1,4 @@
-// -*- mode: cc; c-basic-offset: 4; indent-tabs-mode: nil; -*-
+// -*- mode: c++; c-basic-offset: 4; indent-tabs-mode: nil; -*-
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@
 #include <pthread.h>
 
 #include "servers.h"
+#include "flaschen-taschen.h"
 
 // public interface
 static int server_socket = -1;

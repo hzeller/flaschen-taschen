@@ -12,7 +12,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://gnu.org/licenses/gpl-2.0.txt>
 
-#include "flaschen-taschen.h"
+#include "led-flaschen-taschen.h"
 
 #include <stdint.h>
 #include <assert.h>

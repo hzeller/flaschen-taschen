@@ -1,4 +1,5 @@
 // -*- mode: c++; c-basic-offset: 4; indent-tabs-mode: nil; -*-
+//
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation version 2.
@@ -10,24 +11,32 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://gnu.org/licenses/gpl-2.0.txt>
-//
-// Various servers we support, all competing for the same display.
 
-#ifndef FT_SERVER_H
-#define FT_SERVER_H
+#ifndef FLASCHEN_TASCHEN_H_
+#define FLASCHEN_TASCHEN_H_
 
-class FlaschenTaschen;
+#include <stdint.h>
 
-#include "thread.h"
+struct Color {
+    Color() {}
+    Color(int rr, int gg, int bb) : r(rr), g(gg), b(bb){}
 
-bool opc_server_init(int port);
-void opc_server_run_blocking(FlaschenTaschen *display, ft::Mutex *mutex);
+    uint8_t r;
+    uint8_t g;
+    uint8_t b;
+};
 
-bool udp_server_init(int port);
-void udp_server_run_blocking(FlaschenTaschen *display, ft::Mutex *mutex);
+// We have multiple implementations for FlaschenTaschen, using the
+// same general interface on server and client. Essentially a canvas.
+class FlaschenTaschen {
+public:
+    virtual ~FlaschenTaschen(){}
 
-bool pixel_pusher_init(FlaschenTaschen *canvas);
-void pixel_pusher_run_threads(FlaschenTaschen *display, ft::Mutex *mutex);
+    virtual int width() const = 0;
+    virtual int height() const = 0;
 
-#endif // OPC_SERVER_H
+    virtual void SetPixel(int x, int y, const Color &col) = 0;
+    virtual void Send() = 0;
+};
 
+#endif // FLASCHEN_TASCHEN_H_
