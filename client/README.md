@@ -15,3 +15,27 @@ This directory provides:
 $ sudo aptitude install libmagick++-dev  # we need these devel libs
 $ make
 ```
+
+Example Code
+============
+
+The [simple-example.cc](./simple-example.cc) helps to get started.
+
+```c++
+#include "udp-flaschen-taschen.h"
+
+#define DISPLAY_WIDTH 10
+#define DISPLAY_HEIGHT 10
+
+int main() {
+    int socket = OpenFlaschenTaschenSocket("flaschen-taschen.local");
+    UDPFlaschenTaschen canvas(socket, DISPLAY_WIDTH, DISPLAY_HEIGHT);
+
+    Color red(255, 0, 0);
+    Color blue(0, 0, 255);
+    canvas.SetPixel(0, 0, red);
+    canvas.SetPixel(5, 5, blue);
+
+    canvas.Send();
+}
+```
