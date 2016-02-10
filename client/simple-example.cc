@@ -16,5 +16,5 @@ int main() {
     canvas.SetPixel(0, 0, red);              // Sample with color variable.
     canvas.SetPixel(5, 5, Color(0, 0, 255)); // or just use inline (here: blue).
 
-    canvas.Send();
+    canvas.Send();                           // Send the framebuffer.
 }
