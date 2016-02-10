@@ -40,9 +40,10 @@ public:
     virtual void Send() { Send(fd_); } 
 
     // -- additional features.
+    void Clear();
+
     // Get pixel at given position. Coordinates outside the range are
     // wrapped around.
-    void Clear();
     const Color &GetPixel(int x, int y);
     void Send(int fd);     // Send to given file-descriptor.
 
