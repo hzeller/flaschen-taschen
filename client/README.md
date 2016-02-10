@@ -31,7 +31,7 @@ int main() {
     const int socket = OpenFlaschenTaschenSocket("flaschen-taschen.local");
     UDPFlaschenTaschen canvas(socket, DISPLAY_WIDTH, DISPLAY_HEIGHT);
 
-    Color red(255, 0, 0);
+    const Color red(255, 0, 0);
     canvas.SetPixel(0, 0, red);              // Sample with color variable.
     canvas.SetPixel(5, 5, Color(0, 0, 255)); // or just use inline (here: blue).
 
