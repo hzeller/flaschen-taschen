@@ -12,7 +12,7 @@ This directory provides:
   * (more TBD. Pull requests encouraged, hint hint...)
 
 ```bash
-$ sudo aptitude install libmagick++-dev  # we need these devel libs
+$ sudo aptitude install libgraphicsmagick++-dev libwebp-dev  # we need these devel libs
 $ make
 ```
 
