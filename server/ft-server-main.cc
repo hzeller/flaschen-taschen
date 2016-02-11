@@ -23,6 +23,9 @@
 #include <stdio.h>
 #include <unistd.h>
 
+// Demo RGB demo matrix to play with until the 'big' system is there.
+#define DEMO_RGB 1
+
 #define LPD_STRIP_GPIO 11
 
 #define DROP_PRIV_USER "daemon"
@@ -64,6 +67,9 @@ private:
 };
 
 int main(int argc, const char *argv[]) {
+#if DEMO_RGB
+    RGBMatrixFlaschenTaschen display(0, 0, 45, 32);
+#else
     // TODO(hzeller): remove hardcodedness, provide flags
     WS2811FlaschenTaschen top_display(10, 5);
     LPD6803FlaschenTaschen bottom_display(LPD_STRIP_GPIO, 10, 5);
@@ -72,20 +78,22 @@ int main(int argc, const char *argv[]) {
     bottom_display.SetColorCorrect(1.0, 0.8, 0.8);
 
     StackedFlaschenTaschen display(&top_display, &bottom_display);
-    display.Send();  // Initialize with some black background.
+#endif
 
     opc_server_init(7890);
     pixel_pusher_init(&display);
     udp_server_init(1337);
 
+    if (daemon(0, 0) != 0) {  // Become daemon. TODO: maybe dependent on flag.
+        fprintf(stderr, "Failed to become daemon");
+    }
+
+    display.Send();  // Initialize with some black background.
+
     // After hardware is set up and all servers are listening, we can
     // drop the privileges.
     if (!drop_privs(DROP_PRIV_USER, DROP_PRIV_GROUP))
         return 1;
-
-    if (daemon(0, 0) != 0) {  // Become daemon. TODO: maybe dependent on flag.
-        fprintf(stderr, "Failed to become daemon");
-    }
 
     ft::Mutex mutex;
 

@@ -83,4 +83,30 @@ private:
     float r_correct, g_correct, b_correct;
 };
 
+namespace rgb_matrix {
+class RGBMatrix;
+}
+
+class RGBMatrixFlaschenTaschen : public FlaschenTaschen {
+public:
+    RGBMatrixFlaschenTaschen(int offset_x, int offset_y,
+                             int width, int heigh);
+    virtual ~RGBMatrixFlaschenTaschen();
+
+    int width() const { return width_; }
+    int height() const { return height_; }
+
+    void SetPixel(int x, int y, const Color &col);
+    void Send();
+
+private:
+    const int off_x_;
+    const int off_y_;
+    const int width_;
+    const int height_;
+
+    rgb_matrix::RGBMatrix *matrix_;
+    bool is_initialized_;
+};
+
 #endif // LED_FLASCHEN_TASCHEN_H_
