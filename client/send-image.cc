@@ -164,7 +164,7 @@ static int usage(const char *progname) {
     fprintf(stderr, "usage: %s [options] <image>\n", progname);
     fprintf(stderr, "Options:\n"
             "\t-D <width>x<height> : Output dimension. Default 10x10\n"
-            "\t-h <host>           : host (default: flaschen-taschen.local\n"
+            "\t-h <host>           : host (default: flaschen-taschen.local)\n"
             "\t-s                  : scroll horizontally.\n");
     return 1;
 }

@@ -1,15 +1,16 @@
 Noisebridge Flaschen Taschen Project
 ====================================
 
-Software for [FlaschenTaschen].
+![](./img/flaschen-taschen-logo.jpg)
+
+Software for [FlaschenTaschen]. Inspired by [MateLight].
 
 Current hardware setup on the Raspberry Pi (should work on Pi-1 or Pi-2).
 
  * Top Display: *WS2811* strip to GPIO 18 (pin 12)
  * Bottom Display: *LPD6803* strip: clk on GPIO 17 (pin 11); data on GPIO 11 (pin 23)
 
-Build Instructions
-==================
+## Build Instructions
 
 Note: This project uses a git submodule for controlling ws28xx from the Raspberry Pi software by [jgarf](https://github.com/jgarff/rpi_ws281x)
 
@@ -29,17 +30,15 @@ If you are reading this after cloning and forget to clone recursively, you can j
 $ git submodule update --init
 ```
 
-Operating Instructions
-======================
+## Operating Instructions
 
 The Flaschen-Taschen server `ft-server` becomes a daemon (also it drops
 privileges to daemon:daemon). Kill the hard way with `sudo killall ft-server`
 
-Getting Pixels on Flaschen Taschen
-==================================
+## Getting Pixels on Flaschen Taschen
 
 To make it simple to illuminate the matrix, there are _three_ protocols that
-are all supported at the same time:
+are all supported:
 
  * Receives UDP packet on port 1337 interpreted as framebuffer (RGBRGB...)
    (Simulated layout standard left-right, top-bottom framebuffer expected). Easy
@@ -80,3 +79,4 @@ You find more in the [client/ directory](./client) to directly send
 content to the server.
 
 [FlaschenTaschen]: https://noisebridge.net/wiki/Flaschen_Taschen
+[MateLight]: https://github.com/jaseg/matelight
