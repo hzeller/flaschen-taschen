@@ -25,7 +25,7 @@ make send-image
 ```
 usage: ./send-image [options] <image>
 Options:
-        -D <width>x<height> : Output dimension. Default 10x10
+        -D <width>x<height> : Output dimension. Default 20x20
         -h <host>           : host (default: flaschen-taschen.local)
         -s                  : scroll horizontally.
 ```
@@ -65,8 +65,8 @@ For C++, there is a simple implementation of such a 'client display', the
 ```c++
 #include "udp-flaschen-taschen.h"
 
-#define DISPLAY_WIDTH  10
-#define DISPLAY_HEIGHT 10
+#define DISPLAY_WIDTH  20
+#define DISPLAY_HEIGHT 20
 
 int main() {
     // Open socket and create our canvas.
