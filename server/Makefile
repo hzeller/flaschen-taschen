@@ -1,7 +1,7 @@
 
 INCLUDES=-I./rpi_ws281x -I../common
 WS2812LIB_OBJECTS=$(addprefix rpi_ws281x/, dma.o mailbox.o pwm.o rpihw.o ws2811.o)
-OBJECTS=ws28xx-flaschen-taschen.o lpd6803-flaschen-taschen.o ft-gpio.o thread.o multi-spi.o
+OBJECTS=ws2811-flaschen-taschen.o lpd6803-flaschen-taschen.o ft-gpio.o thread.o multi-spi.o
 SERVER_OBJECTS=opc-server.o udp-server.o pixel-push-server.o
 
 CFLAGS=-Wall -O3 $(INCLUDES)
