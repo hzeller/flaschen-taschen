@@ -30,7 +30,7 @@ public:
     // "serial_bytes_per_stream" define the length of the transmission in
     // each stream. This creates the necessary buffers for streams, all
     // initialized to zero.
-    MultiSPI(int clock_gpio, size_t serial_bytes_per_stream);
+    explicit MultiSPI(int clock_gpio);
     ~MultiSPI();
 
     // Bytes per stream.
@@ -38,7 +38,7 @@ public:
 
     // Register a new data stream for the given GPIO. The SPI data is
     // sent with the common clock and this gpio pin.
-    bool RegisterDataGPIO(int gpio);
+    bool RegisterDataGPIO(int gpio, size_t serial_byte_size);
 
     // Set data byte for given gpio channel at given position in the
     // stream. "pos" needs to be in range [0 .. serial_bytes_per_stream)
@@ -49,9 +49,11 @@ public:
     void SendBuffers();
     
 private:
+    void UpdateBufferSize(size_t s);
+
     ft::GPIO gpio_;
     const int clock_gpio_;
-    const size_t size_;
+    size_t size_;
     bool any_change_;
     uint32_t *gpio_data_;
 };

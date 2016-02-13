@@ -163,7 +163,7 @@ void DisplayAnimation(const std::vector<PreprocessedFrame*> &frames,
 static int usage(const char *progname) {
     fprintf(stderr, "usage: %s [options] <image>\n", progname);
     fprintf(stderr, "Options:\n"
-            "\t-D <width>x<height> : Output dimension. Default 10x10\n"
+            "\t-D <width>x<height> : Output dimension. Default 20x20\n"
             "\t-h <host>           : host (default: flaschen-taschen.local)\n"
             "\t-s                  : scroll horizontally.\n");
     return 1;
@@ -173,8 +173,8 @@ int main(int argc, char *argv[]) {
     Magick::InitializeMagick(*argv);
 
     bool scroll = false;
-    int width = 10;
-    int height = 10;
+    int width = 20;
+    int height = 20;
     const char *host = "flaschen-taschen.local";
 
     int opt;

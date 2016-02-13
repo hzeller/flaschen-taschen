@@ -17,21 +17,43 @@
 
 #include <assert.h>
 #include <strings.h>
+#include <algorithm>
+#include <stdlib.h>
+#include <stdio.h>
 
-MultiSPI::MultiSPI(int clock_gpio, size_t serial_bytes) 
-    : clock_gpio_(clock_gpio), size_(serial_bytes), any_change_(true),
-      gpio_data_(new uint32_t[serial_bytes * 8]) {
+MultiSPI::MultiSPI(int clock_gpio)
+    : clock_gpio_(clock_gpio), size_(0), any_change_(true),
+      gpio_data_(NULL) {
     bool success = gpio_.Init();
     assert(success);  // gpio couldn't be initialized
-    success = RegisterDataGPIO(clock_gpio);
+    success = gpio_.AddOutput(clock_gpio);
     assert(success);  // clock pin not valid
-    bzero(gpio_data_, serial_bytes * 8);
 }
 
-MultiSPI::~MultiSPI() { delete [] gpio_data_; }
+MultiSPI::~MultiSPI() {
+    free(gpio_data_);
+}
 
-bool MultiSPI::RegisterDataGPIO(int gpio) {
+bool MultiSPI::RegisterDataGPIO(int gpio, size_t serial_byte_size) {
+    UpdateBufferSize(serial_byte_size);
     return gpio_.AddOutput(gpio);
+}
+
+void MultiSPI::UpdateBufferSize(size_t requested_size) {
+    if (requested_size == 0) return;
+    // Each bit requires one word to allocate.
+    const size_t memsize = sizeof(uint32_t) * requested_size * 8;
+    if (gpio_data_ == NULL) {
+        fprintf(stderr, "alloc %d \n", (int) memsize);
+        gpio_data_ = (uint32_t*) malloc(memsize);
+        bzero(gpio_data_, memsize);
+        size_ = requested_size;
+    } else if (requested_size > size_) {
+        gpio_data_ = (uint32_t*) realloc(gpio_data_, memsize);
+        const size_t oldsize = sizeof(uint32_t) * size_ * 8;
+        bzero((uint8_t*)gpio_data_ + oldsize, memsize - oldsize);
+        size_ = requested_size;
+    }
 }
 
 void MultiSPI::SetBufferedByte(int data_gpio, size_t pos, uint8_t data) {
@@ -51,7 +73,7 @@ void MultiSPI::SendBuffers() {
     // Hack to work around that there might be multiple displays sending
     // this.
     if (!any_change_) return;
-    const int kSlowdownGPIOFactor = 5;
+    const int kSlowdownGPIOFactor = 20;  // Janky connection currently.
     uint32_t *end = gpio_data_ + 8 * size_;
     for (uint32_t *data = gpio_data_; data < end; ++data) {
         uint32_t d = *data;

@@ -22,38 +22,28 @@
 
 #include "multi-spi.h"
 
-// Pin 11 on Pi
-#define MULTI_SPI_COMMON_CLOCK 17
-
-// Shared singleton. First display initializes it.
-static MultiSPI *multi_spi = NULL;
-
-LPD6803FlaschenTaschen::LPD6803FlaschenTaschen(int gpio, int width, int height)
-    : gpio_pin_(gpio), width_(width), height_(height),
+LPD6803FlaschenTaschen::LPD6803FlaschenTaschen(MultiSPI *spi, int gpio,
+                                               int crate_stack_height)
+    : spi_(spi), gpio_pin_(gpio), height_(crate_stack_height * 5),
       r_correct(1), g_correct(1), b_correct(1) {
     // 2 byts per pixel, 4 bytes start sequence, 4 bytes end-sequence
-    const size_t bytes_needed = 4 + 2 * width * height + 4;
-    // TODO(hzeller): Initialization should happen somewhere in main.
-    if (multi_spi == NULL) {
-        multi_spi = new MultiSPI(MULTI_SPI_COMMON_CLOCK, bytes_needed);
-    } else {
-        // The MultiSPI is initialized by first, but we need to have space for
-        // longest strip. Just make sure that all are the same length for now.
-        assert(multi_spi->serial_byte_size() == bytes_needed);
-    }
-    if (!multi_spi->RegisterDataGPIO(gpio_pin_)) {
+    int width = 5;
+    const size_t bytes_needed = 4 + 2 * width * height_ + 4;
+    
+    if (!spi_->RegisterDataGPIO(gpio_pin_, bytes_needed)) {
         fprintf(stderr, "Couldn't register gpio %d\n", gpio);
         assert(false);
     }
+
     // Four zero bytes as start-bytes for lpd6803
-    multi_spi->SetBufferedByte(gpio_pin_, 0, 0x00);
-    multi_spi->SetBufferedByte(gpio_pin_, 1, 0x00);
-    multi_spi->SetBufferedByte(gpio_pin_, 2, 0x00);
-    multi_spi->SetBufferedByte(gpio_pin_, 3, 0x00);
+    spi_->SetBufferedByte(gpio_pin_, 0, 0x00);
+    spi_->SetBufferedByte(gpio_pin_, 1, 0x00);
+    spi_->SetBufferedByte(gpio_pin_, 2, 0x00);
+    spi_->SetBufferedByte(gpio_pin_, 3, 0x00);
 
     // Initialize all the pixel-bits (upper bit per 16bit value set)
     Color black(0,0,0);
-    for (int x = 0; x < width_; x++) {
+    for (int x = 0; x < 5; x++) {
         for (int y = 0; y < height_; ++y) {
             SetPixel(x, y, black);
         }
@@ -66,14 +56,9 @@ void LPD6803FlaschenTaschen::SetPixel(int x, int y, const Color &col) {
     if (x < 0 || x >= width() || y < 0 || y >= height())
         return;
 
-    // Our boxes are upside down somewhat currently. Correct :)
-    x = width() - x - 1;
-    y = height() - y - 1;
-
-    // Zig-zag assignment of our strips, so every other column has the
-    // y-offset reverse.
-    int y_off = y % height_;
-    int pos = (x * height_) + ((x % 2 == 0) ? y_off : (height_-1) - y_off);
+    const int crate = y / 5;
+    y = y % 5;
+    int pos = 25 * crate + kCrateMapping[4-y][x];
     
     const int r = r_correct * col.r;
     const int g = g_correct * col.g;
@@ -84,10 +69,6 @@ void LPD6803FlaschenTaschen::SetPixel(int x, int y, const Color &col) {
     data |= ((g >> 3) & 0x1F) <<  5;
     data |= ((b >> 3) & 0x1F) <<  0;
 
-    multi_spi->SetBufferedByte(gpio_pin_, 2 * pos + 4 + 0, data >> 8);
-    multi_spi->SetBufferedByte(gpio_pin_, 2 * pos + 4 + 1, data & 0xFF);
-}
-
-void LPD6803FlaschenTaschen::Send() {
-    multi_spi->SendBuffers();
+    spi_->SetBufferedByte(gpio_pin_, 2 * pos + 4 + 0, data >> 8);
+    spi_->SetBufferedByte(gpio_pin_, 2 * pos + 4 + 1, data & 0xFF);
 }

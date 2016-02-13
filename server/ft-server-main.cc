@@ -15,6 +15,7 @@
 
 #include "servers.h"
 #include "led-flaschen-taschen.h"
+#include "multi-spi.h"
 
 #include <unistd.h>
 #include <sys/types.h>
@@ -23,7 +24,13 @@
 #include <stdio.h>
 #include <unistd.h>
 
+// Pin 11 on Pi
+#define MULTI_SPI_COMMON_CLOCK 17
+
 #define LPD_STRIP_GPIO 11
+#define WS_R0_STRIP_GPIO 8
+#define WS_R1_STRIP_GPIO 7
+#define WS_R2_STRIP_GPIO 10
 
 #define DROP_PRIV_USER "daemon"
 #define DROP_PRIV_GROUP "daemon"
@@ -64,15 +71,13 @@ private:
 };
 
 int main(int argc, const char *argv[]) {
-    // TODO(hzeller): remove hardcodedness, provide flags
-    WS2811FlaschenTaschen top_display(10, 5);
-    LPD6803FlaschenTaschen bottom_display(LPD_STRIP_GPIO, 10, 5);
-
-    // Our LPD6803 look a little blue-greenish.
-    bottom_display.SetColorCorrect(1.0, 0.8, 0.8);
-
-    StackedFlaschenTaschen display(&top_display, &bottom_display);
-    display.Send();  // Initialize with some black background.
+    MultiSPI spi(MULTI_SPI_COMMON_CLOCK);
+    ColumnAssembly display(&spi);
+    // From right to left.
+    display.AddColumn(new WS2801FlaschenTaschen(&spi, WS_R0_STRIP_GPIO, 2));
+    display.AddColumn(new WS2801FlaschenTaschen(&spi, WS_R1_STRIP_GPIO, 4));
+    display.AddColumn(new WS2811FlaschenTaschen(2));
+    display.AddColumn(new LPD6803FlaschenTaschen(&spi, LPD_STRIP_GPIO, 2));
 
     opc_server_init(7890);
     pixel_pusher_init(&display);
@@ -87,6 +92,9 @@ int main(int argc, const char *argv[]) {
         fprintf(stderr, "Failed to become daemon");
     }
 
+    display.Send();  // clear.
+
+    fprintf(stderr, "Size: %dx%d\n", display.width(), display.height());
     ft::Mutex mutex;
 
     OPCThread opc_thread(&display, &mutex);
