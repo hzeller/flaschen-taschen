@@ -5,13 +5,14 @@ Noisebridge Flaschen Taschen Project
 
 Software for [FlaschenTaschen].
 
-FlaschenTaschn is Inspired by [MateLight]: a bunch of us have
+FlaschenTaschn is inspired by [MateLight]: a bunch of us have
 seen Mate Light in action at 32c3 and got excited :)
-So our Noisebridge interpretation of it has a German inspired name.
-Unfortunately, in the US, bottle reuse is not at
-all a thing, so there are no standardized crates with bottles you can buy.
-So we use milk crates (which is a thing) and put common, clear bottles in
-12oz (355ml) (Mate, Corona,..) inside. Wrapped in aluminum foil, they
+So our Noisebridge interpretation of it has a German influenced name.
+
+Unfortunately, in the US, bottle reuse is not at all a thing, so there
+are no standardized crates with bottles you can buy.
+So we use milk crates (which is a thing) and put common, clear 12oz (355ml)
+bottles in (Mate, Corona,..) inside. Wrapped in aluminum foil, they
 make nice pixels.
 
 Right now, we're playing with multiple different types of strips to settle
