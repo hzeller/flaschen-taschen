@@ -71,6 +71,9 @@ private:
 };
 
 int main(int argc, const char *argv[]) {
+#if DEMO_RGB
+    RGBMatrixFlaschenTaschen display(0, 0, 45, 32);
+#else
     MultiSPI spi(MULTI_SPI_COMMON_CLOCK);
     ColumnAssembly display(&spi);
     // From right to left.
@@ -78,7 +81,7 @@ int main(int argc, const char *argv[]) {
     display.AddColumn(new WS2801FlaschenTaschen(&spi, WS_R1_STRIP_GPIO, 4));
     display.AddColumn(new WS2811FlaschenTaschen(2));
     display.AddColumn(new LPD6803FlaschenTaschen(&spi, LPD_STRIP_GPIO, 2));
-
+#endif
     opc_server_init(7890);
     pixel_pusher_init(&display);
     udp_server_init(1337);
@@ -92,9 +95,12 @@ int main(int argc, const char *argv[]) {
         fprintf(stderr, "Failed to become daemon");
     }
 
-    display.Send();  // clear.
+#if DEMO_RGB
+    display.PostDaemonInit();
+#endif
 
-    fprintf(stderr, "Size: %dx%d\n", display.width(), display.height());
+    display.Send();  // Clear screen.
+
     ft::Mutex mutex;
 
     OPCThread opc_thread(&display, &mutex);

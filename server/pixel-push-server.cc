@@ -2,7 +2,7 @@
 //  PixelPusher protocol implementation for LED matrix
 //
 //  Copyright (C) 2013 Henner Zeller <h.zeller@acm.org>
-//    
+//
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation; either version 3 of the License, or
@@ -36,7 +36,7 @@
 #include <algorithm>
 
 #include "flaschen-taschen.h"
-#include "thread.h"
+#include "ft-thread.h"
 #include "pixel-push-discovery.h"
 
 using namespace ft;
@@ -152,7 +152,7 @@ public:
         fprintf(stderr, PXP "discovery packet size: %zd\n",
                 discovery_packet_size_);
     }
-  
+
     virtual ~Beacon() {
         Stop();
         delete [] discovery_packet_buffer_;
@@ -244,7 +244,7 @@ public:
             uint8_t strip_index;
             Pixel pixel[0];
         };
-    
+
         int s;
         if ((s = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0) {
             perror("creating listen socket");
@@ -315,7 +315,7 @@ public:
         }
         delete [] packet_buffer;
     }
-  
+
 private:
     FlaschenTaschen *const matrix_;
     Mutex *const display_mutex_;
@@ -359,7 +359,7 @@ bool pixel_pusher_init(FlaschenTaschen *canvas) {
     fprintf(stderr, PXP "Display: %dx%d (%d pixels each on %d strips)\n"
             "Accepting max %d strips per packet.\n",
             pixels_per_strip, number_of_strips,
-            pixels_per_strip, number_of_strips, 
+            pixels_per_strip, number_of_strips,
             pixel_pusher_container.base->max_strips_per_packet);
     pixel_pusher_container.base->power_total = 1;         // ?
     pixel_pusher_container.base->update_period = 1000;   // initial assumption.

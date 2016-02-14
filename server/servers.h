@@ -18,7 +18,7 @@
 
 class FlaschenTaschen;
 
-#include "thread.h"
+#include "ft-thread.h"
 
 bool opc_server_init(int port);
 void opc_server_run_blocking(FlaschenTaschen *display, ft::Mutex *mutex);
@@ -30,4 +30,3 @@ bool pixel_pusher_init(FlaschenTaschen *canvas);
 void pixel_pusher_run_threads(FlaschenTaschen *display, ft::Mutex *mutex);
 
 #endif // OPC_SERVER_H
-
