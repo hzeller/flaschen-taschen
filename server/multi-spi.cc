@@ -22,8 +22,7 @@
 #include <stdio.h>
 
 MultiSPI::MultiSPI(int clock_gpio)
-    : clock_gpio_(clock_gpio), size_(0), any_change_(true),
-      gpio_data_(NULL) {
+    : clock_gpio_(clock_gpio), size_(0), gpio_data_(NULL) {
     bool success = gpio_.Init();
     assert(success);  // gpio couldn't be initialized
     success = gpio_.AddOutput(clock_gpio);
@@ -66,13 +65,9 @@ void MultiSPI::SetBufferedByte(int data_gpio, size_t pos, uint8_t data) {
             *buffer_pos &= ~(1 << data_gpio);
         }
     }
-    any_change_ = true;
 }
 
 void MultiSPI::SendBuffers() {
-    // Hack to work around that there might be multiple displays sending
-    // this.
-    if (!any_change_) return;
     const int kSlowdownGPIOFactor = 20;  // Janky connection currently.
     uint32_t *end = gpio_data_ + 8 * size_;
     for (uint32_t *data = gpio_data_; data < end; ++data) {
@@ -83,6 +78,5 @@ void MultiSPI::SendBuffers() {
         for (int i = 0; i < kSlowdownGPIOFactor; ++i) gpio_.Write(d);
     }
     gpio_.Write(0);  // Reset clock.
-    any_change_ = false;
 }
 
