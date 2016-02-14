@@ -5,8 +5,8 @@
 
 #include "udp-flaschen-taschen.h"
 
-#define DISPLAY_WIDTH  10
-#define DISPLAY_HEIGHT 10
+#define DISPLAY_WIDTH  20
+#define DISPLAY_HEIGHT 20
 
 int main() {
     // Open socket and create our canvas.

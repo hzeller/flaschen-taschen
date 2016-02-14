@@ -17,38 +17,21 @@
 
 #include "flaschen-taschen.h"
 
-class StackedFlaschenTaschen : public FlaschenTaschen {
+#include <vector>
+
+// Crate mapping. Strip position at kCrateMapping[4-y][x]
+extern int kCrateMapping[5][5];
+
+class MultiSPI;
+
+class ColumnAssembly : public FlaschenTaschen {
 public:
-    StackedFlaschenTaschen(FlaschenTaschen *top, FlaschenTaschen *bottom)
-        : top_(top), bottom_(bottom) {
-    }
+    ColumnAssembly(MultiSPI *spi);
+    ~ColumnAssembly();
 
-    int width() const { return top_->width(); }
-    int height() const { return top_->height() + bottom_->height(); }
-
-    void SetPixel(int x, int y, const Color &col) {
-        if (y >= top_->height()) {
-            bottom_->SetPixel(x, y - top_->height(), col);
-        } else {
-            top_->SetPixel(x, y, col);
-        }
-    }
-
-    void Send() {
-        top_->Send();
-        bottom_->Send();
-    }
-
-private:
-    FlaschenTaschen *const top_;
-    FlaschenTaschen *const bottom_;
-};
-
-// Needs to be connected to GPIO 18 (pin 12 on RPi header)
-class WS2811FlaschenTaschen : public FlaschenTaschen {
-public:
-    WS2811FlaschenTaschen(int width, int height);
-    virtual ~WS2811FlaschenTaschen();
+    // Add column. Takes over ownership of column.
+    // Columns have been added right to left.
+    void AddColumn(FlaschenTaschen *taschen);
 
     int width() const { return width_; }
     int height() const { return height_; }
@@ -57,28 +40,67 @@ public:
     void Send();
 
 private:
-    const int width_;
+    MultiSPI *const spi_;
+    std::vector<FlaschenTaschen*> columns_;
+    int width_;
+    int height_;
+};
+
+// SPI-based ws28 led driver. This represents one column. Unlike the
+// final display, x-coordinates go right-to-left, and bottom to up.
+// The final assembly will turn things around.
+class WS2801FlaschenTaschen : public FlaschenTaschen {
+public:
+    WS2801FlaschenTaschen(MultiSPI *spi, int gpio, int crate_stack_height);
+
+    int width() const { return 5; }
+    int height() const { return height_; }
+
+    void SetPixel(int x, int y, const Color &col);
+    void Send() {}  // This happens in SPI sending.
+
+private:
+    MultiSPI *const spi_;
+    const int gpio_pin_;
+    const int height_;
+};
+
+// -- experimental other strips.
+
+// Needs to be connected to GPIO 18 (pin 12 on RPi header)
+class WS2811FlaschenTaschen : public FlaschenTaschen {
+public:
+    WS2811FlaschenTaschen(int crate_stack_height);
+    virtual ~WS2811FlaschenTaschen();
+
+    int width() const { return 5; }
+    int height() const { return height_; }
+
+    void SetPixel(int x, int y, const Color &col);
+    void Send();
+
+private:
     const int height_;
 };
 
 // CLK is GPIO 17 (RPI header pin 11). Rest of pin user chosen.
 class LPD6803FlaschenTaschen : public FlaschenTaschen {
 public:
-    LPD6803FlaschenTaschen(int gpio, int width, int height);
+    LPD6803FlaschenTaschen(MultiSPI *spi, int gpio, int crate_stack_height);
     virtual ~LPD6803FlaschenTaschen();
 
-    int width() const { return width_; }
+    int width() const { return 5; }
     int height() const { return height_; }
 
     void SetPixel(int x, int y, const Color &col);
-    void Send();
+    void Send() {}  // Done by ColumnAssembly
 
     void SetColorCorrect(float r, float g, float b) {
         r_correct = r; g_correct = g; b_correct = b;
     }
 private:
+    MultiSPI *const spi_;
     const int gpio_pin_;
-    const int width_;
     const int height_;
     float r_correct, g_correct, b_correct;
 };

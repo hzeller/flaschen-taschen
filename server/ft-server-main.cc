@@ -15,6 +15,7 @@
 
 #include "servers.h"
 #include "led-flaschen-taschen.h"
+#include "multi-spi.h"
 
 #include <unistd.h>
 #include <sys/types.h>
@@ -24,9 +25,16 @@
 #include <unistd.h>
 
 // Demo RGB demo matrix to play with until the 'big' system is there.
+// 1 for RGB, 0 for rest.
 #define DEMO_RGB 1
 
+// Pin 11 on Pi
+#define MULTI_SPI_COMMON_CLOCK 17
+
 #define LPD_STRIP_GPIO 11
+#define WS_R0_STRIP_GPIO 8
+#define WS_R1_STRIP_GPIO 7
+#define WS_R2_STRIP_GPIO 10
 
 #define DROP_PRIV_USER "daemon"
 #define DROP_PRIV_GROUP "daemon"
@@ -70,36 +78,35 @@ int main(int argc, const char *argv[]) {
 #if DEMO_RGB
     RGBMatrixFlaschenTaschen display(0, 0, 45, 32);
 #else
-    // TODO(hzeller): remove hardcodedness, provide flags
-    WS2811FlaschenTaschen top_display(10, 5);
-    LPD6803FlaschenTaschen bottom_display(LPD_STRIP_GPIO, 10, 5);
-
-    // Our LPD6803 look a little blue-greenish.
-    bottom_display.SetColorCorrect(1.0, 0.8, 0.8);
-
-    StackedFlaschenTaschen display(&top_display, &bottom_display);
+    MultiSPI spi(MULTI_SPI_COMMON_CLOCK);
+    ColumnAssembly display(&spi);
+    // From right to left.
+    display.AddColumn(new WS2801FlaschenTaschen(&spi, WS_R0_STRIP_GPIO, 2));
+    display.AddColumn(new WS2801FlaschenTaschen(&spi, WS_R1_STRIP_GPIO, 4));
+    display.AddColumn(new WS2811FlaschenTaschen(2));
+    display.AddColumn(new LPD6803FlaschenTaschen(&spi, LPD_STRIP_GPIO, 2));
 #endif
-
     opc_server_init(7890);
     pixel_pusher_init(&display);
     udp_server_init(1337);
 
-    if (daemon(0, 0) != 0) {  // Become daemon. TODO: maybe dependent on flag.
+    // After hardware is set up and all servers are listening, we can
+    // drop the privileges.
+    if (true && !drop_privs(DROP_PRIV_USER, DROP_PRIV_GROUP))
+        return 1;
+
+    if (true && daemon(0, 0) != 0) {  // Become daemon. TODO: maybe dependent on flag.
         fprintf(stderr, "Failed to become daemon");
     }
 
-    display.Send();  // Initialize with some black background.
-
-    // After hardware is set up and all servers are listening, we can
-    // drop the privileges.
-    if (!drop_privs(DROP_PRIV_USER, DROP_PRIV_GROUP))
-        return 1;
+    display.Send();  // Clear screen.
 
     ft::Mutex mutex;
-
+#if 1
     OPCThread opc_thread(&display, &mutex);
     opc_thread.Start();
     pixel_pusher_run_threads(&display, &mutex);
 
     udp_server_run_blocking(&display, &mutex);  // last server blocks.
+#endif
 }

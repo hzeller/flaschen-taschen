@@ -25,13 +25,13 @@
 
 static ws2811_t ledstrings = {0};
 
-WS2811FlaschenTaschen::WS2811FlaschenTaschen(int width, int height)
-    : width_(width), height_(height) {
+WS2811FlaschenTaschen::WS2811FlaschenTaschen(int crate_stack_height)
+    : height_(5 * crate_stack_height) {
     const int channel = 0;
     ledstrings.freq = TARGET_FREQ;
     ledstrings.dmanum = DMA_CHANNEL;
     ledstrings.channel[channel].gpionum = GPIO_PIN;  // TODO: channel-config
-    ledstrings.channel[channel].count = width * height;
+    ledstrings.channel[channel].count = 5 * height_;
     ledstrings.channel[channel].brightness = 255;
     
     assert(ws2811_init(&ledstrings) == 0);
@@ -45,14 +45,9 @@ void WS2811FlaschenTaschen::SetPixel(int x, int y, const Color &col) {
     if (x < 0 || x >= width() || y < 0 || y >= height())
         return;
 
-    // Our boxes are upside down somewhat currently. Correct :)
-    x = width() - x - 1;
-    y = height() - y - 1;
-
-    // Zig-zag assignment of our strips, so every other column has the
-    // y-offset reverse.
-    int y_off = y % height_;
-    int pos = (x * height_) + ((x % 2 == 0) ? y_off : (height_-1) - y_off);
+    const int crate = y / 5;
+    y = y % 5;
+    const int pos = 25 * crate + kCrateMapping[4-y][x];
 
     // Our strip has swapped colors.
     const ws2811_led_t strip_color = col.g << 16 | col.r << 8 | col.b;
