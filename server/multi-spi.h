@@ -1,5 +1,5 @@
 // -*- mode: c++; c-basic-offset: 4; indent-tabs-mode: nil; -*-
-// Copyright (C) 2013 Henner Zeller <h.zeller@acm.org>
+// Copyright (C) 2016 Henner Zeller <h.zeller@acm.org>
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by

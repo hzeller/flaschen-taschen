@@ -1,5 +1,5 @@
 // -*- mode: c++; c-basic-offset: 4; indent-tabs-mode: nil; -*-
-// Copyright (C) 2013 Henner Zeller <h.zeller@acm.org>
+// Copyright (C) 2016 Henner Zeller <h.zeller@acm.org>
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,9 +17,7 @@
 
 #include <assert.h>
 #include <strings.h>
-#include <algorithm>
 #include <stdlib.h>
-#include <stdio.h>
 
 MultiSPI::MultiSPI(int clock_gpio)
     : clock_gpio_(clock_gpio), size_(0), gpio_data_(NULL) {
@@ -43,7 +41,6 @@ void MultiSPI::UpdateBufferSize(size_t requested_size) {
     // Each bit requires one word to allocate.
     const size_t memsize = sizeof(uint32_t) * requested_size * 8;
     if (gpio_data_ == NULL) {
-        fprintf(stderr, "alloc %d \n", (int) memsize);
         gpio_data_ = (uint32_t*) malloc(memsize);
         bzero(gpio_data_, memsize);
         size_ = requested_size;
@@ -79,4 +76,3 @@ void MultiSPI::SendBuffers() {
     }
     gpio_.Write(0);  // Reset clock.
 }
-
