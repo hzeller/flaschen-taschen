@@ -115,11 +115,15 @@ public:
                              int width, int heigh);
     virtual ~RGBMatrixFlaschenTaschen();
 
+    // Initialization that needs to be called after we have
+    // become a daemon.
+    void PostDaemonInit();
+
     int width() const { return width_; }
     int height() const { return height_; }
 
     void SetPixel(int x, int y, const Color &col);
-    void Send();
+    void Send() { }
 
 private:
     const int off_x_;
@@ -128,7 +132,6 @@ private:
     const int height_;
 
     rgb_matrix::RGBMatrix *matrix_;
-    bool is_initialized_;
 };
 
 #endif // LED_FLASCHEN_TASCHEN_H_

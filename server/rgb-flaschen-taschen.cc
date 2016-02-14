@@ -18,14 +18,20 @@
 #include "gpio.h"
 #include <stdio.h>
 
+// We can simulate the spacing between crates by having an extra dark pixel
+// in-between. It is not quite perfect, but the actual spacing on the real
+// FlaschenTaschen crates is more like 3/4 of a bottle, but probably more
+// 'honest' than ignoring the spacing.
+#define CRATE_SPACING 1
+
 static rgb_matrix::GPIO gpio_s;
 
 RGBMatrixFlaschenTaschen::RGBMatrixFlaschenTaschen(int offset_x, int offset_y,
                                                    int width, int height)
-    : off_x_(offset_x), off_y_(offset_y), width_(width), height_(height),
-      is_initialized_(false) {
+    : off_x_(offset_x), off_y_(offset_y), width_(width), height_(height) {
     gpio_s.Init();
     matrix_ = new rgb_matrix::RGBMatrix(NULL, 32, 1, 2);
+    // Initialize all GPIO pins, but don't start thread yet.
     matrix_->SetGPIO(&gpio_s, false);
 }
 
@@ -34,9 +40,8 @@ RGBMatrixFlaschenTaschen::~RGBMatrixFlaschenTaschen() {
 }
 
 void RGBMatrixFlaschenTaschen::SetPixel(int x, int y, const Color &col) {
-    if (!is_initialized_) return;
-    // Simulate spacing of crates (they need less)
-#if 0
+#if CRATE_SPACING
+    // Simulate spacing of crates. One extra pixel every 5 pixels.
     x += x / 5;
     y += y / 5;
 #endif
@@ -44,10 +49,6 @@ void RGBMatrixFlaschenTaschen::SetPixel(int x, int y, const Color &col) {
     matrix_->SetPixel(31 - y + off_y_, x + off_x_, col.r, col.g, col.b);
 }
 
-void RGBMatrixFlaschenTaschen::Send() {
-    if (!is_initialized_) {
-        matrix_->SetGPIO(&gpio_s, true);
-        is_initialized_ = true;
-        fprintf(stderr, "Initialized.\n");
-    }
+void RGBMatrixFlaschenTaschen::PostDaemonInit() {
+    matrix_->SetGPIO(&gpio_s, true);  // Start thread.
 }

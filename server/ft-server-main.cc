@@ -24,10 +24,6 @@
 #include <stdio.h>
 #include <unistd.h>
 
-// Demo RGB demo matrix to play with until the 'big' system is there.
-// 1 for RGB, 0 for rest.
-#define DEMO_RGB 1
-
 // Pin 11 on Pi
 #define MULTI_SPI_COMMON_CLOCK 17
 
@@ -92,21 +88,24 @@ int main(int argc, const char *argv[]) {
 
     // After hardware is set up and all servers are listening, we can
     // drop the privileges.
-    if (true && !drop_privs(DROP_PRIV_USER, DROP_PRIV_GROUP))
+    if (!drop_privs(DROP_PRIV_USER, DROP_PRIV_GROUP))
         return 1;
 
-    if (true && daemon(0, 0) != 0) {  // Become daemon. TODO: maybe dependent on flag.
+    if (daemon(0, 0) != 0) {  // Become daemon. TODO: maybe dependent on flag.
         fprintf(stderr, "Failed to become daemon");
     }
+
+#if DEMO_RGB
+    display.PostDaemonInit();
+#endif
 
     display.Send();  // Clear screen.
 
     ft::Mutex mutex;
-#if 1
+
     OPCThread opc_thread(&display, &mutex);
     opc_thread.Start();
     pixel_pusher_run_threads(&display, &mutex);
 
     udp_server_run_blocking(&display, &mutex);  // last server blocks.
-#endif
 }
