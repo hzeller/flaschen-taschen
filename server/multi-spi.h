@@ -33,14 +33,13 @@ public:
     explicit MultiSPI(int clock_gpio);
     ~MultiSPI();
 
-    // Bytes per stream.
-    size_t serial_byte_size() const { return size_; }
-
     // Register a new data stream for the given GPIO. The SPI data is
     // sent with the common clock and this gpio pin.
+    //
     // Note, each channel might receive more bytes because they share the
-    // same clock and it depends on varying length. The remaining bytes
-    // are all zero though.
+    // same clock with everyone and it depends on what is the longest requested
+    // length.
+    // Overlength transmission bytes are all zero.
     bool RegisterDataGPIO(int gpio, size_t serial_byte_size);
 
     // Set data byte for given gpio channel at given position in the
@@ -48,11 +47,11 @@ public:
     // Data is sent with next Send().
     void SetBufferedByte(int data_gpio, size_t pos, uint8_t data);
 
-    // Send data for all streams if there was any change.
+    // Send data for all streams.
     void SendBuffers();
     
 private:
-    void UpdateBufferSize(size_t s);
+    void UpdateBufferSize(size_t new_size);
 
     ft::GPIO gpio_;
     const int clock_gpio_;
