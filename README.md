@@ -3,32 +3,33 @@ Noisebridge Flaschen Taschen Project
 
 ![](./img/flaschen-taschen-logo.jpg)
 
-Software for [FlaschenTaschen]. Inspired by [MateLight].
+Software for [FlaschenTaschen].
 
-Current hardware setup on the Raspberry Pi (should work on Pi-1 or Pi-2).
+FlaschenTaschn is Inspired by [MateLight]: a bunch of us have
+seen Mate Light in action at 32c3 and got excited :)
+So our Noisebridge interpretation of it has a German inspired name.
+Unfortunately, in the US, bottle reuse is not at
+all a thing, so there are no standardized crates with bottles you can buy.
+So we use milk crates (which is a thing) and put common, clear bottles in
+12oz (355ml) (Mate, Corona,..) inside. Wrapped in aluminum foil, they
+make nice pixels.
 
- * Top Display: *WS2811* strip to GPIO 18 (pin 12)
- * Bottom Display: *LPD6803* strip: clk on GPIO 17 (pin 11); data on GPIO 11 (pin 23)
+Right now, we're playing with multiple different types of strips to settle
+before a larger order.
 
-## Build Instructions
+Current hardware setup:
 
-Note: This project uses a git submodule for controlling ws28xx from the Raspberry Pi software by [jgarf](https://github.com/jgarff/rpi_ws281x)
+   1. column: LDP6803  (<- 5 bit grayscale, meh).
+   2. column: WS2811   (<- nasty timing sensitive single line serial)
+   3. column and 4. column: WS2801  (<- most likely the type to settle on)
 
-```bash
-$ git clone --recursive https://github.com/hzeller/flaschen-taschen.git
-$ cd flaschen-taschen
-$ make -C server
-$ sudo ./server/ft-server   # runs as daemon on a Raspberry Pi.
-# Clients to send content to the display can be found in the client/ dir
-$ sudo aptitude install libmagick++-dev
-$ make -C client
-```
+See little video in the [ExperimentalStage] blog post. Ideally, we'd like to
+have APA102, but they don't seem to be available wired up in the way we'd need
+for the bottles.
 
-If you are reading this after cloning and forget to clone recursively, you can just run the following git command to update the submodule:
-
-```
-$ git submodule update --init
-```
+Final set-up will be 9 crates wide and 7 crates high for a total of 63 crates
+with 25 'pixels' each. 45x35 pixels or 1575 pixels total. All operated by
+a Raspberry Pi that provides a network API to update the display.
 
 ## Operating Instructions
 
@@ -43,7 +44,10 @@ are all supported:
  * Receives UDP packet on port 1337 interpreted as framebuffer (RGBRGB...)
    (Simulated layout standard left-right, top-bottom framebuffer expected). Easy
    way to get such raw picture is to edit out the header out of *.ppm file.
-
+   (this protocol is likely to change to include size essentially directly
+   accepting a `P6` PPM file. This makes things more flexible and easier
+   to send. And we can extend it for offset. But for now: just a raw image).
+    
 ![](./img/udp.png)
 
  * Runs http://openpixelcontrol.org/ server on standard port 7890
@@ -78,5 +82,26 @@ The current display is 10x10 pixels, so it would be 3 * 100 bytes.
 You find more in the [client/ directory](./client) to directly send
 content to the server.
 
+## Build Instructions
+
+Note: This project uses a git submodule for controlling ws28xx from the Raspberry Pi software by [jgarf](https://github.com/jgarff/rpi_ws281x)
+
+```bash
+$ git clone --recursive https://github.com/hzeller/flaschen-taschen.git
+$ cd flaschen-taschen
+$ make -C server
+$ sudo ./server/ft-server   # runs as daemon on a Raspberry Pi.
+# Clients to send content to the display can be found in the client/ dir
+$ sudo aptitude install libmagick++-dev
+$ make -C client
+```
+
+If you are reading this after cloning and forget to clone recursively, you can just run the following git command to update the submodule:
+
+```
+$ git submodule update --init
+```
+
 [FlaschenTaschen]: https://noisebridge.net/wiki/Flaschen_Taschen
 [MateLight]: https://github.com/jaseg/matelight
+[ExperimentalStage]: http://blog.noisebridge.net/post/139304835544/i-walked-into-noisebridge-yesterday-and-was
