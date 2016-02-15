@@ -138,39 +138,39 @@ Wire Wire Line
 $Comp
 L GND #PWR05
 U 1 1 54ECB7BC
-P 1800 3900
-F 0 "#PWR05" H 1800 3900 30  0001 C CNN
-F 1 "GND" H 1800 3830 30  0001 C CNN
-F 2 "" H 1800 3900 60  0000 C CNN
-F 3 "" H 1800 3900 60  0000 C CNN
-	1    1800 3900
-	0    1    1    0   
+P 1400 4150
+F 0 "#PWR05" H 1400 4150 30  0001 C CNN
+F 1 "GND" H 1400 4080 30  0001 C CNN
+F 2 "" H 1400 4150 60  0000 C CNN
+F 3 "" H 1400 4150 60  0000 C CNN
+	1    1400 4150
+	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	1800 3900 1900 3900
+	1650 3900 1900 3900
 Text GLabel 1900 3000 0    51   Output ~ 0
 D2
-Text GLabel 2400 3700 2    51   Output ~ 0
-D8
-Text GLabel 1900 3700 0    51   Output ~ 0
-D9
-Text GLabel 2400 3800 2    51   Output ~ 0
-D10
 Text GLabel 1900 4100 0    51   Output ~ 0
+D8
+Text GLabel 2400 4200 2    51   Output ~ 0
+D9
+Text GLabel 1900 4300 0    51   Output ~ 0
+D10
+Text GLabel 1900 4400 0    51   Output ~ 0
 D13
 Text GLabel 1900 3300 0    51   Output ~ 0
 clock
-Text GLabel 1900 4200 0    51   Output ~ 0
+Text GLabel 1900 4500 0    51   Output ~ 0
 D14
-Text GLabel 1900 3600 0    51   Output ~ 0
+Text GLabel 2400 3700 2    51   Output ~ 0
 D6
-Text GLabel 1900 4300 0    51   Output ~ 0
+Text GLabel 2400 4600 2    51   Output ~ 0
 D16
-Text GLabel 2400 4200 2    51   Output ~ 0
+Text GLabel 2400 4500 2    51   Output ~ 0
 D15
-Text GLabel 2400 3900 2    51   Output ~ 0
+Text GLabel 2400 4400 2    51   Output ~ 0
 D12
-Text GLabel 1900 3800 0    51   Output ~ 0
+Text GLabel 1900 4200 0    51   Output ~ 0
 D11
 Text GLabel 1900 3400 0    51   Output ~ 0
 D5
@@ -1071,4 +1071,42 @@ Wire Wire Line
 	6400 6900 6400 6950
 Text Notes 5150 6100 0    60   ~ 0
 GND CLK DO +5V\n
+Wire Wire Line
+	1400 3600 1900 3600
+Wire Wire Line
+	1400 3700 1900 3700
+Wire Wire Line
+	1400 3800 1900 3800
+$Comp
+L CONN_01X06 P22
+U 1 1 56C265D6
+P 1200 3850
+F 0 "P22" H 1119 3368 50  0000 C CNN
+F 1 "CONN_01X06" H 1119 3460 50  0000 C CNN
+F 2 "Pin_Headers:Pin_Header_Straight_1x06" H 1119 3460 50  0001 C CNN
+F 3 "" H 1200 3850 50  0000 C CNN
+	1    1200 3850
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	1400 4100 1400 4150
+Wire Wire Line
+	1400 4100 1650 4100
+Wire Wire Line
+	1650 4100 1650 3900
+Text GLabel 2400 3800 2    51   Output ~ 0
+CS0
+Text GLabel 2400 3900 2    51   Output ~ 0
+CS1
+Text GLabel 1400 3900 2    51   Input ~ 0
+CS0
+Text GLabel 1400 4000 2    51   Input ~ 0
+CS1
+Connection ~ 1400 4100
+Text Label 1500 3600 0    60   ~ 0
+MOSI
+Text Label 1500 3700 0    60   ~ 0
+MISO
+Text Label 1500 3800 0    60   ~ 0
+SCLK
 $EndSCHEMATC
