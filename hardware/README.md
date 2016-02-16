@@ -26,7 +26,7 @@ The 5V output, accessible on each of the 16 connectors, is fused, so that accide
 messing with the data lines in the field do not cause harm. Use a fast 1A fuse.
 
 (The outputs are beefy enough that they even could support a couple of shorter LED strips directly,
-in that case use up to 20A fuse. Generally it is advised to directly power the strips though).
+in that case use up to 20A fuse. Generally it is advised to separately power the strips though).
 
 [ As soon as design is tested in the field, there will be an OshPark link here ]
 
