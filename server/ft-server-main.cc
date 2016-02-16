@@ -17,11 +17,16 @@
 #include "led-flaschen-taschen.h"
 #include "multi-spi.h"
 
-#include <unistd.h>
-#include <sys/types.h>
+#include <arpa/inet.h>
 #include <grp.h>
+#include <linux/netdevice.h>
 #include <pwd.h>
 #include <stdio.h>
+#include <string.h>
+#include <sys/ioctl.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <sys/types.h>
 #include <unistd.h>
 
 // Pin 11 on Pi
@@ -57,6 +62,32 @@ bool drop_privs(const char *priv_user, const char *priv_group) {
     return true;
 }
 
+// Figuring out if a particular interface is already initialized.
+static bool IsEthernetReady(const char *interface) {
+    int s;
+    if ((s = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+        return false;
+    }
+
+    bool success = true;
+
+    struct ifreq ip_addr_query;
+    strcpy(ip_addr_query.ifr_name, interface);
+    if (ioctl(s, SIOCGIFADDR, &ip_addr_query) == 0) {
+        struct sockaddr_in *s_in = (struct sockaddr_in *) &ip_addr_query.ifr_addr;
+        char printed_ip[64];
+        inet_ntop(AF_INET, &s_in->sin_addr, printed_ip, sizeof(printed_ip));
+        fprintf(stderr, "%s ip: %s\n", interface, printed_ip);
+    } else {
+        perror("Getting IP address");
+        success = false;
+    }
+
+    close(s);
+
+    return success;
+}
+
 class OPCThread : public ft::Thread {
 public:
     OPCThread(FlaschenTaschen *display, ft::Mutex *mutex)
@@ -82,6 +113,15 @@ int main(int argc, const char *argv[]) {
     display.AddColumn(new WS2811FlaschenTaschen(2));
     display.AddColumn(new LPD6803FlaschenTaschen(&spi, LPD_STRIP_GPIO, 2));
 #endif
+
+    // Wait up to a minute for the network to show up before we start
+    // our servers that listen on 0.0.0.0
+    // TODO: maybe we should fork/exec already first stage here (but still stay
+    // root) to not have this happen in foreground ?
+    for (int i = 0; !IsEthernetReady("eth0") && i < 60; ++i) {
+        sleep(1);
+    }
+
     opc_server_init(7890);
     pixel_pusher_init(&display);
     udp_server_init(1337);
