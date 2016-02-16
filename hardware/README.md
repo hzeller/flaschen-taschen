@@ -5,18 +5,25 @@ Adapter to connect up to 16 SPI-type LED strips (e.g. WS2801 or LDP6803). The ou
 contain GND, CLK and Data. Also, 5V is given which can be useful for active termination of
 longer wires.
 
-Features
+Pinout of each of the connectors:
 
-* 16 data outputs for LED strips including GND and also 5V.
+GND | CLK | DATA | +5V
+---:|:---:|:----:|:---
+
+(GND is pointing towards the Rasbperry Pi GPIO header).
+
+### Features
+
+* 16 data outputs for LED strips including GND and 5V.
 * Input power (5V) operates level shifter as well as the Rasbpeery Pi; no separate USB supply
   needed.
 * Fused power output to prevent accidents.
 * Breakout for I2C, UART and SPI busses of Raspberry Pi to allow connecting other peripherals.
 
-The CLK is shared on the input, but each output connector has its own output buffer.
+The CLK is shared on the input, but each connector gets a dedicated buffered signal.
 
-The 5V output, accessible on each of the 16 connector, is fused, so that accidental shorts on the
-data lines in the field do not cause harm. Use a fast 1A fuse.
+The 5V output, accessible on each of the 16 connectors, is fused, so that accidental shorts when
+messing with the data lines in the field do not cause harm. Use a fast 1A fuse.
 
 (The outputs are beefy enough that they even could support a couple of shorter LED strips directly,
 in that case use up to 20A fuse. Generally it is advised to directly power the strips though).
