@@ -48,7 +48,7 @@ are all supported:
    (this protocol is likely to change to include size essentially directly
    accepting a `P6` PPM file. This makes things more flexible and easier
    to send. And we can extend it for offset. But for now: just a raw image).
-    
+
 ![](./img/udp.png)
 
  * Runs http://openpixelcontrol.org/ server on standard port 7890
@@ -103,6 +103,14 @@ If you are reading this after cloning and forget to clone recursively, you can j
 $ git submodule update --init
 ```
 
+## Connecting to the Pi
+
+Right now, LED strips are wired up with some ad-hoc level shifter (re-using a [RGB Matrix Adapter]
+board). In the near future, this will be replaced by something [dedicated for the task](./hardware):
+
+<a href="hardware/"><img src="img/pi-adapter-pcb.png" width="200px"></a>
+
 [FlaschenTaschen]: https://noisebridge.net/wiki/Flaschen_Taschen
 [MateLight]: https://github.com/jaseg/matelight
 [ExperimentalStage]: http://blog.noisebridge.net/post/139304835544/i-walked-into-noisebridge-yesterday-and-was
+[RGB Matrix Adapter]: https://github.com/hzeller/rpi-rgb-led-matrix/tree/master/adapter/active-3
