@@ -5,11 +5,11 @@
 import sys
 
 from pcbnew import *
-filename=sys.argv[1]
+basename=sys.argv[1]
 
-board = LoadBoard(filename)
+board = LoadBoard(basename + ".kicad_pcb")
 
-plotDir = "plot/"
+plotDir = basename
 
 pctl = PLOT_CONTROLLER(board)
 
