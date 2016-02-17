@@ -18,6 +18,7 @@
 #include "flaschen-taschen.h"
 
 #include <vector>
+#include <string>
 
 // Crate mapping. Strip position at kCrateMapping[4-y][x]
 extern int kCrateMapping[5][5];
@@ -132,6 +133,25 @@ private:
     const int height_;
 
     rgb_matrix::RGBMatrix *matrix_;
+};
+
+class TerminalFlaschenTaschen : public FlaschenTaschen {
+public:
+    TerminalFlaschenTaschen(int width, int heigh);
+
+    int width() const { return width_; }
+    int height() const { return height_; }
+
+    void SetPixel(int x, int y, const Color &col);
+    void Send();
+
+private:
+    const int width_;
+    const int height_;
+    size_t initial_offset_;
+    size_t pixel_offset_;
+    bool is_first_;
+    std::string buffer_;
 };
 
 #endif // LED_FLASCHEN_TASCHEN_H_

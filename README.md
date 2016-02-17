@@ -32,13 +32,27 @@ Final set-up will be 9 crates wide and 7 crates high for a total of 63 crates
 with 25 'pixels' each. 45x35 pixels or 1575 pixels total. All operated by
 a Raspberry Pi that provides a network API to update the display.
 
-## Operating Instructions
-
-The Flaschen-Taschen server `ft-server` becomes a daemon (also it drops
-privileges to daemon:daemon). Kill the hard way with `sudo killall ft-server`
-
 ## Getting Pixels on Flaschen Taschen
 
+### Various server implementations
+
+The FlaschenTaschen display is accessible via some network protocol. The
+protocol is implemented by the `ft-server` ('Flaschen Taschen server`).
+See the [server directory](./server) how to compile and run.
+
+Next to the actual server (running LED strips in milk crate), there are also
+some test servers available that allow different ways to display content -
+which is in particular useful while the actual FlaschenTaschen display is still
+being set-up but we already want to develop content for the final display.
+The protocol is exactly the same.
+
+For instance, there is a way to visualize in a unix terminal:
+
+<a href="server/#terminal"><img src="img/terminal-screenshot.png" width="200px"></a>
+
+(See the [client directory](./client) how to send content).
+
+### Protocols
 To make it simple to illuminate the matrix, there are _three_ protocols that
 are all supported:
 
@@ -80,10 +94,10 @@ cat raw-image.bytes > /dev/udp/flaschen-taschen.local/1337
 
 The current display is 10x10 pixels, so it would be 3 * 100 bytes.
 
-You find more in the [client/ directory](./client) to directly send
+You find more in the [client directory](./client) to directly send
 content to the server.
 
-## Build Instructions
+## Getting started
 
 Note: This project uses a git submodule for controlling ws28xx from the Raspberry Pi software by [jgarf](https://github.com/jgarff/rpi_ws281x)
 

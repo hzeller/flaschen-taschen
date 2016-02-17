@@ -41,6 +41,8 @@
 
 using namespace ft;
 
+#define PP_VERBOSE 0
+
 // PixelPushPrefix :) for our logs.
 #define PXP "PixelPush: "
 
@@ -149,8 +151,10 @@ public:
                                  + sizeof(pixel_pusher_.ext)),
           discovery_packet_buffer_(new uint8_t[discovery_packet_size_]),
         previous_sequence_(-1) {
+#if PP_VERBOSE
         fprintf(stderr, PXP "discovery packet size: %zd\n",
                 discovery_packet_size_);
+#endif
     }
 
     virtual ~Beacon() {
@@ -188,8 +192,10 @@ public:
         addr.sin_addr.s_addr = htonl(INADDR_BROADCAST);
         addr.sin_port = htons(kPixelPusherDiscoveryPort);
 
+#if PP_VERBOSE
         fprintf(stderr, PXP "Starting PixelPusher discovery beacon "
                 "broadcasting to port %d\n", kPixelPusherDiscoveryPort);
+#endif
         struct timespec sleep_time = { 1, 0 };  // todo: tweak.
         while (running()) {
             // The header is of type 'DiscoveryPacket'.
@@ -260,8 +266,10 @@ public:
             perror("bind");
             exit(1);
         }
+#if PP_VERBOSE
         fprintf(stderr, PXP "Listening for pixels pushed to port %d\n",
                 kPixelPusherListenPort);
+#endif
         while (running()) {
             ssize_t buffer_bytes = recvfrom(s, packet_buffer, kMaxUDPPacketSize,
                                             0, NULL, 0);
@@ -356,11 +364,13 @@ bool pixel_pusher_init(FlaschenTaschen *canvas) {
     pixel_pusher_container.base->max_strips_per_packet
         = std::min(kUsablePacketSize / (1 + 3 * pixels_per_strip),
                    number_of_strips);
+#if PP_VERBOSE
     fprintf(stderr, PXP "Display: %dx%d (%d pixels each on %d strips)\n"
             "Accepting max %d strips per packet.\n",
             pixels_per_strip, number_of_strips,
             pixels_per_strip, number_of_strips,
             pixel_pusher_container.base->max_strips_per_packet);
+#endif
     pixel_pusher_container.base->power_total = 1;         // ?
     pixel_pusher_container.base->update_period = 1000;   // initial assumption.
     pixel_pusher_container.base->controller_ordinal = 0;  // TODO: provide config
@@ -380,5 +390,7 @@ void pixel_pusher_run_threads(FlaschenTaschen *display, Mutex *display_mutex) {
 
     receiver->Start(0);         // fairly low priority
     discovery_beacon->Start(5); // This should accurately send updates.
+#if PP_VERBOSE
     fprintf(stderr, "Pixel pusher running %d.", kPixelPusherDiscoveryPort);
+#endif
 }
