@@ -27,7 +27,8 @@
 // so each pixel needs to be fixed width. Thus we do %03 (which luckily is
 // not interpreted as octal by the terminal)
 
-// Setting this Unicode character seems to confuse the terminal.
+// Setting this Unicode character seems to confuse at least konsole. Also,
+// it is pretty dark.
 //#define PIXEL_FORMAT   "\033[38;2;%03d;%03d;%03dm●"   // Sent per pixel.
 
 // This is a little dark.
@@ -41,7 +42,7 @@ TerminalFlaschenTaschen::TerminalFlaschenTaschen(int width, int height)
     buffer_.append(SCREEN_PREFIX);
     initial_offset_ = buffer_.size();
     char scratch[64];
-    snprintf(scratch, sizeof(scratch), PIXEL_FORMAT, 0, 0, 0);  // black RGB
+    snprintf(scratch, sizeof(scratch), PIXEL_FORMAT, 0, 0, 50); // dark blue.
     pixel_offset_ = strlen(scratch) + 1;   // one extra space.
     for (int y = 0; y < height; ++y) {
         for (int x = 0; x < width; ++x) {
@@ -61,13 +62,7 @@ void TerminalFlaschenTaschen::SetPixel(int x, int y, const Color &col) {
         + y;  // <- one newline per y
     char *buf = const_cast<char*>(buffer_.data())  // Living on the edge
         + pos;
-    if (*buf != '\033') {
-        printf("Buffer is %x\n", *buf);
-    }
     snprintf(buf, pixel_offset_, PIXEL_FORMAT, col.r, col.g, col.b);
-    if (buf[pixel_offset_-1] != 0) {
-        printf("Uhm, what ? %x\n", buf[pixel_offset_]);
-    }
     buf[pixel_offset_-1] = ' ';   // overwrite \0-byte with space again.
 }
 
