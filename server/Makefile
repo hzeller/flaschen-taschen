@@ -30,7 +30,8 @@ RGB_LDFLAGS=-lrt -lm -lpthread
 WS2812LIB_OBJECTS=$(addprefix rpi_ws281x/, dma.o mailbox.o pwm.o rpihw.o ws2811.o)
 
 INCLUDES=-I../common
-OBJECTS=ft-thread.o opc-server.o udp-server.o pixel-push-server.o
+OBJECTS=ft-thread.o opc-server.o udp-server.o
+# OBJECTS=ft-thread.o opc-server.o udp-server.o pixel-push-server.o
 
 # Nested if/else are very awkward, so we just compare each possible outcome
 ifeq ($(FLASCHEN_TASCHEN_BACKEND), ft)

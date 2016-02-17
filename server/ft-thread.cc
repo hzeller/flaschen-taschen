@@ -50,6 +50,7 @@ void Thread::Start(int priority, uint32_t affinity_mask) {
         pthread_setschedparam(thread_, SCHED_FIFO, &p);
     }
 
+#   if 0
     if (affinity_mask != 0) {
         cpu_set_t cpu_mask;
         CPU_ZERO(&cpu_mask);
@@ -60,6 +61,7 @@ void Thread::Start(int priority, uint32_t affinity_mask) {
         }
         pthread_setaffinity_np(thread_, sizeof(cpu_mask), &cpu_mask);
     }
+#   endif
 
     started_ = true;
 }

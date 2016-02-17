@@ -20,7 +20,7 @@
 #include <arpa/inet.h>
 #include <getopt.h>
 #include <grp.h>
-#include <linux/netdevice.h>
+//#include <linux/netdevice.h>
 #include <pwd.h>
 #include <stdio.h>
 #include <string.h>
@@ -43,6 +43,7 @@
 #define DROP_PRIV_USER "daemon"
 #define DROP_PRIV_GROUP "daemon"
 
+#if 0
 bool drop_privs(const char *priv_user, const char *priv_group) {
     uid_t ruid, euid, suid;
     if (getresuid(&ruid, &euid, &suid) >= 0) {
@@ -70,7 +71,9 @@ bool drop_privs(const char *priv_user, const char *priv_group) {
     }
     return true;
 }
+#endif
 
+#if 0
 // Figuring out if a particular interface is already initialized.
 static bool IsEthernetReady(const std::string &interface) {
     if (interface.empty())
@@ -98,6 +101,7 @@ static bool IsEthernetReady(const std::string &interface) {
 
     return success;
 }
+#endif
 
 class OPCThread : public ft::Thread {
 public:
@@ -175,22 +179,24 @@ int main(int argc, char *argv[]) {
     // our servers that listen on 0.0.0.0
     // TODO: maybe we should fork/exec already first stage here (but still stay
     // root) to not have this happen in foreground ?
-    for (int i = 0; !IsEthernetReady(interface) && i < 60; ++i) {
-        sleep(1);
-    }
+    // for (int i = 0; !IsEthernetReady(interface) && i < 60; ++i) {
+    //     sleep(1);
+    // }
 
     opc_server_init(7890);
-    pixel_pusher_init(&display);
+    // pixel_pusher_init(&display);
     udp_server_init(1337);
 
     // After hardware is set up and all servers are listening, we can
     // drop the privileges.
+#   if 0
     if (!drop_privs(DROP_PRIV_USER, DROP_PRIV_GROUP))
         return 1;
 
     if (as_daemon && daemon(0, 0) != 0) {  // Become daemon.
         fprintf(stderr, "Failed to become daemon");
     }
+#   endif
 
 #if FT_BACKEND == 1
     display.PostDaemonInit();
@@ -202,7 +208,7 @@ int main(int argc, char *argv[]) {
 
     OPCThread opc_thread(&display, &mutex);
     opc_thread.Start();
-    pixel_pusher_run_threads(&display, &mutex);
+    // pixel_pusher_run_threads(&display, &mutex);
 
     udp_server_run_blocking(&display, &mutex);  // last server blocks.
 }
