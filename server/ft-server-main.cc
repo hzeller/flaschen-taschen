@@ -114,10 +114,6 @@ int main(int argc, char *argv[]) {
     opc_server_init(7890);
     udp_server_init(1337);
 
-    if (as_daemon && daemon(0, 0) != 0) {  // Become daemon.
-        fprintf(stderr, "Failed to become daemon");
-    }
-
 #if FT_BACKEND == 1
     display.PostDaemonInit();
 #endif
