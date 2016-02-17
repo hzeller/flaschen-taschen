@@ -118,8 +118,8 @@ static int usage(const char *progname) {
             "\t-D <width>x<height> : Output dimension. Default 45x35\n"
             "\t-I <interface>      : Which network interface to wait for\n"
             "\t                      to be ready (Empty string '' for no "
-            "waiting)."
-            "Default 'eth0'\n"
+            "waiting).\n"
+            "\t                      Default 'eth0'\n"
             "\t-d                  : Become daemon\n");
     return 1;
 }
