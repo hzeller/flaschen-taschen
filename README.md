@@ -24,7 +24,7 @@ Current hardware setup:
    2. column: WS2811   (<- nasty timing sensitive single line serial)
    3. column and 4. column: WS2801  (<- most likely the type to settle on)
 
-![](../img/ft-work-in-progress.jpg)
+![](./img/ft-work-in-progress.jpg)
 
 See little video in the [ExperimentalStage] blog post. Ideally, we'd like to
 have APA102, but they don't seem to be available wired up in the way we'd need
