@@ -17,7 +17,7 @@
 #    Output things to a LED matrix
 #    (see https://github.com/hzeller/rpi-rgb-led-matrix )
 #
-FLASCHEN_TASCHEN_BACKEND=ft
+FLASCHEN_TASCHEN_BACKEND=terminal
 
 # RGB matrix related. It is checked out as a submodule in rgb-matrix/
 RGB_INCDIR=rgb-matrix/include
@@ -30,7 +30,7 @@ RGB_LDFLAGS=-lrt -lm -lpthread
 WS2812LIB_OBJECTS=$(addprefix rpi_ws281x/, dma.o mailbox.o pwm.o rpihw.o ws2811.o)
 
 INCLUDES=-I../common
-OBJECTS=ft-thread.o opc-server.o udp-server.o pixel-push-server.o
+OBJECTS=ft-thread.o opc-server.o udp-server.o
 
 # Nested if/else are very awkward, so we just compare each possible outcome
 ifeq ($(FLASCHEN_TASCHEN_BACKEND), ft)

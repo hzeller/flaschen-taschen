@@ -20,7 +20,6 @@
 #include <arpa/inet.h>
 #include <getopt.h>
 #include <grp.h>
-#include <linux/netdevice.h>
 #include <pwd.h>
 #include <stdio.h>
 #include <string.h>
@@ -39,65 +38,6 @@
 #define WS_R0_STRIP_GPIO 8
 #define WS_R1_STRIP_GPIO 7
 #define WS_R2_STRIP_GPIO 10
-
-#define DROP_PRIV_USER "daemon"
-#define DROP_PRIV_GROUP "daemon"
-
-bool drop_privs(const char *priv_user, const char *priv_group) {
-    uid_t ruid, euid, suid;
-    if (getresuid(&ruid, &euid, &suid) >= 0) {
-        if (euid != 0)   // not root anyway. No priv dropping.
-            return true;
-    }
-
-    struct group *g = getgrnam(priv_group);
-    if (g == NULL) {
-        perror("group lookup.");
-        return false;
-    }
-    if (setresgid(g->gr_gid, g->gr_gid, g->gr_gid) != 0) {
-        perror("setresgid()");
-        return false;
-    }
-    struct passwd *p = getpwnam(priv_user);
-    if (p == NULL) {
-        perror("user lookup.");
-        return false;
-    }
-    if (setresuid(p->pw_uid, p->pw_uid, p->pw_uid) != 0) {
-        perror("setresuid()");
-        return false;
-    }
-    return true;
-}
-
-// Figuring out if a particular interface is already initialized.
-static bool IsEthernetReady(const std::string &interface) {
-    if (interface.empty())
-        return true;
-    int s;
-    if ((s = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-        return false;
-    }
-
-    bool success = true;
-
-    struct ifreq ip_addr_query;
-    strcpy(ip_addr_query.ifr_name, interface.c_str());
-    if (ioctl(s, SIOCGIFADDR, &ip_addr_query) == 0) {
-        struct sockaddr_in *s_in = (struct sockaddr_in *) &ip_addr_query.ifr_addr;
-        char printed_ip[64];
-        inet_ntop(AF_INET, &s_in->sin_addr, printed_ip, sizeof(printed_ip));
-        fprintf(stderr, "%s ip: %s\n", interface.c_str(), printed_ip);
-    } else {
-        perror("Getting IP address");
-        success = false;
-    }
-
-    close(s);
-
-    return success;
-}
 
 class OPCThread : public ft::Thread {
 public:
@@ -171,22 +111,8 @@ int main(int argc, char *argv[]) {
     TerminalFlaschenTaschen display(width, height);
 #endif
 
-    // Wait up to a minute for the network to show up before we start
-    // our servers that listen on 0.0.0.0
-    // TODO: maybe we should fork/exec already first stage here (but still stay
-    // root) to not have this happen in foreground ?
-    for (int i = 0; !IsEthernetReady(interface) && i < 60; ++i) {
-        sleep(1);
-    }
-
     opc_server_init(7890);
-    pixel_pusher_init(&display);
     udp_server_init(1337);
-
-    // After hardware is set up and all servers are listening, we can
-    // drop the privileges.
-    if (!drop_privs(DROP_PRIV_USER, DROP_PRIV_GROUP))
-        return 1;
 
     if (as_daemon && daemon(0, 0) != 0) {  // Become daemon.
         fprintf(stderr, "Failed to become daemon");
@@ -202,7 +128,6 @@ int main(int argc, char *argv[]) {
 
     OPCThread opc_thread(&display, &mutex);
     opc_thread.Start();
-    pixel_pusher_run_threads(&display, &mutex);
 
     udp_server_run_blocking(&display, &mutex);  // last server blocks.
 }
