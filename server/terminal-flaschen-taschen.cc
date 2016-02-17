@@ -41,7 +41,7 @@ TerminalFlaschenTaschen::TerminalFlaschenTaschen(int width, int height)
     buffer_.append(SCREEN_PREFIX);
     initial_offset_ = buffer_.size();
     char scratch[64];
-    snprintf(scratch, sizeof(scratch), PIXEL_FORMAT, 0, 0, 255);  // black RGB
+    snprintf(scratch, sizeof(scratch), PIXEL_FORMAT, 0, 0, 0);  // black RGB
     pixel_offset_ = strlen(scratch) + 1;   // one extra space.
     for (int y = 0; y < height; ++y) {
         for (int x = 0; x < width; ++x) {
