@@ -44,6 +44,12 @@
 #define DROP_PRIV_GROUP "daemon"
 
 bool drop_privs(const char *priv_user, const char *priv_group) {
+    uid_t ruid, euid, suid;
+    if (getresuid(&ruid, &euid, &suid) >= 0) {
+        if (euid != 0)   // not root anyway. No priv dropping.
+            return true;
+    }
+
     struct group *g = getgrnam(priv_group);
     if (g == NULL) {
         perror("group lookup.");
@@ -110,8 +116,9 @@ static int usage(const char *progname) {
     fprintf(stderr, "usage: %s [options]\n", progname);
     fprintf(stderr, "Options:\n"
             "\t-D <width>x<height> : Output dimension. Default 45x35\n"
-            "\t-I <interface>      : Which network interface to wait for to be "
-            "ready (Empty string '' for no waiting)."
+            "\t-I <interface>      : Which network interface to wait for\n"
+            "\t                      to be ready (Empty string '' for no "
+            "waiting)."
             "Default 'eth0'\n"
             "\t-d                  : Become daemon\n");
     return 1;
@@ -150,9 +157,7 @@ int main(int argc, char *argv[]) {
         }
     }
 
-#if DEMO_RGB
-    RGBMatrixFlaschenTaschen display(0, 0, width, height);
-#else
+#if FT_BACKEND == 0
     MultiSPI spi(MULTI_SPI_COMMON_CLOCK);
     ColumnAssembly display(&spi);
     // From right to left.
@@ -160,6 +165,10 @@ int main(int argc, char *argv[]) {
     display.AddColumn(new WS2801FlaschenTaschen(&spi, WS_R1_STRIP_GPIO, 4));
     display.AddColumn(new WS2811FlaschenTaschen(2));
     display.AddColumn(new LPD6803FlaschenTaschen(&spi, LPD_STRIP_GPIO, 2));
+#elif FT_BACKEND == 1
+    RGBMatrixFlaschenTaschen display(0, 0, width, height);
+#elif FT_BACKEND == 2
+    TerminalFlaschenTaschen display(width, height);
 #endif
 
     // Wait up to a minute for the network to show up before we start
@@ -183,7 +192,7 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "Failed to become daemon");
     }
 
-#if DEMO_RGB
+#if FT_BACKEND == 1
     display.PostDaemonInit();
 #endif
 

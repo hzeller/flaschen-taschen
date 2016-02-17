@@ -1,8 +1,23 @@
-# To demo the 'final' look of the FlaschenTaschen display, we have a mode
-# in which we support the same protocol but output things to a LED matrix
-# (see https://github.com/hzeller/rpi-rgb-led-matrix )
-# This switches between the two options.
-RGB_MATRIX_DEMO=0
+# To demo the 'final' look of the FlaschenTaschen display, we have other
+# output modes, that allow to already see the full resolution of the final
+# display without having it available. We support all the same network API
+# interface, so things can be tested independently.
+#
+# FLASCHEN_TASCHEN_BACKEND can be one of the following
+# ft
+#    The implementation that talks to the real FlaschenTaschen LED strip
+#    installation.
+#
+# terminal
+#     Very simple output to current terminal. Requires decent terminal
+#     implementation that understands ANSI color escapes. Known terminals to
+#     work are konsole or xterm works. Gnome terminal does not.
+#
+# rgb-matrix
+#    Output things to a LED matrix
+#    (see https://github.com/hzeller/rpi-rgb-led-matrix )
+#
+FLASCHEN_TASCHEN_BACKEND=ft
 
 # RGB matrix related. It is checked out as a submodule in rgb-matrix/
 RGB_INCDIR=rgb-matrix/include
@@ -17,18 +32,26 @@ WS2812LIB_OBJECTS=$(addprefix rpi_ws281x/, dma.o mailbox.o pwm.o rpihw.o ws2811.
 INCLUDES=-I../common
 OBJECTS=ft-thread.o opc-server.o udp-server.o pixel-push-server.o
 
-ifeq ($(RGB_MATRIX_DEMO), 1)
-   DEFINES=-DDEMO_RGB=1
-   INCLUDES+=-I$(RGB_INCDIR)
-   OBJECTS+=rgb-flaschen-taschen.o
-   STATIC_LIBS+=$(RGB_LIBRARY)
-   LDFLAGS+=$(RGB_LDFLAGS)
-else
-   DEFINES=-DDEMO_RGB=0
+# Nested if/else are very awkward, so we just compare each possible outcome
+ifeq ($(FLASCHEN_TASCHEN_BACKEND), ft)
+   DEFINES=-DFT_BACKEND=0
    INCLUDES+=-I./rpi_ws281x
    OBJECTS+=ws2811-flaschen-taschen.o ws2801-flaschen-taschen.o lpd6803-flaschen-taschen.o ft-gpio.o multi-spi.o crate-mapping.o column-assembly.o 
    STATIC_LIBS+=libws281x.a
    LDFLAGS+=$(WS2812_LDFLAGS)
+endif
+
+ifeq ($(FLASCHEN_TASCHEN_BACKEND), rgb-matrix)
+   DEFINES=-DFT_BACKEND=1
+   INCLUDES+=-I$(RGB_INCDIR)
+   OBJECTS+=rgb-flaschen-taschen.o
+   STATIC_LIBS+=$(RGB_LIBRARY)
+   LDFLAGS+=$(RGB_LDFLAGS)
+endif
+
+ifeq ($(FLASCHEN_TASCHEN_BACKEND), terminal)
+   DEFINES=-DFT_BACKEND=2
+   OBJECTS+=terminal-flaschen-taschen.o
 endif
 
 CFLAGS=-Wall -O3 $(INCLUDES) $(DEFINES)

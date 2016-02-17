@@ -28,6 +28,8 @@
 #include "servers.h"
 #include "flaschen-taschen.h"
 
+#define SHOW_REFRESH_RATE 0
+
 struct Header {
     uint8_t y_pos;
     uint8_t command;
@@ -80,8 +82,10 @@ static void handle_connection(int fd, FlaschenTaschen *display,
                               ft::Mutex *mutex) {
     bool any_error = false;
     while (!any_error) {
+#if SHOW_REFRESH_RATE
         struct timeval start, end;
         gettimeofday(&start, NULL);
+#endif
 
         struct Header h;
         if (!reliable_read(fd, &h, sizeof(h)))
@@ -115,13 +119,13 @@ static void handle_connection(int fd, FlaschenTaschen *display,
         display->Send();
         mutex->Unlock();
         delete [] buffer;
-
+#if SHOW_REFRESH_RATE
         gettimeofday(&end, NULL);
         int64_t usec = ((uint64_t)end.tv_sec * 1000000 + end.tv_usec)
             - ((int64_t)start.tv_sec * 1000000 + start.tv_usec);
         printf("\b\b\b\b\b\b\b\b%6.1fHz", 1e6 / usec);
+#endif
     }
-    fprintf(stderr, "OPC:[conn closed]\n");
 }
 
 static void run_server(int listen_socket,
