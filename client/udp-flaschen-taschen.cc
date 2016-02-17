@@ -25,7 +25,7 @@
 
 int OpenFlaschenTaschenSocket(const char *host) {
     struct addrinfo addr_hints = {0};
-    addr_hints.ai_family = AF_UNSPEC;
+    addr_hints.ai_family = AF_INET;
     addr_hints.ai_socktype = SOCK_DGRAM;
 
     struct addrinfo *addr_result = NULL;
@@ -50,7 +50,7 @@ int OpenFlaschenTaschenSocket(const char *host) {
     return fd;
 }
 
-UDPFlaschenTaschen::UDPFlaschenTaschen(int socket, int width, int height) 
+UDPFlaschenTaschen::UDPFlaschenTaschen(int socket, int width, int height)
     : fd_(socket), width_(width), height_(height),
       buf_size_(width * height * sizeof(Color)),
       buffer_(new Color [ buf_size_ ]) {
@@ -75,4 +75,3 @@ void UDPFlaschenTaschen::UDPFlaschenTaschen::Send(int fd) {
     // Some fudging to make the compiler shut up about non-used return value
     if (write(fd, buffer_, buf_size_) < 0) return;
 }
-
