@@ -10,6 +10,8 @@
 
 int main() {
     // Open socket and create our canvas.
+    // If you run your local server (e.g. the terminal thing), just use
+    // 127.0.0.1 instead of flaschen-taschen.local
     const int socket = OpenFlaschenTaschenSocket("flaschen-taschen.local");
     UDPFlaschenTaschen canvas(socket, DISPLAY_WIDTH, DISPLAY_HEIGHT);
 
