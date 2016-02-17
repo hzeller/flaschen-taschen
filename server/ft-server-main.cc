@@ -18,6 +18,7 @@
 #include "multi-spi.h"
 
 #include <arpa/inet.h>
+#include <getopt.h>
 #include <grp.h>
 #include <linux/netdevice.h>
 #include <pwd.h>
@@ -28,6 +29,8 @@
 #include <sys/types.h>
 #include <sys/types.h>
 #include <unistd.h>
+
+#include <string>
 
 // Pin 11 on Pi
 #define MULTI_SPI_COMMON_CLOCK 17
@@ -63,7 +66,9 @@ bool drop_privs(const char *priv_user, const char *priv_group) {
 }
 
 // Figuring out if a particular interface is already initialized.
-static bool IsEthernetReady(const char *interface) {
+static bool IsEthernetReady(const std::string &interface) {
+    if (interface.empty())
+        return true;
     int s;
     if ((s = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
         return false;
@@ -72,12 +77,12 @@ static bool IsEthernetReady(const char *interface) {
     bool success = true;
 
     struct ifreq ip_addr_query;
-    strcpy(ip_addr_query.ifr_name, interface);
+    strcpy(ip_addr_query.ifr_name, interface.c_str());
     if (ioctl(s, SIOCGIFADDR, &ip_addr_query) == 0) {
         struct sockaddr_in *s_in = (struct sockaddr_in *) &ip_addr_query.ifr_addr;
         char printed_ip[64];
         inet_ntop(AF_INET, &s_in->sin_addr, printed_ip, sizeof(printed_ip));
-        fprintf(stderr, "%s ip: %s\n", interface, printed_ip);
+        fprintf(stderr, "%s ip: %s\n", interface.c_str(), printed_ip);
     } else {
         perror("Getting IP address");
         success = false;
@@ -101,9 +106,52 @@ private:
     ft::Mutex *const mutex_;
 };
 
-int main(int argc, const char *argv[]) {
+static int usage(const char *progname) {
+    fprintf(stderr, "usage: %s [options]\n", progname);
+    fprintf(stderr, "Options:\n"
+            "\t-D <width>x<height> : Output dimension. Default 45x35\n"
+            "\t-I <interface>      : Which network interface to wait for to be "
+            "ready (Empty string '' for no waiting)."
+            "Default 'eth0'\n"
+            "\t-d                  : Become daemon\n");
+    return 1;
+}
+
+int main(int argc, char *argv[]) {
+    std::string interface = "eth0";
+    int width = 45;
+    int height = 35;
+    bool as_daemon = false;
+
+    static struct option long_options[] = {
+        { "interface",          required_argument, NULL, 'I'},
+        { "dimension",          required_argument, NULL, 'D'},
+        { "daemon",             no_argument,       NULL, 'd'},
+        { 0,                    0,                 0,    0  },
+    };
+
+    int opt;
+    while ((opt = getopt_long(argc, argv, "I:D:d", long_options, NULL)) != -1) {
+        switch (opt) {
+        case 'D':
+            if (sscanf(optarg, "%dx%d", &width, &height) != 2) {
+                fprintf(stderr, "Invalid size spec '%s'\n", optarg);
+                return usage(argv[0]);
+            }
+            break;
+        case 'd':
+            as_daemon = true;
+            break;
+        case 'I':
+            interface = optarg;
+            break;
+        default:
+            return usage(argv[0]);
+        }
+    }
+
 #if DEMO_RGB
-    RGBMatrixFlaschenTaschen display(0, 0, 45, 32);
+    RGBMatrixFlaschenTaschen display(0, 0, width, height);
 #else
     MultiSPI spi(MULTI_SPI_COMMON_CLOCK);
     ColumnAssembly display(&spi);
@@ -118,7 +166,7 @@ int main(int argc, const char *argv[]) {
     // our servers that listen on 0.0.0.0
     // TODO: maybe we should fork/exec already first stage here (but still stay
     // root) to not have this happen in foreground ?
-    for (int i = 0; !IsEthernetReady("eth0") && i < 60; ++i) {
+    for (int i = 0; !IsEthernetReady(interface) && i < 60; ++i) {
         sleep(1);
     }
 
@@ -131,7 +179,7 @@ int main(int argc, const char *argv[]) {
     if (!drop_privs(DROP_PRIV_USER, DROP_PRIV_GROUP))
         return 1;
 
-    if (daemon(0, 0) != 0) {  // Become daemon. TODO: maybe dependent on flag.
+    if (as_daemon && daemon(0, 0) != 0) {  // Become daemon.
         fprintf(stderr, "Failed to become daemon");
     }
 
