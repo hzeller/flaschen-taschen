@@ -6,7 +6,7 @@ Noisebridge Flaschen Taschen Project
 Software for [FlaschenTaschen].
 
 FlaschenTaschn is inspired by [MateLight]: a bunch of us have
-seen Mate Light in action at 32c3 and got excited :)
+seen Mate Light in action at [32c3] and got excited :)
 So our Noisebridge interpretation of it has a German influenced name.
 
 Unfortunately, in the US, bottle reuse is not at all a thing, so there
@@ -24,6 +24,8 @@ Current hardware setup:
    2. column: WS2811   (<- nasty timing sensitive single line serial)
    3. column and 4. column: WS2801  (<- most likely the type to settle on)
 
+![](./img/ft-work-in-progress.jpg)
+
 See little video in the [ExperimentalStage] blog post. Ideally, we'd like to
 have APA102, but they don't seem to be available wired up in the way we'd need
 for the bottles.
@@ -37,7 +39,7 @@ a Raspberry Pi that provides a network API to update the display.
 ### Various server implementations
 
 The FlaschenTaschen display is accessible via some network protocol. The
-protocol is implemented by the `ft-server` ('Flaschen Taschen server`).
+protocol is implemented by `ft-server` ('Flaschen Taschen server`).
 See the [server directory](./server) how to compile and run.
 
 Next to the actual server (running LED strips in milk crate), there are also
@@ -46,7 +48,7 @@ which is in particular useful while the actual FlaschenTaschen display is still
 being set-up but we already want to develop content for the final display.
 The protocol is exactly the same.
 
-For instance, there is a way to visualize in a unix terminal:
+For instance, there is a way to simulate the output in a unix terminal:
 
 <a href="server/#terminal"><img src="img/terminal-screenshot.png" width="200px"></a>
 
@@ -99,7 +101,10 @@ content to the server.
 
 ## Getting started
 
-Note: This project uses a git submodule for controlling ws28xx from the Raspberry Pi software by [jgarf](https://github.com/jgarff/rpi_ws281x)
+Note: This project uses various submodules with libraries used
+([rpi_ws2801](https://github.com/jgarff/rpi_ws281x) and
+[rpi-rgb-led-matrix](https://github.com/hzeller/rpi-rgb-led-matrix)), so we want
+to use `git clone --recursive` to get them together with the main project:
 
 ```bash
 $ git clone --recursive https://github.com/hzeller/flaschen-taschen.git
@@ -107,20 +112,22 @@ $ cd flaschen-taschen
 $ make -C server
 $ sudo ./server/ft-server   # runs as daemon on a Raspberry Pi.
 # Clients to send content to the display can be found in the client/ dir
-$ sudo aptitude install libmagick++-dev
+$ sudo aptitude install libgraphicsmagick++-dev libwebp-dev
 $ make -C client
 ```
 
-If you are reading this after cloning and forget to clone recursively, you can just run the following git command to update the submodule:
+If you are reading this after cloning and forget to clone recursively, run the
+following git command to update the submodules:
 
 ```
 $ git submodule update --init
 ```
 
-## Connecting to the Pi
+## Connecting LED strips to the Pi
 
-Right now, LED strips are wired up with some ad-hoc level shifter (re-using a [RGB Matrix Adapter]
-board). In the near future, this will be replaced by something [dedicated for the task](./hardware):
+Right now, LED strips are wired up with some ad-hoc level shifter
+(re-using a [RGB Matrix Adapter] board). In the near future, this will be
+replaced by something [dedicated for the task](./hardware):
 
 <a href="hardware/"><img src="img/pi-adapter-pcb.png" width="200px"></a>
 
@@ -128,3 +135,4 @@ board). In the near future, this will be replaced by something [dedicated for th
 [MateLight]: https://github.com/jaseg/matelight
 [ExperimentalStage]: http://blog.noisebridge.net/post/139304835544/i-walked-into-noisebridge-yesterday-and-was
 [RGB Matrix Adapter]: https://github.com/hzeller/rpi-rgb-led-matrix/tree/master/adapter/active-3
+[32c3]: https://events.ccc.de/congress/2015/wiki/Static:Main_Page

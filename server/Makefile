@@ -3,7 +3,7 @@
 # display without having it available. We support all the same network API
 # interface, so things can be tested independently.
 #
-# FLASCHEN_TASCHEN_BACKEND can be one of the following
+# FT_BACKEND can be one of the following
 # ft
 #    The implementation that talks to the real FlaschenTaschen LED strip
 #    installation.
@@ -17,7 +17,7 @@
 #    Output things to a LED matrix
 #    (see https://github.com/hzeller/rpi-rgb-led-matrix )
 #
-FLASCHEN_TASCHEN_BACKEND=terminal
+FT_BACKEND=terminal
 
 # RGB matrix related. It is checked out as a submodule in rgb-matrix/
 RGB_INCDIR=rgb-matrix/include
@@ -33,15 +33,15 @@ INCLUDES=-I../common
 OBJECTS=ft-thread.o opc-server.o udp-server.o
 
 # Nested if/else are very awkward, so we just compare each possible outcome
-ifeq ($(FLASCHEN_TASCHEN_BACKEND), ft)
+ifeq ($(FT_BACKEND), ft)
    DEFINES=-DFT_BACKEND=0
    INCLUDES+=-I./rpi_ws281x
-   OBJECTS+=ws2811-flaschen-taschen.o ws2801-flaschen-taschen.o lpd6803-flaschen-taschen.o ft-gpio.o multi-spi.o crate-mapping.o column-assembly.o 
+   OBJECTS+=ws2811-flaschen-taschen.o ws2801-flaschen-taschen.o lpd6803-flaschen-taschen.o ft-gpio.o multi-spi.o crate-mapping.o column-assembly.o
    STATIC_LIBS+=libws281x.a
    LDFLAGS+=$(WS2812_LDFLAGS)
 endif
 
-ifeq ($(FLASCHEN_TASCHEN_BACKEND), rgb-matrix)
+ifeq ($(FT_BACKEND), rgb-matrix)
    DEFINES=-DFT_BACKEND=1
    INCLUDES+=-I$(RGB_INCDIR)
    OBJECTS+=rgb-flaschen-taschen.o
@@ -49,7 +49,7 @@ ifeq ($(FLASCHEN_TASCHEN_BACKEND), rgb-matrix)
    LDFLAGS+=$(RGB_LDFLAGS)
 endif
 
-ifeq ($(FLASCHEN_TASCHEN_BACKEND), terminal)
+ifeq ($(FT_BACKEND), terminal)
    DEFINES=-DFT_BACKEND=2
    OBJECTS+=terminal-flaschen-taschen.o
 endif
@@ -63,12 +63,24 @@ all : ft-server
 ft-server: ft-server-main.o $(OBJECTS) $(STATIC_LIBS)
 	$(CXX) -o $@ $^ $(LDFLAGS)
 
+%.o : %.cc compiler-flags
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+%.o : %.c compiler-flags
+	$(CC) $(CXXFLAGS) -c -o $@ $<
+
 # ws281x does not provide makefile, so build it out-of-band.
 libws281x.a : $(WS2812LIB_OBJECTS)
 	ar rcs $@ $^
 
 $(RGB_LIBRARY):
 	DEFINES=-DRGB_CLASSIC_PINOUT $(MAKE) -C $(RGB_LIBDIR)
+
+# Make sure to re-compile when the compiler flags change.
+compiler-flags: FORCE
+	@echo '$(CXXFLAGS)$(OBJECTS)' | cmp -s - $@ || echo '$(CXXFLAGS)$(OBJECTS)' > $@
+
+.PHONY: FORCE
 
 clean:
 	rm -f libws281x.a ft-server ft-server-main.o $(OBJECTS) $(WS2812LIB_OBJECTS) ft-server-main.o

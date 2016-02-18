@@ -31,6 +31,8 @@
 
 #include <string>
 
+#include "ft-thread.h"
+
 // Pin 11 on Pi
 #define MULTI_SPI_COMMON_CLOCK 17
 
@@ -39,28 +41,19 @@
 #define WS_R1_STRIP_GPIO 7
 #define WS_R2_STRIP_GPIO 10
 
-class OPCThread : public ft::Thread {
-public:
-    OPCThread(FlaschenTaschen *display, ft::Mutex *mutex)
-        : display_(display), mutex_(mutex) {}
-    virtual void Run() {
-        opc_server_run_blocking(display_, mutex_);
-    }
-
-private:
-    FlaschenTaschen *const display_;
-    ft::Mutex *const mutex_;
-};
-
 static int usage(const char *progname) {
     fprintf(stderr, "usage: %s [options]\n", progname);
     fprintf(stderr, "Options:\n"
             "\t-D <width>x<height> : Output dimension. Default 45x35\n"
             "\t-I <interface>      : Which network interface to wait for\n"
             "\t                      to be ready (Empty string '' for no "
-            "waiting)."
-            "Default 'eth0'\n"
-            "\t-d                  : Become daemon\n");
+            "waiting).\n"
+            "\t                      Default 'eth0'\n"
+            "\t-d                  : Become daemon\n"
+            "\t--pixel_pusher      : Run PixelPusher protocol (default: false)\n"
+            "\t--opc               : Run OpenPixelControl protocol (default: false)\n"
+            "(By default, only the FlaschenTaschen UDP protocol is enabled)\n"
+            );
     return 1;
 }
 
@@ -68,12 +61,17 @@ int main(int argc, char *argv[]) {
     std::string interface = "eth0";
     int width = 45;
     int height = 35;
-    bool as_daemon = false;
+    bool run_opc = false;
+
+    enum LongOptionsOnly {
+        OPT_OPC_SERVER = 1000,
+        OPT_PIXEL_PUSHER = 1001,
+    };
 
     static struct option long_options[] = {
         { "interface",          required_argument, NULL, 'I'},
         { "dimension",          required_argument, NULL, 'D'},
-        { "daemon",             no_argument,       NULL, 'd'},
+        { "opc",                no_argument,       NULL,  OPT_OPC_SERVER },
         { 0,                    0,                 0,    0  },
     };
 
@@ -86,11 +84,11 @@ int main(int argc, char *argv[]) {
                 return usage(argv[0]);
             }
             break;
-        case 'd':
-            as_daemon = true;
-            break;
         case 'I':
             interface = optarg;
+            break;
+        case OPT_OPC_SERVER:
+            run_opc = true;
             break;
         default:
             return usage(argv[0]);
@@ -111,8 +109,9 @@ int main(int argc, char *argv[]) {
     TerminalFlaschenTaschen display(width, height);
 #endif
 
-    opc_server_init(7890);
     udp_server_init(1337);
+    // Optional services.
+    if (run_opc) opc_server_init(7890);
 
 #if FT_BACKEND == 1
     display.PostDaemonInit();
@@ -122,8 +121,8 @@ int main(int argc, char *argv[]) {
 
     ft::Mutex mutex;
 
-    OPCThread opc_thread(&display, &mutex);
-    opc_thread.Start();
+    // Optional services as thread.
+    if (run_opc) opc_server_run_thread(&display, &mutex);
 
     udp_server_run_blocking(&display, &mutex);  // last server blocks.
 }

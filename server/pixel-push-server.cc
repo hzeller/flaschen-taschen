@@ -215,7 +215,7 @@ public:
             }
             if (sendto(s, discovery_packet_buffer_, discovery_packet_size_, 0,
                        (struct sockaddr *) &addr, sizeof(addr)) < 0) {
-                perror("Broadcasting problem");
+                perror(PXP "Broadcasting problem");
             }
             nanosleep(&sleep_time, NULL);
         }
@@ -382,7 +382,7 @@ bool pixel_pusher_init(FlaschenTaschen *canvas) {
     return true;
 }
 
-void pixel_pusher_run_threads(FlaschenTaschen *display, Mutex *display_mutex) {
+void pixel_pusher_run_thread(FlaschenTaschen *display, Mutex *display_mutex) {
     // Create our threads.
     Beacon *discovery_beacon = new Beacon(header, pixel_pusher_container);
     PacketReceiver *receiver = new PacketReceiver(display, display_mutex,

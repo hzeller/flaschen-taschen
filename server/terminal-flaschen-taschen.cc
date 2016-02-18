@@ -34,7 +34,7 @@
 // This is a little dark.
 //#define PIXEL_FORMAT   "\033[38;2;%03d;%03d;%03dm*"   // Sent per pixel.
 
-// So, let's just send two spaces 
+// So, let's just send two spaces. First space here, rest separate below.
 #define PIXEL_FORMAT   "\033[48;2;%03d;%03d;%03dm "   // Sent per pixel.
 
 TerminalFlaschenTaschen::TerminalFlaschenTaschen(int width, int height)
@@ -57,11 +57,10 @@ TerminalFlaschenTaschen::TerminalFlaschenTaschen(int width, int height)
 }
 
 void TerminalFlaschenTaschen::SetPixel(int x, int y, const Color &col) {
-    int pos = initial_offset_
+    const int pos = initial_offset_
         + (width_ * y + x) * pixel_offset_
         + y;  // <- one newline per y
-    char *buf = const_cast<char*>(buffer_.data())  // Living on the edge
-        + pos;
+    char *buf = const_cast<char*>(buffer_.data()) + pos;  // Living on the edge
     snprintf(buf, pixel_offset_, PIXEL_FORMAT, col.r, col.g, col.b);
     buf[pixel_offset_-1] = ' ';   // overwrite \0-byte with space again.
 }
