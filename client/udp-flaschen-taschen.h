@@ -53,8 +53,9 @@ private:
     const int fd_;
     const int width_;
     const int height_;
-    const size_t buf_size_;
-    Color *const buffer_;
+    size_t buf_size_;
+    char *buffer_;
+    Color *pixel_buffer_;
 };
 
 #endif  // UDP_FLASCHEN_TASCHEN_H

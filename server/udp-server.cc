@@ -13,19 +13,83 @@
 // along with this program.  If not, see <http://gnu.org/licenses/gpl-2.0.txt>
 
 #include <arpa/inet.h>
-#include <unistd.h>
-#include <stdio.h>
+#include <ctype.h>
+#include <limits.h>
+#include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/types.h>
-#include <sys/socket.h>
 #include <sys/ioctl.h>
-#include <pthread.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 #include "flaschen-taschen.h"
 #include "ft-thread.h"
 #include "servers.h"
+
+struct ImageInfo {
+    int width;
+    int height;
+    int range;
+};
+
+static const char *skipWhitespace(const char *buffer, const char *end) {
+    for (;;) {
+        while (buffer < end && isspace(*buffer))
+            ++buffer;
+        if (buffer >= end)
+            return NULL;
+        if (*buffer == '#') {
+            while (buffer < end && *buffer != '\n') // read to end of line.
+                ++buffer;
+            continue;  // Back to whitespace eating.
+        }
+        return buffer;
+    }
+}
+
+// Read next number. Start reading at *start; modifies the *start pointer
+// to point to the character just after the decimal number or NULL if reading
+// was not successful.
+static int readNextNumber(const char **start, const char *end) {
+    const char *start_number = skipWhitespace(*start, end);
+    if (start_number == NULL) { *start = NULL; return 0; }
+    char *end_number = NULL;
+    int result = strtol(start_number, &end_number, 10);
+    if (end_number == start_number) { *start = NULL; return 0; }
+    *start = end_number;
+    return result;
+}
+
+// Given an image buffer containing either a PPM or raw framebuffer, extract the
+// width and height of the image (if available) and return pointer to start
+// of image data.
+// Image info is left untouched when image does not contain any
+// information.
+static const char *GetImageData(const char *in_buffer, size_t buf_len,
+                                   struct ImageInfo *info) {
+    if (in_buffer[0] != 'P' || in_buffer[1] != '6' ||
+        (!isspace(in_buffer[2]) && in_buffer[2] != '#')) {
+        return in_buffer;  // raw image. No P6 magic header.
+    }
+    const char *const end = in_buffer + buf_len;
+    const char *parse_buffer = in_buffer + 2;
+    const int width = readNextNumber(&parse_buffer, end);
+    if (parse_buffer == NULL) return in_buffer;
+    const int height = readNextNumber(&parse_buffer, end);
+    if (parse_buffer == NULL) return in_buffer;
+    const int range = readNextNumber(&parse_buffer, end);
+    if (parse_buffer == NULL) return in_buffer;
+    if (!isspace(*parse_buffer++)) return in_buffer;   // last char before data
+    // Now make sure that the rest of the buffer still makes sense
+    if (end - parse_buffer < width * height * 3)
+        return in_buffer;   // Uh, not enough data.
+    info->width = width;
+    info->height = height;
+    info->range = range;
+    return parse_buffer;
+}
 
 // public interface
 static int server_socket = -1;
@@ -49,23 +113,28 @@ bool udp_server_init(int port) {
 }
 
 void udp_server_run_blocking(FlaschenTaschen *display, ft::Mutex *mutex) {
-    int frame_buffer_size = display->width() * display->height() * 3;
-    uint8_t *packet_buffer = new uint8_t[frame_buffer_size];
-    bzero(packet_buffer, frame_buffer_size);
+    static const int kBufferSize = 65535;  // maximum UDP has to offer.
+    char *packet_buffer = new char[kBufferSize];
+    bzero(packet_buffer, kBufferSize);
 
     for (;;) {
         ssize_t received_bytes = recvfrom(server_socket,
-                                          packet_buffer, frame_buffer_size,
+                                          packet_buffer, kBufferSize,
                                           0, NULL, 0);
         if (received_bytes < 0) {
             perror("Trouble receiving.");
             break;
         }
 
+        ImageInfo img_info;
+        img_info.width = display->width();  // defaults.
+        img_info.height = display->height();
+
+        const char *pixel_pos = GetImageData(packet_buffer, received_bytes,
+                                             &img_info);
         mutex->Lock();
-        uint8_t *pixel_pos = packet_buffer;
-        for (int y = 0; y < display->height(); ++y) {
-            for (int x = 0; x < display->width(); ++x) {
+        for (int y = 0; y < img_info.height; ++y) {
+            for (int x = 0; x < img_info.width; ++x) {
                 Color c;
                 c.r = *pixel_pos++;
                 c.g = *pixel_pos++;
@@ -76,4 +145,5 @@ void udp_server_run_blocking(FlaschenTaschen *display, ft::Mutex *mutex) {
         display->Send();
         mutex->Unlock();
     }
+    delete [] packet_buffer;
 }

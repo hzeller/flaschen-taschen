@@ -57,6 +57,7 @@ TerminalFlaschenTaschen::TerminalFlaschenTaschen(int width, int height)
 }
 
 void TerminalFlaschenTaschen::SetPixel(int x, int y, const Color &col) {
+    if (x < 0 || x >= width_ || y < 0 || y >= height_) return;
     const int pos = initial_offset_
         + (width_ * y + x) * pixel_offset_
         + y;  // <- one newline per y
