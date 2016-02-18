@@ -38,9 +38,11 @@ namespace {
 // animation delay.
 class PreprocessedFrame {
 public:
-    PreprocessedFrame(const Magick::Image &img, int width, int height)
+    PreprocessedFrame(const Magick::Image &img,
+                      int width, int height, int offset_x, int offset_y)
         : width_(width), content_(-1, width, height) {
         assert(width >= (int) img.columns() && height >= (int) img.rows());
+        content_.SetOffset(offset_x, offset_y);
         int delay_time = img.animationDelay();  // in 1/100s of a second.
         if (delay_time < 1) delay_time = 1;
         delay_micros_ = delay_time * 10000;
@@ -87,6 +89,7 @@ private:
 // all animation frames.
 static bool LoadAnimationAndScale(const char *filename,
                                   int target_width, int target_height,
+                                  int offset_x, int offset_y,
                                   bool scroll,
                                   std::vector<PreprocessedFrame*> *result) {
     std::vector<Magick::Image> frames;
@@ -128,14 +131,17 @@ static bool LoadAnimationAndScale(const char *filename,
     // Now, convert to preprocessed frames.
     for (size_t i = 0; i < image_sequence.size(); ++i) {
         result->push_back(new PreprocessedFrame(image_sequence[i],
-                                                target_width, target_height));
+                                                target_width, target_height,
+                                                offset_x, offset_y));
     }
 
     return true;
 }
 
 void DisplayAnimation(const std::vector<PreprocessedFrame*> &frames,
-                      int display_width, int display_height, int fd) {
+                      int display_width, int display_height,
+                      int offset_x, int offset_y,
+                      int fd) {
     fprintf(stderr, "Display.\n");
     for (unsigned int i = 0; /*forever*/; ++i) {
         PreprocessedFrame *frame = frames[i % frames.size()];
@@ -145,8 +151,9 @@ void DisplayAnimation(const std::vector<PreprocessedFrame*> &frames,
         } else {
             // Width is larger than what we have. Scroll.
             UDPFlaschenTaschen scroll_buffer(fd, display_width, display_height);
-            for (int x_off = 0; x_off < frame->width(); ++x_off) {
-                frame->ExtractCrop(x_off, 0, &scroll_buffer);
+            scroll_buffer.SetOffset(offset_x, offset_y);
+            for (int scroll_x = 0; scroll_x < frame->width(); ++scroll_x) {
+                frame->ExtractCrop(scroll_x, 0, &scroll_buffer);
                 scroll_buffer.Send();
                 usleep(60 * 1000);
             }
@@ -163,25 +170,28 @@ void DisplayAnimation(const std::vector<PreprocessedFrame*> &frames,
 static int usage(const char *progname) {
     fprintf(stderr, "usage: %s [options] <image>\n", progname);
     fprintf(stderr, "Options:\n"
-            "\t-D <width>x<height> : Output dimension. Default 20x20\n"
-            "\t-h <host>           : host (default: flaschen-taschen.local)\n"
-            "\t-s                  : scroll horizontally.\n");
+            "\t-g <width>x<height>[+<off_x>+<off_y>] : Output geometry. Default 20x20+0+0\n"
+            "\t-h <host>                             : host (default: flaschen-taschen.local)\n"
+            "\t-s                                    : scroll horizontally.\n");
     return 1;
 }
 
 int main(int argc, char *argv[]) {
     Magick::InitializeMagick(*argv);
 
-    bool scroll = false;
+    bool do_scroll = false;
     int width = 20;
     int height = 20;
+    int off_x = 0;
+    int off_y = 0;
     const char *host = "flaschen-taschen.local";
 
     int opt;
-    while ((opt = getopt(argc, argv, "D:h:s")) != -1) {
+    while ((opt = getopt(argc, argv, "g:h:s")) != -1) {
         switch (opt) {
-        case 'D':
-            if (sscanf(optarg, "%dx%d", &width, &height) != 2) {
+        case 'g':
+            if (sscanf(optarg, "%dx%d%d%d", &width, &height, &off_x, &off_y)
+                < 2) {
                 fprintf(stderr, "Invalid size spec '%s'", optarg);
                 return usage(argv[0]);
             }
@@ -190,7 +200,7 @@ int main(int argc, char *argv[]) {
             host = strdup(optarg); // leaking. Ignore.
             break;
         case 's':
-            scroll = true;
+            do_scroll = true;
             break;
         default:
             return usage(argv[0]);
@@ -215,11 +225,13 @@ int main(int argc, char *argv[]) {
     const char *filename = argv[optind];
 
     std::vector<PreprocessedFrame*> frames;
-    if (!LoadAnimationAndScale(filename, width, height, scroll, &frames)) {
+    if (!LoadAnimationAndScale(filename,
+                               width, height, off_x, off_y,
+                               do_scroll, &frames)) {
         return 1;
     }
 
-    DisplayAnimation(frames, width, height, fd);
+    DisplayAnimation(frames, width, height, off_x, off_y, fd);
 
     close(fd);
     return 0;

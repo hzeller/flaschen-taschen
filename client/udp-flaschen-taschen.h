@@ -45,6 +45,10 @@ public:
     void Send(int fd);     // Send to given file-descriptor.
     void Clear();          // Clear screen (fill with black).
 
+    // Set offset where this picture should be displayed on the remote
+    // display.
+    void SetOffset(int offset_x, int offset_y);
+
     // Get pixel color at given position. Coordinates outside the range
     // are wrapped around.
     const Color &GetPixel(int x, int y);
@@ -53,9 +57,14 @@ private:
     const int fd_;
     const int width_;
     const int height_;
+
+    // Raw transmit buffer
     size_t buf_size_;
     char *buffer_;
-    Color *pixel_buffer_;
+
+    // pointers into the buffer.
+    Color *pixel_buffer_start_;
+    char *footer_start_;
 };
 
 #endif  // UDP_FLASCHEN_TASCHEN_H

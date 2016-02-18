@@ -32,6 +32,8 @@ struct ImageInfo {
     int width;
     int height;
     int range;
+    int offset_x;
+    int offset_y;
 };
 
 static const char *skipWhitespace(const char *buffer, const char *end) {
@@ -83,8 +85,20 @@ static const char *GetImageData(const char *in_buffer, size_t buf_len,
     if (parse_buffer == NULL) return in_buffer;
     if (!isspace(*parse_buffer++)) return in_buffer;   // last char before data
     // Now make sure that the rest of the buffer still makes sense
-    if (end - parse_buffer < width * height * 3)
+    const size_t expected_image_data = width * height * 3;
+    const size_t actual_data = end - parse_buffer;
+    if (actual_data < expected_image_data)
         return in_buffer;   // Uh, not enough data.
+    if (actual_data > expected_image_data) {
+        // Our extension: at the end of the binary data, we provide an optional
+        // offset. We can't store it in the header, as it is fixed in number
+        // of fields. But nobody cares what is at the end of the buffer.
+        const char *offset_data = parse_buffer + expected_image_data;
+        info->offset_x = readNextNumber(&offset_data, end);
+        if (offset_data != NULL) {
+            info->offset_y = readNextNumber(&offset_data, end);
+        }
+    }
     info->width = width;
     info->height = height;
     info->range = range;
@@ -126,7 +140,7 @@ void udp_server_run_blocking(FlaschenTaschen *display, ft::Mutex *mutex) {
             break;
         }
 
-        ImageInfo img_info;
+        ImageInfo img_info = {0};
         img_info.width = display->width();  // defaults.
         img_info.height = display->height();
 
@@ -139,7 +153,9 @@ void udp_server_run_blocking(FlaschenTaschen *display, ft::Mutex *mutex) {
                 c.r = *pixel_pos++;
                 c.g = *pixel_pos++;
                 c.b = *pixel_pos++;
-                display->SetPixel(x, y, c);
+                display->SetPixel(x + img_info.offset_x,
+                                  y + img_info.offset_y,
+                                  c);
             }
         }
         display->Send();

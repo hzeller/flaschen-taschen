@@ -25,20 +25,20 @@ make send-image
 ```
 usage: ./send-image [options] <image>
 Options:
-        -D <width>x<height> : Output dimension. Default 20x20
-        -h <host>           : host (default: flaschen-taschen.local)
-        -s                  : scroll horizontally.
+        -g <width>x<height>[+<off_x>+<off_y>] : Output geometry. Default 20x20+0+0
+        -h <host>                             : host (default: flaschen-taschen.local)
+        -s                                    : scroll horizontally.
 ```
 
 Essentially just send the FlaschenTaschen display an image over the network:
 
 ```
-./send-image some-image.png
+./send-image -g10x20+15+7 some-image.png
 ```
 
-Images will be scaled to the display dimensions and shown.
-(You can give display dimensions with `-D` option, but they are already pre-set
-to the current FlaschenTaschen installation).
+Image will be scaled to the given size (here 10x20) and shown
+on the FlaschenTaschen display at the given offset (here 15 pixels x-offset,
+7 pixels y-offset).
 
 The program exits as soon as the image is sent unless it is an animated gif in
 which case `send-image` keeps streaming until interrupted with `Ctrl-C`.
@@ -80,3 +80,6 @@ int main() {
     canvas.Send();                           // Send the framebuffer.
 }
 ```
+
+Next step, try a [simple-animation.cc](./simple-animation.cc)
+<a href="./simple-animation.cc"><img src="../img/invader.png" width="50px"></a>

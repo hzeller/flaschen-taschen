@@ -11,7 +11,16 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://gnu.org/licenses/gpl-2.0.txt>
-
+//
+//
+// Our format has the same header and data as a P6 PPM format.
+// However, we add an optional footer with offset_x and offset_y where
+// to display the PPM image.
+// This is to
+//   * be compatible with regular PPM: it can be read, but footer is ignored.
+//   * it couldn't have been put in the header, as that is already strictly
+//     defined to contain exactly three decimal numbers.
+//
 #include "udp-flaschen-taschen.h"
 
 #include <assert.h>
@@ -50,30 +59,39 @@ int OpenFlaschenTaschenSocket(const char *host) {
     return fd;
 }
 
+// Let's have a fixed-size footer for fixed buffer calculation.
+static const int kFooterLen = strlen("\n0001 0001\n") + 1;  // offset-x and y
+
 UDPFlaschenTaschen::UDPFlaschenTaschen(int socket, int width, int height)
     : fd_(socket), width_(width), height_(height) {
     char header[64];
     int header_len = snprintf(header, sizeof(header),
                               "P6\n%d %d\n255\n", width, height);
-    buf_size_ = header_len + width_ * height_ * sizeof(Color);
+    buf_size_ = header_len + width_ * height_ * sizeof(Color) + kFooterLen;
     buffer_ = new char[buf_size_];
     bzero(buffer_, buf_size_);
     strcpy(buffer_, header);
-    pixel_buffer_ = reinterpret_cast<Color*>(buffer_ + header_len);
+    pixel_buffer_start_ = reinterpret_cast<Color*>(buffer_ + header_len);
+    footer_start_ = buffer_ + buf_size_ - kFooterLen;
+    SetOffset(0, 0);
 }
 UDPFlaschenTaschen::~UDPFlaschenTaschen() { delete [] buffer_; }
 
 void UDPFlaschenTaschen::Clear() {
-    bzero(pixel_buffer_, width_ * height_ * sizeof(Color));
+    bzero(pixel_buffer_start_, width_ * height_ * sizeof(Color));
+}
+
+void UDPFlaschenTaschen::SetOffset(int offset_x, int offset_y){
+    snprintf(footer_start_, kFooterLen, "\n%4d %4d\n", offset_x, offset_y);
 }
 
 void UDPFlaschenTaschen::SetPixel(int x, int y, const Color &col) {
     if (x < 0 || x >= width_ || y < 0 || y >= height_) return;
-    pixel_buffer_[x + y * width_] = col;
+    pixel_buffer_start_[x + y * width_] = col;
 }
 
 const Color &UDPFlaschenTaschen::GetPixel(int x, int y) {
-    return pixel_buffer_[(x % width_) + (y % height_) * width_];
+    return pixel_buffer_start_[(x % width_) + (y % height_) * width_];
 }
 
 void UDPFlaschenTaschen::UDPFlaschenTaschen::Send(int fd) {

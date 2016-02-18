@@ -59,12 +59,22 @@ To make it simple to illuminate the matrix, there are _three_ protocols that
 are all supported:
 
  * Receives UDP packet on port 1337 interpreted as raw PPM file (`P6`).
-   A 10x10 image looks like this (header + data).
-   
-P6<br/>
-10 10<br/>
-255<br/>
-![](./img/udp.png)
+   A 10x10 image looks like this (header + data + optional footer).
+
+```
+P6     # Magic number
+10 10  # width height (decimal, number in ASCII)
+255    # values per color (fixed)
+```
+![](./img/udp.png)<br/>
+```
+5      # optional x offset
+5      # optional y offset
+```
+
+Optionally, at the end of the image data (and as extension to the PPM file
+format), there can be a footer with decimal numbers describing the offset
+at which the image is to be displayed on the display.
 
  * Runs http://openpixelcontrol.org/ server on standard port 7890
    (Simulated layout row 0: left-right, row 1: right-left, row 2: left-right...;
