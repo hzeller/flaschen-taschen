@@ -37,7 +37,7 @@ a Raspberry Pi that provides a network API to update the display.
 ## Tutorial: getting started
 
 To develop visuals for the FlaschenTaschen display once it is ready, here you
-already can play around writing software that updates the networked display.
+can already play around writing software that updates the networked display.
 
 #### 1. Check out the project
 
@@ -76,7 +76,7 @@ the programs and run it.
 ```
 $ cd client
 $ make simple-animation
-$ ./simple-animation localhost # <- network address of output
+$ ./simple-animation localhost # <- network address of display.
 ```
 
 Easiest to get started with the programming is
