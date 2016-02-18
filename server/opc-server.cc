@@ -25,8 +25,9 @@
 #include <arpa/inet.h>
 #include <sys/time.h>
 
-#include "servers.h"
 #include "flaschen-taschen.h"
+#include "ft-thread.h"
+#include "servers.h"
 
 #define SHOW_REFRESH_RATE 0
 
@@ -158,6 +159,21 @@ bool opc_server_init(int port) {
     return true;
 }
 
-void opc_server_run_blocking(FlaschenTaschen *display, ft::Mutex *mutex) {
-    run_server(server_socket, display, mutex);
+class OPCThread : public ft::Thread {
+public:
+    OPCThread(FlaschenTaschen *display, ft::Mutex *mutex)
+        : display_(display), mutex_(mutex) {}
+
+    virtual void Run() {
+        run_server(server_socket, display_, mutex_);
+    }
+
+private:
+    FlaschenTaschen *const display_;
+    ft::Mutex *const mutex_;
+};
+
+void opc_server_run_thread(FlaschenTaschen *display, ft::Mutex *mutex) {
+    OPCThread *thread = new OPCThread(display, mutex);
+    thread->Start();
 }

@@ -17,16 +17,19 @@ These are the options
 ```
 usage: ./ft-server [options]
 Options:
-        -D <width>x<height> : Output dimension. Default 45x35
-        -I <interface>      : Which network interface to wait for
-                              to be ready (Empty string '' for no waiting).
-                              Default 'eth0'
-        -d                  : Become daemon
+	-D <width>x<height> : Output dimension. Default 45x35
+	-I <interface>      : Which network interface to wait for
+	                      to be ready (Empty string '' for no waiting).
+	                      Default 'eth0'
+	-d                  : Become daemon
+	--pixel_pusher      : Run PixelPusher protocol (default: false)
+	--opc               : Run OpenPixelControl protocol (default: false)
+(By default, only the FlaschenTaschen UDP protocol is enabled)
 ```
 
 ```bash
  # Run as root.
- sudo ./ft-server -d
+ sudo ./ft-server -d --opc --pixel_pusher
 ```
 
 The server has to be started as root as it has to access and initialize the
@@ -64,7 +67,7 @@ terminal.
 ```
 
 ```bash
-  # Then run and pass the desired resolution.
+  # Then run (and optionally pass the desired resolution)
   ./ft-server -D45x35
 ```
 

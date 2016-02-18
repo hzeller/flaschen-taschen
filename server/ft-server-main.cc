@@ -32,6 +32,8 @@
 
 #include <string>
 
+#include "ft-thread.h"
+
 // Pin 11 on Pi
 #define MULTI_SPI_COMMON_CLOCK 17
 
@@ -99,19 +101,6 @@ static bool IsEthernetReady(const std::string &interface) {
     return success;
 }
 
-class OPCThread : public ft::Thread {
-public:
-    OPCThread(FlaschenTaschen *display, ft::Mutex *mutex)
-        : display_(display), mutex_(mutex) {}
-    virtual void Run() {
-        opc_server_run_blocking(display_, mutex_);
-    }
-
-private:
-    FlaschenTaschen *const display_;
-    ft::Mutex *const mutex_;
-};
-
 static int usage(const char *progname) {
     fprintf(stderr, "usage: %s [options]\n", progname);
     fprintf(stderr, "Options:\n"
@@ -120,7 +109,11 @@ static int usage(const char *progname) {
             "\t                      to be ready (Empty string '' for no "
             "waiting).\n"
             "\t                      Default 'eth0'\n"
-            "\t-d                  : Become daemon\n");
+            "\t-d                  : Become daemon\n"
+            "\t--pixel_pusher      : Run PixelPusher protocol (default: false)\n"
+            "\t--opc               : Run OpenPixelControl protocol (default: false)\n"
+            "(By default, only the FlaschenTaschen UDP protocol is enabled)\n"
+            );
     return 1;
 }
 
@@ -129,11 +122,20 @@ int main(int argc, char *argv[]) {
     int width = 45;
     int height = 35;
     bool as_daemon = false;
+    bool run_opc = false;
+    bool run_pixel_pusher = false;
+
+    enum LongOptionsOnly {
+        OPT_OPC_SERVER = 1000,
+        OPT_PIXEL_PUSHER = 1001,
+    };
 
     static struct option long_options[] = {
         { "interface",          required_argument, NULL, 'I'},
         { "dimension",          required_argument, NULL, 'D'},
         { "daemon",             no_argument,       NULL, 'd'},
+        { "opc",                no_argument,       NULL,  OPT_OPC_SERVER },
+        { "pixel_pusher",       no_argument,       NULL,  OPT_PIXEL_PUSHER },
         { 0,                    0,                 0,    0  },
     };
 
@@ -151,6 +153,12 @@ int main(int argc, char *argv[]) {
             break;
         case 'I':
             interface = optarg;
+            break;
+        case OPT_OPC_SERVER:
+            run_opc = true;
+            break;
+        case OPT_PIXEL_PUSHER:
+            run_pixel_pusher = true;
             break;
         default:
             return usage(argv[0]);
@@ -179,9 +187,11 @@ int main(int argc, char *argv[]) {
         sleep(1);
     }
 
-    opc_server_init(7890);
-    pixel_pusher_init(&display);
     udp_server_init(1337);
+
+    // Optional services.
+    if (run_opc) opc_server_init(7890);
+    if (run_pixel_pusher) pixel_pusher_init(&display);
 
     // After hardware is set up and all servers are listening, we can
     // drop the privileges.
@@ -200,9 +210,9 @@ int main(int argc, char *argv[]) {
 
     ft::Mutex mutex;
 
-    OPCThread opc_thread(&display, &mutex);
-    opc_thread.Start();
-    pixel_pusher_run_threads(&display, &mutex);
+    // Optional services as thread.
+    if (run_opc) opc_server_run_thread(&display, &mutex);
+    if (run_pixel_pusher) pixel_pusher_run_thread(&display, &mutex);
 
     udp_server_run_blocking(&display, &mutex);  // last server blocks.
 }
