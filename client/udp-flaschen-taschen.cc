@@ -51,24 +51,29 @@ int OpenFlaschenTaschenSocket(const char *host) {
 }
 
 UDPFlaschenTaschen::UDPFlaschenTaschen(int socket, int width, int height)
-    : fd_(socket), width_(width), height_(height),
-      buf_size_(width * height * sizeof(Color)),
-      buffer_(new Color [ buf_size_ ]) {
+    : fd_(socket), width_(width), height_(height) {
+    char header[64];
+    int header_len = snprintf(header, sizeof(header),
+                              "P6\n%d %d\n255\n", width, height);
+    buf_size_ = header_len + width_ * height_ * sizeof(Color);
+    buffer_ = new char[buf_size_];
     bzero(buffer_, buf_size_);
+    strcpy(buffer_, header);
+    pixel_buffer_ = reinterpret_cast<Color*>(buffer_ + header_len);
 }
 UDPFlaschenTaschen::~UDPFlaschenTaschen() { delete [] buffer_; }
 
 void UDPFlaschenTaschen::Clear() {
-    bzero(buffer_, buf_size_);
+    bzero(pixel_buffer_, width_ * height_ * sizeof(Color));
 }
 
 void UDPFlaschenTaschen::SetPixel(int x, int y, const Color &col) {
     if (x < 0 || x >= width_ || y < 0 || y >= height_) return;
-    memcpy(buffer_ + x + y * width_, &col, sizeof(Color));
+    pixel_buffer_[x + y * width_] = col;
 }
 
 const Color &UDPFlaschenTaschen::GetPixel(int x, int y) {
-    return buffer_[(x % width_) + (y % height_) * width_];
+    return pixel_buffer_[(x % width_) + (y % height_) * width_];
 }
 
 void UDPFlaschenTaschen::UDPFlaschenTaschen::Send(int fd) {

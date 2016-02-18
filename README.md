@@ -58,13 +58,12 @@ For instance, there is a way to simulate the output in a unix terminal:
 To make it simple to illuminate the matrix, there are _three_ protocols that
 are all supported:
 
- * Receives UDP packet on port 1337 interpreted as framebuffer (RGBRGB...)
-   (Simulated layout standard left-right, top-bottom framebuffer expected). Easy
-   way to get such raw picture is to edit out the header out of *.ppm file.
-   (this protocol is likely to change to include size essentially directly
-   accepting a `P6` PPM file. This makes things more flexible and easier
-   to send. And we can extend it for offset. But for now: just a raw image).
-
+ * Receives UDP packet on port 1337 interpreted as raw PPM file (`P6`).
+   A 10x10 image looks like this (header + data).
+   
+P6<br/>
+10 10<br/>
+255<br/>
 ![](./img/udp.png)
 
  * Runs http://openpixelcontrol.org/ server on standard port 7890
@@ -85,16 +84,15 @@ Within noisebridge, the hostname is `flaschen-taschen.local`.
 So, for instance you can send a raw image to the service like this; each pixel
 represented by a red/green/blue byte.
 
-```
-cat raw-image.bytes | socat STDIO UDP-SENDTO:flaschen-taschen.local:1337
-```
-
-Or, if you are using bash, it is even simpler
-```
-cat raw-image.bytes > /dev/udp/flaschen-taschen.local/1337
+```bash
+cat image.ppm > /dev/udp/flaschen-taschen.local/1337   # ft-installation
 ```
 
-The current display is 10x10 pixels, so it would be 3 * 100 bytes.
+(If you're not using `bash`, you can use the network-swiss army knife `socat`
+```
+cat image.ppm | socat STDIO UDP4-SENDTO:flaschen-taschen.local:1337
+```
+)
 
 You find more in the [client directory](./client) to directly send
 content to the server.
