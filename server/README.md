@@ -1,8 +1,8 @@
 Server implementation
 =====================
 
-The server implements the protocols described in the
-[toplevel README](../README.md).
+The server implements various [protocols](../doc/protocols.md) so that
+it is easy to interface with the display over the network.
 
 ## Regular Flaschen Taschen server
 
@@ -19,17 +19,17 @@ usage: ./ft-server [options]
 Options:
 	-D <width>x<height> : Output dimension. Default 45x35
 	-I <interface>      : Which network interface to wait for
-	                      to be ready (Empty string '' for no waiting).
-	                      Default 'eth0'
+	                      to be ready (e.g. eth0. Empty string '' for no waiting).
+	                      Default ''
 	-d                  : Become daemon
-	--pixel_pusher      : Run PixelPusher protocol (default: false)
+	--pixel-pusher      : Run PixelPusher protocol (default: false)
 	--opc               : Run OpenPixelControl protocol (default: false)
 (By default, only the FlaschenTaschen UDP protocol is enabled)
 ```
 
 ```bash
  # Run as root.
- sudo ./ft-server -d --opc --pixel_pusher
+ sudo ./ft-server -d --opc --pixel-pusher
 ```
 
 The server has to be started as root as it has to access and initialize the

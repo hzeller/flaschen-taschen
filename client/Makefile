@@ -6,6 +6,10 @@ MAGICK_LDFLAGS=`GraphicsMagick++-config --ldflags --libs`
 
 all : send-image simple-example simple-animation
 
+simple-animation: simple-animation.cc
+
+simple-example: simple-example.cc
+
 send-image : send-image.cc $(OBJECTS)
 	$(CXX) $(CXXFLAGS) $(MAGICK_CXXFLAGS) -o $@ $^ $(MAGICK_LDFLAGS)
 

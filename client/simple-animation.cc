@@ -63,7 +63,7 @@ int main(int argc, char *argv[]) {
         hostname = argv[1];     // Single command line argument.
     }
 
-    // Open socket and create our canvas.
+    // Open socket.
     const int socket = OpenFlaschenTaschenSocket(hostname);
 
     // Prepare a couple of frames ready to send.
