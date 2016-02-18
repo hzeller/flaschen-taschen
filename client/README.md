@@ -80,3 +80,6 @@ int main() {
     canvas.Send();                           // Send the framebuffer.
 }
 ```
+
+Next step, try a [simple-animation.cc](./simple-animation.cc)
+<a href="./simple-animation.cc"><img src="../img/invader.png" width="50px"></a>
