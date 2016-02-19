@@ -34,102 +34,66 @@ Final set-up will be 9 crates wide and 7 crates high for a total of 63 crates
 with 25 'pixels' each. 45x35 pixels or 1575 pixels total. All operated by
 a Raspberry Pi that provides a network API to update the display.
 
-## Getting Pixels on Flaschen Taschen
+## Tutorial: getting started
 
-### Various server implementations
+To develop visuals for the FlaschenTaschen display once it is ready, here you
+can already play around writing software that updates the networked display.
 
-The FlaschenTaschen display is accessible via some network protocol. The
-protocol is implemented by `ft-server` ('Flaschen Taschen server`).
-See the [server directory](./server) how to compile and run.
-
-Next to the actual server (running LED strips in milk crate), there are also
-some test servers available that allow different ways to display content -
-which is in particular useful while the actual FlaschenTaschen display is still
-being set-up but we already want to develop content for the final display.
-The protocol is exactly the same.
-
-For instance, there is a way to simulate the output in a unix terminal:
-
-<a href="server/#terminal"><img src="img/terminal-screenshot.png" width="200px"></a>
-
-(See the [client directory](./client) how to send content).
-
-### Protocols
-To make it simple to illuminate the matrix, there are _three_ protocols that
-are all supported:
-
- * Receives UDP packet on port 1337 interpreted as raw PPM file (`P6`).
-   A 10x10 image looks like this (header + data + optional footer).
-
-```
-P6     # Magic number
-10 10  # width height (decimal, number in ASCII)
-255    # values per color (fixed)
-```
-![](./img/udp.png)<br/>
-```
-5      # optional x offset
-5      # optional y offset
-```
-
-Optionally, at the end of the image data (and as extension to the PPM file
-format), there can be a footer with decimal numbers describing the offset
-at which the image is to be displayed on the display.
-
- * Runs http://openpixelcontrol.org/ server on standard port 7890
-   (Simulated layout row 0: left-right, row 1: right-left, row 2: left-right...;
-   this is what their standard `wall.py` script assumes).
-
-![](./img/opc.png)
-
- * Provides pixel pusher control via standard beacon (this is cool to be used
-   together with processing, there are libs that support it).
-   (Simulated layout: 10 strips starting on the left with 10 pixels each;
-   pretty much like a standard framebuffer).
-
-![](./img/pixelpusher.png)
-
-Within noisebridge, the hostname is `flaschen-taschen.local`.
-
-So, for instance you can send a raw image to the service like this; each pixel
-represented by a red/green/blue byte.
-
-```bash
-cat image.ppm > /dev/udp/flaschen-taschen.local/1337   # ft-installation
-```
-
-(If you're not using `bash`, you can use the network-swiss army knife `socat`
-```
-cat image.ppm | socat STDIO UDP4-SENDTO:flaschen-taschen.local:1337
-```
-)
-
-You find more in the [client directory](./client) to directly send
-content to the server.
-
-## Getting started
-
-Note: This project uses various submodules with libraries used
-([rpi_ws2801](https://github.com/jgarff/rpi_ws281x) and
-[rpi-rgb-led-matrix](https://github.com/hzeller/rpi-rgb-led-matrix)), so we want
-to use `git clone --recursive` to get them together with the main project:
+#### 1. Check out the project
 
 ```bash
 $ git clone --recursive https://github.com/hzeller/flaschen-taschen.git
 $ cd flaschen-taschen
-$ make -C server
-$ sudo ./server/ft-server   # runs as daemon on a Raspberry Pi.
-# Clients to send content to the display can be found in the client/ dir
-$ sudo aptitude install libgraphicsmagick++-dev libwebp-dev
-$ make -C client
 ```
 
-If you are reading this after cloning and forget to clone recursively, run the
-following git command to update the submodules:
+Make sure to use the `--recursive` flag, as there are sub-modules to check
+out. If you forgot that, type
 
 ```
 $ git submodule update --init
 ```
+
+in the `flaschen-taschen/` directory.
+
+#### 2. Compile and run local server
+In one terminal, go to the [server/](./server) directory, compile the
+terminal-based display and run it. Make sure to have it large enough to show
+all pixels:
+
+```
+$ cd server
+$ make FT_BACKEND=terminal
+$ ./ft-server   #  this will now show a black 'screen'
+```
+
+If you want to dig into details and understand the various server
+implementations, check out the [server README](./server/README.md).
+
+#### 3. Run client programs
+In another terminal, go to the [client/](./client) directory, compile
+the programs and run it.
+
+```
+$ cd client
+$ make simple-animation
+$ ./simple-animation localhost # <- network address of display.
+```
+
+Easiest to get started with the programming is
+to read the [simple-example.cc](./client/simple-example.cc) code, then move on
+to [simple-animation.cc](./client/simple-animation.cc).
+
+If you want to implement the simple network protocol in another language
+[check out the protocol description](./doc/protocols.md) or look at the
+[C++ implementation](./client/udp-flaschen-taschen.cc)
+
+For some immediate fun, compile send-image (`make send-image`, see
+[SendImage section in client/](./client/README.md#sendimage) for needed
+dependencies), then run
+`./send-image -h localhost some-image.png` which reads images and
+sends them to the FlaschenTaschen display (also animated gifs):
+
+<a href="server/#terminal"><img src="img/terminal-screenshot.png" width="200px"></a>
 
 ## Connecting LED strips to the Pi
 

@@ -1,0 +1,68 @@
+Protocols
+=========
+
+To make it simple to illuminate the matrix, there are _three_ protocols that
+are all supported:
+
+### Standard Flaschen Taschen protocol
+
+Receives UDP packets with a raw PPM file (`P6`) on port 1337.
+A 10x10 image looks like this (header + data + optional footer).
+
+```
+P6     # Magic number
+10 10  # width height (decimal, number in ASCII)
+255    # values per color (fixed)
+```
+![](../img/udp.png)<br/>
+```
+5      # optional x offset
+5      # optional y offset
+```
+
+Optionally, at the end of the image data (and our extension to the PPM file
+format), there can be a footer with decimal numbers describing the offset
+at which the image is to be displayed on the display.
+
+This allows to place an image at an arbitrary position - good for animations
+or having non-overlapping areas on the screen.
+
+Since the server accepts a standard PPM format, sending an image is as
+simple as this:
+
+```bash
+# This works in the bash shell
+cat image.ppm > /dev/udp/flaschen-taschen.local/1337   # ft-installation
+# replace 'flaschen-taschen.local' with 127.0.0.1 if you have
+# a locally running server, e.g. terminal based
+```
+
+If you're not using `bash`, then the `/dev/udp/...` path won't work, then
+you can use the network-swiss army knife `socat`
+```
+cat image.ppm | socat STDIO UDP4-SENDTO:flaschen-taschen.local:1337
+```
+
+You find more in the [client directory](../client) to directly send
+content to the server, including a convenient class that already provides
+an implementation of the client side.
+
+### OpenPixelControl
+
+The http://openpixelcontrol.org/ socket listens on standard port 7890
+(Simulated layout row 0: left-right, row 1: right-left, row 2: left-right...;
+this is what their standard `wall.py` script assumes).
+
+![](../img/opc.png)
+
+### PixelPusher
+
+Provides pixel pusher control via standard beacon (this is cool to be used
+together with processing, there are libs that support it).
+(Simulated layout: 10 strips starting on the left with 10 pixels each;
+pretty much like a standard framebuffer).
+
+![](../img/pixelpusher.png)
+
+### Installation
+Within Noisebridge, the hostname is `flaschen-taschen.local`.

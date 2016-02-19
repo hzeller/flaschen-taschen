@@ -6,11 +6,15 @@ MAGICK_LDFLAGS=`GraphicsMagick++-config --ldflags --libs`
 
 all : send-image simple-example simple-animation
 
+simple-animation: simple-animation.cc $(OBJECTS)
+
+simple-example: simple-example.cc $(OBJECTS)
+
 send-image : send-image.cc $(OBJECTS)
 	$(CXX) $(CXXFLAGS) $(MAGICK_CXXFLAGS) -o $@ $^ $(MAGICK_LDFLAGS)
 
 % : %.cc
-	$(CXX) $(CXXFLAGS) -o $@ $^ $(OBJECTS)
+	$(CXX) $(CXXFLAGS) -o $@ $^
 
 clean:
-	rm -f send-image simple-example simple-animation
+	rm -f send-image simple-example simple-animation $(OBJECTS)

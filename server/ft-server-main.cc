@@ -46,11 +46,11 @@ static int usage(const char *progname) {
     fprintf(stderr, "Options:\n"
             "\t-D <width>x<height> : Output dimension. Default 45x35\n"
             "\t-I <interface>      : Which network interface to wait for\n"
-            "\t                      to be ready (Empty string '' for no "
+            "\t                      to be ready (e.g eth0. Empty string '' for no "
             "waiting).\n"
-            "\t                      Default 'eth0'\n"
+            "\t                      Default ''\n"
             "\t-d                  : Become daemon\n"
-            "\t--pixel_pusher      : Run PixelPusher protocol (default: false)\n"
+            "\t--pixel-pusher      : Run PixelPusher protocol (default: false)\n"
             "\t--opc               : Run OpenPixelControl protocol (default: false)\n"
             "(By default, only the FlaschenTaschen UDP protocol is enabled)\n"
             );
@@ -58,7 +58,7 @@ static int usage(const char *progname) {
 }
 
 int main(int argc, char *argv[]) {
-    std::string interface = "eth0";
+    std::string interface = "";
     int width = 45;
     int height = 35;
     bool run_opc = false;

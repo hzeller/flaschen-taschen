@@ -82,6 +82,8 @@ void UDPFlaschenTaschen::Clear() {
 }
 
 void UDPFlaschenTaschen::SetOffset(int offset_x, int offset_y){
+    // Our extension to the PPM format adds additional information after the
+    // image data.
     snprintf(footer_start_, kFooterLen, "\n%4d %4d\n", offset_x, offset_y);
 }
 
