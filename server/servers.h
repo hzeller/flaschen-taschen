@@ -30,7 +30,7 @@ void udp_server_run_blocking(FlaschenTaschen *display, ft::Mutex *mutex);
 bool opc_server_init(int port);
 void opc_server_run_thread(FlaschenTaschen *display, ft::Mutex *mutex);
 
-bool pixel_pusher_init(FlaschenTaschen *canvas);
+bool pixel_pusher_init(const char *interface, FlaschenTaschen *canvas);
 void pixel_pusher_run_thread(FlaschenTaschen *display, ft::Mutex *mutex);
 
 #endif // OPC_SERVER_H

@@ -32,7 +32,7 @@ for the bottles.
 
 Final set-up will be 9 crates wide and 7 crates high for a total of 63 crates
 with 25 'pixels' each. 45x35 pixels or 1575 pixels total. All operated by
-a Raspberry Pi that provides a network API to update the display.
+a Raspberry Pi that provides a [network API][protocols] to update the display.
 
 ## Tutorial: getting started
 
@@ -108,3 +108,4 @@ replaced by something [dedicated for the task](./hardware):
 [ExperimentalStage]: http://blog.noisebridge.net/post/139304835544/i-walked-into-noisebridge-yesterday-and-was
 [RGB Matrix Adapter]: https://github.com/hzeller/rpi-rgb-led-matrix/tree/master/adapter/active-3
 [32c3]: https://events.ccc.de/congress/2015/wiki/Static:Main_Page
+[protocols]: ./doc/protocols.md

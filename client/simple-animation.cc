@@ -1,16 +1,19 @@
 // -*- mode: c++; c-basic-offset: 4; indent-tabs-mode: nil; -*-
 //
-// Simple example how to write a client.
-// This sets two points. A red at (0,0); a blue dot at (5,5)
-// If you run your local server (e.g. the terminal server), just call binary
-// with 127.0.0.1 instead of flaschen-taschen.local
+// Simple example how to write an animation. Prepares two UDPFlaschenTaschen
+// with one frame of an invader animation each and shows them in sequence
+// while modifying the position on the screen.
 //
-//  ./simple-animation 127.0.0.1
+// If you run at Noisebridge, call the binary with the Noisebridge
+// display hostname flaschen-taschen.local:
+//
+// ./simple-animation flaschen-taschen.local
 
 #include "udp-flaschen-taschen.h"
 
 #include <vector>
 #include <unistd.h>
+#include <stdio.h>
 
 #define INVADER_ROWS 8
 #define INVADER_WIDTH 11
@@ -58,10 +61,11 @@ UDPFlaschenTaschen *CreateFromPattern(const char *invader[],
 }
 
 int main(int argc, char *argv[]) {
-    const char *hostname = "flaschen-taschen.local";
+    const char *hostname = "127.0.0.1";
     if (argc > 1) {
         hostname = argv[1];     // Single command line argument.
     }
+    fprintf(stderr, "Sending to %s\n", hostname);
 
     // Open socket.
     const int socket = OpenFlaschenTaschenSocket(hostname);

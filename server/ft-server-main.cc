@@ -109,9 +109,12 @@ int main(int argc, char *argv[]) {
     TerminalFlaschenTaschen display(width, height);
 #endif
 
-    udp_server_init(1337);
+    if (!udp_server_init(1337))
+        return 1;
+
     // Optional services.
-    if (run_opc) opc_server_init(7890);
+    if (run_opc && !opc_server_init(7890))
+        return 1;
 
 #if FT_BACKEND == 1
     display.PostDaemonInit();

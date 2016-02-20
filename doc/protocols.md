@@ -6,13 +6,18 @@ are all supported:
 
 ### Standard Flaschen Taschen protocol
 
-Receives UDP packets with a raw PPM file (`P6`) on port 1337.
-A 10x10 image looks like this (header + data + optional footer).
+Receives UDP packets with a raw [PPM file][ppm] (`P6`) on port 1337.
+A ppm file has a simple text header followed by the binary RGB image data.
+We add another feature: 'offset'; since the header is already defined in a
+fixed way, we add a footer after the binary image data to be backward compatible.
+
+A 10x10 image looks like this (header + data + optional footer). End-of-line
+comments in the header are allowed with `#` character:
 
 ```
 P6     # Magic number
 10 10  # width height (decimal, number in ASCII)
-255    # values per color (fixed)
+255    # values per color (fixed). After newline, 10 * 10 * 3 bytes RGB data follows
 ```
 ![](../img/udp.png)<br/>
 ```
@@ -20,9 +25,9 @@ P6     # Magic number
 5      # optional y offset
 ```
 
-Optionally, at the end of the image data (and our extension to the PPM file
-format), there can be a footer with decimal numbers describing the offset
-at which the image is to be displayed on the display.
+The optional offset determines where the image is displayed on the
+Flaschen Taschen display relative to the top left corner (provided in the
+[remote Flaschen Taschen class][remote-ft] as a `SetOffset(x, y)` method).
 
 This allows to place an image at an arbitrary position - good for animations
 or having non-overlapping areas on the screen.
@@ -44,8 +49,8 @@ cat image.ppm | socat STDIO UDP4-SENDTO:flaschen-taschen.local:1337
 ```
 
 You find more in the [client directory](../client) to directly send
-content to the server, including a convenient class that already provides
-an implementation of the client side.
+content to the server, including a [convenient class][remote-ft] that provides
+an implementation on the client side.
 
 ### OpenPixelControl
 
@@ -66,3 +71,6 @@ pretty much like a standard framebuffer).
 
 ### Installation
 Within Noisebridge, the hostname is `flaschen-taschen.local`.
+
+[ppm]: http://netpbm.sourceforge.net/doc/ppm.html
+[remote-ft]: ../client/udp-flaschen-taschen.h
