@@ -154,7 +154,7 @@ Text GLabel 1900 4100 0    51   Output ~ 0
 D8
 Text GLabel 2400 4200 2    51   Output ~ 0
 D9
-Text GLabel 1900 4300 0    51   Output ~ 0
+Text GLabel 1900 4200 0    51   Output ~ 0
 D10
 Text GLabel 1900 4400 0    51   Output ~ 0
 D13
@@ -162,7 +162,7 @@ Text GLabel 1900 3300 0    51   Output ~ 0
 clock
 Text GLabel 1900 4500 0    51   Output ~ 0
 D14
-Text GLabel 2400 3700 2    51   Output ~ 0
+Text GLabel 2400 3500 2    51   Output ~ 0
 D6
 Text GLabel 2400 4600 2    51   Output ~ 0
 D16
@@ -170,7 +170,7 @@ Text GLabel 2400 4500 2    51   Output ~ 0
 D15
 Text GLabel 2400 4400 2    51   Output ~ 0
 D12
-Text GLabel 1900 4200 0    51   Output ~ 0
+Text GLabel 1900 4300 0    51   Output ~ 0
 D11
 Text GLabel 1900 3400 0    51   Output ~ 0
 D5
@@ -641,7 +641,7 @@ Wire Wire Line
 Wire Wire Line
 	1600 3100 1600 3000
 Connection ~ 1600 3100
-Text GLabel 2400 3500 2    51   Output ~ 0
+Text GLabel 2400 3700 2    51   Output ~ 0
 D7
 Text GLabel 3850 1850 0    51   Input ~ 0
 D1
@@ -653,17 +653,17 @@ Text GLabel 3850 1350 0    51   Input ~ 0
 D4
 Text GLabel 3850 3550 0    51   Input ~ 0
 D5
-Text GLabel 3850 3250 0    51   Input ~ 0
-D6
 Text GLabel 3850 3350 0    51   Input ~ 0
+D6
+Text GLabel 3850 3250 0    51   Input ~ 0
 D7
 Text GLabel 3850 3050 0    51   Input ~ 0
 D8
 Text GLabel 3850 5250 0    51   Input ~ 0
 D9
-Text GLabel 3850 4950 0    51   Input ~ 0
-D10
 Text GLabel 3850 5050 0    51   Input ~ 0
+D10
+Text GLabel 3850 4950 0    51   Input ~ 0
 D11
 Text GLabel 3850 4750 0    51   Input ~ 0
 D12
