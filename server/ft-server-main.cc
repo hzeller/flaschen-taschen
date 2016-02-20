@@ -74,7 +74,7 @@ bool drop_privs(const char *priv_user, const char *priv_group) {
 }
 
 // Figuring out if a particular interface is already initialized.
-static bool IsEthernetReady(const std::string &interface) {
+static bool IsInterfaceReady(const std::string &interface) {
     if (interface.empty())
         return true;
     int s;
@@ -183,15 +183,20 @@ int main(int argc, char *argv[]) {
     // our servers that listen on 0.0.0.0
     // TODO: maybe we should fork/exec already first stage here (but still stay
     // root) to not have this happen in foreground ?
-    for (int i = 0; !IsEthernetReady(interface) && i < 60; ++i) {
+    for (int i = 0; !IsInterfaceReady(interface) && i < 60; ++i) {
         sleep(1);
     }
 
-    udp_server_init(1337);
+    if (!udp_server_init(1337))
+        return 1;
 
     // Optional services.
-    if (run_opc) opc_server_init(7890);
-    if (run_pixel_pusher) pixel_pusher_init(&display);
+    if (run_opc && !opc_server_init(7890))
+        return 1;
+    if (run_pixel_pusher
+        && !pixel_pusher_init(interface.c_str(), &display)) {
+        return 1;
+    }
 
     // After hardware is set up and all servers are listening, we can
     // drop the privileges.

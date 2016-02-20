@@ -46,7 +46,6 @@ using namespace ft;
 // PixelPushPrefix :) for our logs.
 #define PXP "PixelPush: "
 
-static const char kNetworkInterface[] = "eth0";
 static const uint16_t kPixelPusherDiscoveryPort = 7331;
 static const uint16_t kPixelPusherListenPort = 5078;
 static const uint8_t kSoftwareRevision = 122;
@@ -332,16 +331,19 @@ private:
 
 static DiscoveryPacketHeader header;
 static PixelPusherContainer pixel_pusher_container;
-bool pixel_pusher_init(FlaschenTaschen *canvas) {
-    const char *interface = kNetworkInterface;
-
+bool pixel_pusher_init(const char *interface, FlaschenTaschen *canvas) {
+    if (interface == NULL || strlen(interface) == 0) {
+        fprintf(stderr, "For PixelPusher to work, supply network interface "
+                "name with -I option.\n");
+        return false;
+    }
     // Init PixelPusher protocol
     memset(&header, 0, sizeof(header));
 
     if (!DetermineNetwork(interface, &header)) {
         fprintf(stderr, PXP "Couldn't listen on network interface %s.\n",
                 interface);
-        return 1;
+        return false;
     }
     header.device_type = PIXELPUSHER;
     header.protocol_version = 1;  // ?
