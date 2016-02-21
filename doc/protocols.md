@@ -34,11 +34,11 @@ This allows to place an image at an arbitrary position - good for animations
 or having non-overlapping areas on the screen.
 
 Since the server accepts a standard PPM format, sending an image is as
-simple as this:
+simple as this; you can make use of the convenient pnm-tools:
 
 ```bash
-# This works in the bash shell
-cat image.ppm > /dev/udp/flaschen-taschen.local/1337   # ft-installation
+# This works in the bash shell.
+jpegtopnm color.jpg | pnmscale -xysize 20 20 > /dev/udp/flaschen-taschen.local/1337
 # replace 'flaschen-taschen.local' with 127.0.0.1 if you have
 # a locally running server, e.g. terminal based
 ```
@@ -46,7 +46,7 @@ cat image.ppm > /dev/udp/flaschen-taschen.local/1337   # ft-installation
 If you're not using `bash`, then the `/dev/udp/...` path won't work, then
 you can use the network-swiss army knife `socat`
 ```
-cat image.ppm | socat STDIO UDP4-SENDTO:flaschen-taschen.local:1337
+jpegtopnm color.jpg | pnmscale -xysize 20 20 | socat STDIO UDP4-SENDTO:flaschen-taschen.local:1337
 ```
 
 You find more in the [client directory](../client) to directly send
