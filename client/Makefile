@@ -4,11 +4,13 @@ OBJECTS=udp-flaschen-taschen.o
 MAGICK_CXXFLAGS=`GraphicsMagick++-config --cppflags --cxxflags`
 MAGICK_LDFLAGS=`GraphicsMagick++-config --ldflags --libs`
 
-all : send-image simple-example simple-animation
+all : send-image simple-example simple-animation mandelbrot
 
 simple-animation: simple-animation.cc $(OBJECTS)
 
 simple-example: simple-example.cc $(OBJECTS)
+
+mandelbrot: mandelbrot.cc $(OBJECTS)
 
 send-image : send-image.cc $(OBJECTS)
 	$(CXX) $(CXXFLAGS) $(MAGICK_CXXFLAGS) -o $@ $^ $(MAGICK_LDFLAGS)
