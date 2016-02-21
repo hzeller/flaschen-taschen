@@ -37,8 +37,8 @@ Since the server accepts a standard PPM format, sending an image is as
 simple as this; you can make use of the convenient pnm-tools:
 
 ```bash
-# This works in the bash shell.
-jpegtopnm color.jpg | pnmscale -xysize 20 20 > /dev/udp/flaschen-taschen.local/1337
+# This works in the bash shell providing the pseudo-files /dev/udp/host/port
+bash$ jpegtopnm color.jpg | pnmscale -xysize 20 20 > /dev/udp/flaschen-taschen.local/1337
 # replace 'flaschen-taschen.local' with 127.0.0.1 if you have
 # a locally running server, e.g. terminal based
 ```
@@ -46,7 +46,7 @@ jpegtopnm color.jpg | pnmscale -xysize 20 20 > /dev/udp/flaschen-taschen.local/1
 If you're not using `bash`, then the `/dev/udp/...` path won't work, then
 you can use the network-swiss army knife `socat`
 ```
-jpegtopnm color.jpg | pnmscale -xysize 20 20 | socat STDIO UDP4-SENDTO:flaschen-taschen.local:1337
+$ jpegtopnm color.jpg | pnmscale -xysize 20 20 | socat STDIO UDP4-SENDTO:flaschen-taschen.local:1337
 ```
 
 You find more in the [client directory](../client) to directly send

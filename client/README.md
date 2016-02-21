@@ -12,7 +12,7 @@ This directory provides:
   * A simple-example.cc code example.
   * (more TBD. Pull requests encouraged, hint hint...)
 
-## SendImage
+## Send-Image
 
 ### Compile
 ```bash
