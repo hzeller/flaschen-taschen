@@ -38,6 +38,8 @@ a Raspberry Pi that provides a [network API][protocols] to update the display.
 
 To develop visuals for the FlaschenTaschen display once it is ready, here you
 can already play around writing software that updates the networked display.
+(If you're running a Mac, switch to `mac-os-compilable` branch as it has some
+Linux specifics removed).
 
 #### 1. Check out the project
 

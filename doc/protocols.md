@@ -6,7 +6,8 @@ are all supported:
 
 ### Standard Flaschen Taschen protocol
 
-Receives UDP packets with a raw [PPM file][ppm] (`P6`) on port 1337.
+Receives UDP packets with a raw [PPM file][ppm] (`P6`) on port 1337 in a
+single datagram per image.
 A ppm file has a simple text header followed by the binary RGB image data.
 We add another feature: 'offset'; since the header is already defined in a
 fixed way, we add a footer after the binary image data to be backward compatible.

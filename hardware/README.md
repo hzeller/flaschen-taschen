@@ -25,8 +25,10 @@ The CLK is shared, but each connector gets a dedicated buffered signal.
 The 5V output, accessible on each of the 16 connectors, is fused, so that accidental shorts when
 messing with the LED strip wires in the field do not cause harm. Use a fast 1A fuse.
 
-(The outputs are beefy enough that they even could support a couple of shorter LED strips directly,
-in that case use up to 20A fuse. Generally it is advised to separately power the strips though).
+(The outputs are beefy enough that they even could support a couple of shorter
+5V LED strips directly, in that case use up to 20A fuse. Generally it is
+advised to separately power the strips though: 20A only powers 300 LEDs
+or so.)
 
 [ As soon as design is tested in the field, there will be an OshPark link here ]
 
