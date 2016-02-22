@@ -40,7 +40,8 @@ static int usage(const char *progname) {
     fprintf(stderr, "usage: %s [options] <video>\n", progname);
     fprintf(stderr, "Options:\n"
             "\t-g <width>x<height>[+<off_x>+<off_y>] : Output geometry. Default 20x20+0+0\n"
-            "\t-h <host>                             : host (default: flaschen-taschen.local)\n");
+            "\t-h <host>                             : host (default: flaschen-taschen.local)\n"
+            "\t-v                                    : verbose\n");
     return 1;
 }
 
@@ -49,10 +50,11 @@ int main(int argc, char *argv[]) {
     int display_height = 20;
     int off_x = 0;
     int off_y = 0;
+    bool verbose = false;
     const char *ft_host = "flaschen-taschen.local";
 
     int opt;
-    while ((opt = getopt(argc, argv, "g:h:")) != -1) {
+    while ((opt = getopt(argc, argv, "g:h:v")) != -1) {
         switch (opt) {
         case 'g':
             if (sscanf(optarg, "%dx%d%d%d",
@@ -63,6 +65,9 @@ int main(int argc, char *argv[]) {
             break;
         case 'h':
             ft_host = strdup(optarg); // leaking. Ignore.
+            break;
+        case 'v':
+            verbose = true;
             break;
         default:
             return usage(argv[0]);
@@ -110,7 +115,9 @@ int main(int argc, char *argv[]) {
         return -1; // Couldn't find stream information
 
     // Dump information about file onto standard error
-    av_dump_format(pFormatCtx, 0, movie_file, 0);
+    if (verbose) {
+        av_dump_format(pFormatCtx, 0, movie_file, 0);
+    }
 
     // Find the first video stream
     videoStream=-1;
@@ -131,7 +138,7 @@ int main(int argc, char *argv[]) {
     if (fps < 0) {
         fps = 1.0 / av_q2d(pFormatCtx->streams[videoStream]->codec->time_base);
     }
-    fprintf(stderr, "FPS: %f\n", fps);
+    if (verbose) fprintf(stderr, "FPS: %f\n", fps);
 
     // Find the decoder for the video stream
     pCodec=avcodec_find_decoder(pCodecCtxOrig->codec_id);
