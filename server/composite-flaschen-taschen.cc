@@ -16,9 +16,13 @@
 #include "composite-flaschen-taschen.h"
 
 #include <assert.h>
-#include <vector>
-#include <unistd.h>
+#include <limits.h>
 #include <strings.h>
+#include <unistd.h>
+
+#include <vector>
+
+#include "ft-thread.h"
 
 namespace {
 // A two-dimensional array, essentially.
@@ -51,35 +55,74 @@ public:
     ZBuffer(int w, int h) : TypedScreenBuffer(w, h){}
 };
 
+class CompositeFlaschenTaschen::GarbageCollector : public ft::Thread {
+public:
+    GarbageCollector(CompositeFlaschenTaschen *owner, ft::Mutex *m,
+                     int max_age)
+        : owner_(owner), lock_(m), max_age_(max_age),
+          running_(true), ticks_(0) {}
+
+    void Run() {
+        for (;;) {
+            {
+                ft::MutexLock m(lock_);
+                if (!running_) break;
+                owner_->ClearLayersOlderThan(ticks_ - max_age_);
+                owner_->SetTimeTicks(ticks_);
+            }
+            sleep(1);
+            ++ticks_;
+        }
+    }
+
+    void SetStopped() {
+        ft::MutexLock m(lock_);
+        running_ = false;
+    }
+
+private:
+    CompositeFlaschenTaschen *const owner_;
+    ft::Mutex *const lock_;
+    const int max_age_;
+    bool running_;
+    int ticks_;
+};
+
 CompositeFlaschenTaschen::CompositeFlaschenTaschen(FlaschenTaschen *delegatee,
                                                    int layers) 
     : delegatee_(delegatee),
       width_(delegatee->width()), height_(delegatee->height()),
-      z_buffer_(new ZBuffer(width_, height_)) {
-    assert(layers < 32);  // this might be pretty slow.
+      current_layer_(0),
+      z_buffer_(new ZBuffer(width_, height_)),
+      garbage_collect_(NULL) {
+    assert(layers < 32);  // otherwise could getting slow.
     for (int i = 0; i < layers; ++i) {
         screens_.push_back(new ScreenBuffer(delegatee->width(),
                                             delegatee->height()));
+        last_layer_update_time_.push_back(INT_MAX);
     }
 }
 
 CompositeFlaschenTaschen::~CompositeFlaschenTaschen() {
+    if (garbage_collect_) {
+        garbage_collect_->SetStopped();
+        garbage_collect_->WaitStopped();
+    }
     for (size_t i = 0; i < screens_.size(); ++i) delete screens_[i];
     delete z_buffer_;
 }
 
-// TODO: garbage collect layers > 0 that have not been updated for more than
-// 30 seconds or so to prevent permanently covering up stuff.
-void CompositeFlaschenTaschen::SetPixelInLayer(int x, int y,
-                                               int layer, const Color &col) {
+void CompositeFlaschenTaschen::SetPixel(int x, int y, const Color &col) {
     if (x < 0 || x >= width_ || y < 0 || y >= height_) return;
-    if (layer < 0) layer = 0;
-    if (layer >= (int)screens_.size()) layer = screens_.size() - 1;
+    SetPixelAtLayer(x, y, current_layer_, col);
+}
+
+void CompositeFlaschenTaschen::SetPixelAtLayer(int x, int y, int layer,
+                                               const Color &col) {
     screens_[layer]->At(x, y) = col;
-    
     if (layer >= z_buffer_->At(x, y)) {
         if (col.is_black()) {
-            // transparent pixel. Find next below us that is not.
+            // Transparent pixel. Find closest stacked below us that is not.
             for (/**/; layer > 0; --layer) {
                 if (!screens_[layer]->At(x, y).is_black())
                     break;
@@ -92,3 +135,36 @@ void CompositeFlaschenTaschen::SetPixelInLayer(int x, int y,
     }
 }
 
+void CompositeFlaschenTaschen::SetLayer(int layer) {
+    if (layer < 0) layer = 0;
+    if (layer >= (int)screens_.size()) layer = screens_.size() - 1;
+    current_layer_ = layer;
+    last_layer_update_time_[current_layer_] = current_time_;
+}
+
+void CompositeFlaschenTaschen::StartLayerGarbageCollection(ft::Mutex *lock,
+                                                           int timeout_seconds) {
+    assert(garbage_collect_ == NULL);  // only start once.
+    assert(lock != NULL);  // Must provide mutex.
+    garbage_collect_ = new GarbageCollector(this, lock, timeout_seconds);
+    garbage_collect_->Start();
+}
+
+void CompositeFlaschenTaschen::ClearLayersOlderThan(Ticks cutoff_time) {
+    const Color black(0, 0, 0);
+    bool any_change = false;
+    // Only cleaning layers above zero (= background)
+    for (size_t layer = 1; layer < last_layer_update_time_.size(); ++layer) {
+        if (last_layer_update_time_[layer] > cutoff_time)
+            continue;
+        // Not very efficient, but good for now:
+        for (int x = 0; x < width_; ++x) {
+            for (int y = 0; y < height_; ++y) {
+                SetPixelAtLayer(x, y, layer, black);
+            }
+        }
+        last_layer_update_time_[layer] = INT_MAX;
+        any_change = true;
+    }
+    if (any_change) Send();
+}

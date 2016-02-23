@@ -216,6 +216,7 @@ int main(int argc, char *argv[]) {
     ft::Mutex mutex;
 
     CompositeFlaschenTaschen layered_display(&display, 16);
+    layered_display.StartLayerGarbageCollection(&mutex, 10);
 
     // Optional services as thread.
     if (run_opc) opc_server_run_thread(&layered_display, &mutex);

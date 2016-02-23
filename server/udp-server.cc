@@ -152,16 +152,16 @@ void udp_server_run_blocking(CompositeFlaschenTaschen *display,
         const char *pixel_pos = GetImageData(packet_buffer, received_bytes,
                                              &img_info);
         mutex->Lock();
+        display->SetLayer(img_info.layer);
         for (int y = 0; y < img_info.height; ++y) {
             for (int x = 0; x < img_info.width; ++x) {
                 Color c;
                 c.r = *pixel_pos++;
                 c.g = *pixel_pos++;
                 c.b = *pixel_pos++;
-                display->SetPixelInLayer(x + img_info.offset_x,
-                                         y + img_info.offset_y,
-                                         img_info.layer,
-                                         c);
+                display->SetPixel(x + img_info.offset_x,
+                                  y + img_info.offset_y,
+                                  c);
             }
         }
         display->Send();

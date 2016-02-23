@@ -44,6 +44,8 @@ moving character in the front. This allows for full screen sprites essentially).
 Or you can overlay, say a message over the currently running content.
 The nice thing is is that you don't need to know what the current background
 is - a fully networked composite display essentially :)
+Note: layers above the background (z=0) will auomatically turn transparent again
+if they stick around for a while without being updated.
 
 Since the server accepts a standard PPM format, sending an image is as
 simple as this; you can make use of the convenient pnm-tools:
