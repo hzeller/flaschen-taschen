@@ -6,6 +6,9 @@
 // Martin Bohme (boehme@inb.uni-luebeckREMOVETHIS.de)
 //
 
+// Ancient AV versions forgot to set this.
+#define __STDC_CONSTANT_MACROS
+
 // libav: "U NO extern C in header ?"
 extern "C" {
 #  include <libavcodec/avcodec.h>
