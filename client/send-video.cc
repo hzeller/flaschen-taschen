@@ -16,8 +16,14 @@ extern "C" {
 #include <stdio.h>
 #include <unistd.h>
 #include <getopt.h>
+#include <signal.h>
 
 #include "udp-flaschen-taschen.h"
+
+volatile bool interrupt_received = false;
+static void InterruptHandler(int signo) {
+  interrupt_received = true;
+}
 
 // compatibility with newer API
 #if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(55,28,1)
@@ -39,7 +45,7 @@ void SendFrame(AVFrame *pFrame, UDPFlaschenTaschen *display) {
 static int usage(const char *progname) {
     fprintf(stderr, "usage: %s [options] <video>\n", progname);
     fprintf(stderr, "Options:\n"
-            "\t-g <width>x<height>[+<off_x>+<off_y>] : Output geometry. Default 20x20+0+0\n"
+            "\t-g <width>x<height>[+<off_x>+<off_y>[+<layer>]] : Output geometry. Default 20x20+0+0\n"
             "\t-h <host>                             : host (default: flaschen-taschen.local)\n"
             "\t-v                                    : verbose\n");
     return 1;
@@ -50,6 +56,7 @@ int main(int argc, char *argv[]) {
     int display_height = 20;
     int off_x = 0;
     int off_y = 0;
+    int off_z = 0;
     bool verbose = false;
     const char *ft_host = "flaschen-taschen.local";
 
@@ -57,8 +64,8 @@ int main(int argc, char *argv[]) {
     while ((opt = getopt(argc, argv, "g:h:v")) != -1) {
         switch (opt) {
         case 'g':
-            if (sscanf(optarg, "%dx%d%d%d",
-                       &display_width, &display_height, &off_x, &off_y) < 2) {
+            if (sscanf(optarg, "%dx%d%d%d%d",
+                       &display_width, &display_height, &off_x, &off_y, &off_z) < 2) {
                 fprintf(stderr, "Invalid size spec '%s'", optarg);
                 return usage(argv[0]);
             }
@@ -74,18 +81,18 @@ int main(int argc, char *argv[]) {
         }
     }
 
+    if (optind >= argc) {
+        fprintf(stderr, "Expected image filename.\n");
+        return usage(argv[0]);
+    }
+
     const int ft_socket = OpenFlaschenTaschenSocket(ft_host);
     if (ft_socket < 0) {
         fprintf(stderr, "Couldn't open socket to FlaschenTaschen\n");
         return -1;
     }
     UDPFlaschenTaschen display(ft_socket, display_width, display_height);
-    display.SetOffset(off_x, off_y);
-
-    if (optind >= argc) {
-        fprintf(stderr, "Expected image filename.\n");
-        return usage(argv[0]);
-    }
+    display.SetOffset(off_x, off_y, off_z);
 
     // Initalizing these to NULL prevents segfaults!
     AVFormatContext   *pFormatCtx = NULL;
@@ -131,7 +138,7 @@ int main(int argc, char *argv[]) {
 
     // Get a pointer to the codec context for the video stream
     pCodecCtxOrig = pFormatCtx->streams[videoStream]->codec;
-    double fps = av_q2d(pFormatCtx->streams[videoStream]->r_frame_rate);
+    double fps = -1;//av_q2d(pFormatCtx->streams[videoStream]->r_frame_rate);
     if (fps < 0) {
         fps = av_q2d(pFormatCtx->streams[videoStream]->avg_frame_rate);
     }
@@ -187,10 +194,18 @@ int main(int argc, char *argv[]) {
                              NULL,
                              NULL
                              );
+    if (sws_ctx == 0) {
+        fprintf(stderr, "Trouble doing scaling to %dx%d :(\n",
+                display.width(), display.height());
+        return 1;
+    }
+
+    signal(SIGTERM, InterruptHandler);
+    signal(SIGINT, InterruptHandler);
 
     // Read frames and send to FlaschenTaschen.
     const int frame_wait_micros = 1e6 / fps;
-    while (av_read_frame(pFormatCtx, &packet) >= 0) {
+    while (!interrupt_received && av_read_frame(pFormatCtx, &packet) >= 0) {
         // Is this a packet from the video stream?
         if (packet.stream_index==videoStream) {
             // Decode video frame
@@ -211,6 +226,11 @@ int main(int argc, char *argv[]) {
 
         // Free the packet that was allocated by av_read_frame
         av_free_packet(&packet);
+    }
+
+    if (off_z > 0) {
+        display.Clear();
+        display.Send();
     }
 
     // Free the RGB image

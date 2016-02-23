@@ -19,6 +19,7 @@
 #include <assert.h>
 #include <math.h>
 #include <netdb.h>
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -32,6 +33,11 @@
 
 #include "udp-flaschen-taschen.h"
 
+volatile bool interrupt_received = false;
+static void InterruptHandler(int signo) {
+  interrupt_received = true;
+}
+
 namespace {
 // Frame already prepared as the buffer to be sent over so that animation
 // and re-sizing operations don't have to be done online. Also knows about the
@@ -39,10 +45,11 @@ namespace {
 class PreprocessedFrame {
 public:
     PreprocessedFrame(const Magick::Image &img,
-                      int width, int height, int offset_x, int offset_y)
+                      int width, int height,
+                      int offset_x, int offset_y, int offset_z)
         : width_(width), content_(-1, width, height) {
         assert(width >= (int) img.columns() && height >= (int) img.rows());
-        content_.SetOffset(offset_x, offset_y);
+        content_.SetOffset(offset_x, offset_y, offset_z);
         int delay_time = img.animationDelay();  // in 1/100s of a second.
         if (delay_time < 1) delay_time = 1;
         delay_micros_ = delay_time * 10000;
@@ -89,7 +96,7 @@ private:
 // all animation frames.
 static bool LoadAnimationAndScale(const char *filename,
                                   int target_width, int target_height,
-                                  int offset_x, int offset_y,
+                                  int offset_x, int offset_y, int offset_z,
                                   bool scroll,
                                   std::vector<PreprocessedFrame*> *result) {
     std::vector<Magick::Image> frames;
@@ -132,7 +139,7 @@ static bool LoadAnimationAndScale(const char *filename,
     for (size_t i = 0; i < image_sequence.size(); ++i) {
         result->push_back(new PreprocessedFrame(image_sequence[i],
                                                 target_width, target_height,
-                                                offset_x, offset_y));
+                                                offset_x, offset_y, offset_z));
     }
 
     return true;
@@ -140,10 +147,13 @@ static bool LoadAnimationAndScale(const char *filename,
 
 void DisplayAnimation(const std::vector<PreprocessedFrame*> &frames,
                       int display_width, int display_height,
-                      int offset_x, int offset_y,
+                      int offset_x, int offset_y, int offset_z,
                       int fd) {
+    signal(SIGTERM, InterruptHandler);
+    signal(SIGINT, InterruptHandler);
+
     fprintf(stderr, "Display.\n");
-    for (unsigned int i = 0; /*forever*/; ++i) {
+    for (unsigned int i = 0; !interrupt_received; ++i) {
         PreprocessedFrame *frame = frames[i % frames.size()];
         const bool requires_scroll = (frame->width() > display_width);
         if (!requires_scroll) {
@@ -151,7 +161,7 @@ void DisplayAnimation(const std::vector<PreprocessedFrame*> &frames,
         } else {
             // Width is larger than what we have. Scroll.
             UDPFlaschenTaschen scroll_buffer(fd, display_width, display_height);
-            scroll_buffer.SetOffset(offset_x, offset_y);
+            scroll_buffer.SetOffset(offset_x, offset_y, offset_z);
             for (int scroll_x = 0; scroll_x < frame->width(); ++scroll_x) {
                 frame->ExtractCrop(scroll_x, 0, &scroll_buffer);
                 scroll_buffer.Send();
@@ -164,13 +174,20 @@ void DisplayAnimation(const std::vector<PreprocessedFrame*> &frames,
             usleep(frame->delay_micros());
         }
     }
+
+    // Don't let leftovers cover up content.
+    if (interrupt_received && offset_z > 0) {
+        UDPFlaschenTaschen clear_screen(fd, display_width, display_height);
+        clear_screen.SetOffset(offset_x, offset_y, offset_z);
+        clear_screen.Send();
+    }
 }
 
 
 static int usage(const char *progname) {
     fprintf(stderr, "usage: %s [options] <image>\n", progname);
     fprintf(stderr, "Options:\n"
-            "\t-g <width>x<height>[+<off_x>+<off_y>] : Output geometry. Default 20x20+0+0\n"
+            "\t-g <width>x<height>[+<off_x>+<off_y>[+<layer>]] : Output geometry. Default 20x20+0+0+0\n"
             "\t-h <host>                             : host (default: flaschen-taschen.local)\n"
             "\t-s                                    : scroll horizontally.\n");
     return 1;
@@ -184,13 +201,14 @@ int main(int argc, char *argv[]) {
     int height = 20;
     int off_x = 0;
     int off_y = 0;
+    int off_z = 0;
     const char *host = "flaschen-taschen.local";
 
     int opt;
     while ((opt = getopt(argc, argv, "g:h:s")) != -1) {
         switch (opt) {
         case 'g':
-            if (sscanf(optarg, "%dx%d%d%d", &width, &height, &off_x, &off_y)
+            if (sscanf(optarg, "%dx%d%d%d%d", &width, &height, &off_x, &off_y, &off_z)
                 < 2) {
                 fprintf(stderr, "Invalid size spec '%s'", optarg);
                 return usage(argv[0]);
@@ -226,12 +244,12 @@ int main(int argc, char *argv[]) {
 
     std::vector<PreprocessedFrame*> frames;
     if (!LoadAnimationAndScale(filename,
-                               width, height, off_x, off_y,
+                               width, height, off_x, off_y, off_z,
                                do_scroll, &frames)) {
         return 1;
     }
 
-    DisplayAnimation(frames, width, height, off_x, off_y, fd);
+    DisplayAnimation(frames, width, height, off_x, off_y, off_z, fd);
 
     close(fd);
     return 0;

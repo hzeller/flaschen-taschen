@@ -1,4 +1,5 @@
 // -*- mode: c++; c-basic-offset: 4; indent-tabs-mode: nil; -*-
+// Copyright (C) 2016 Henner Zeller <h.zeller@acm.org>
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,6 +21,8 @@
 struct Color {
     Color() {}
     Color(int rr, int gg, int bb) : r(rr), g(gg), b(bb){}
+
+    bool is_black() const { return r == 0 && g == 0 && b == 0; }
 
     uint8_t r;
     uint8_t g;

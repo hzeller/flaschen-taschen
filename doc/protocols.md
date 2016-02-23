@@ -24,14 +24,26 @@ P6     # Magic number
 ```
 5      # optional x offset
 5      # optional y offset
+0      # optional z offset.
 ```
 
 The optional offset determines where the image is displayed on the
 Flaschen Taschen display relative to the top left corner (provided in the
-[remote Flaschen Taschen class][remote-ft] as a `SetOffset(x, y)` method).
+[remote Flaschen Taschen class][remote-ft] as a `SetOffset(x, y, z)` method).
 
-This allows to place an image at an arbitrary position - good for animations
-or having non-overlapping areas on the screen.
+The (x,y) offset allows to place an image at an arbitrary position - good
+for animations or having non-overlapping areas on the screen.
+
+The z offset represents a layer above the background. Zero is the background
+image, layers above that are overlaying content if there is a color set (black
+in layers not the background are regarded transparent).
+That way, it is possible to write games simply (consider typical arcade games
+with slow moving background, a little faster moving middelground and a fast
+moving character in the front. This allows for full screen sprites essentially).
+
+Or you can overlay, say a message over the currently running content.
+The nice thing is is that you don't need to know what the current background
+is - a fully networked composite display essentially :)
 
 Since the server accepts a standard PPM format, sending an image is as
 simple as this; you can make use of the convenient pnm-tools:

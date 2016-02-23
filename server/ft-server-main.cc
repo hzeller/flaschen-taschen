@@ -13,10 +13,6 @@
 
 // Flaschen Taschen Server
 
-#include "servers.h"
-#include "led-flaschen-taschen.h"
-#include "multi-spi.h"
-
 #include <arpa/inet.h>
 #include <getopt.h>
 #include <grp.h>
@@ -32,7 +28,11 @@
 
 #include <string>
 
+#include "composite-flaschen-taschen.h"
 #include "ft-thread.h"
+#include "led-flaschen-taschen.h"
+#include "multi-spi.h"
+#include "servers.h"
 
 // Pin 11 on Pi
 #define MULTI_SPI_COMMON_CLOCK 17
@@ -215,9 +215,11 @@ int main(int argc, char *argv[]) {
 
     ft::Mutex mutex;
 
-    // Optional services as thread.
-    if (run_opc) opc_server_run_thread(&display, &mutex);
-    if (run_pixel_pusher) pixel_pusher_run_thread(&display, &mutex);
+    CompositeFlaschenTaschen layered_display(&display, 16);
 
-    udp_server_run_blocking(&display, &mutex);  // last server blocks.
+    // Optional services as thread.
+    if (run_opc) opc_server_run_thread(&layered_display, &mutex);
+    if (run_pixel_pusher) pixel_pusher_run_thread(&layered_display, &mutex);
+
+    udp_server_run_blocking(&layered_display, &mutex);  // last server blocks.
 }

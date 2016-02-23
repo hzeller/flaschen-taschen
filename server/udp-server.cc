@@ -24,7 +24,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "flaschen-taschen.h"
+#include "composite-flaschen-taschen.h"
 #include "ft-thread.h"
 #include "servers.h"
 
@@ -34,6 +34,7 @@ struct ImageInfo {
     int range;
     int offset_x;
     int offset_y;
+    int layer;
 };
 
 static const char *skipWhitespace(const char *buffer, const char *end) {
@@ -98,6 +99,9 @@ static const char *GetImageData(const char *in_buffer, size_t buf_len,
         if (offset_data != NULL) {
             info->offset_y = readNextNumber(&offset_data, end);
         }
+        if (offset_data != NULL) {
+            info->layer = readNextNumber(&offset_data, end);
+        }
     }
     info->width = width;
     info->height = height;
@@ -126,7 +130,8 @@ bool udp_server_init(int port) {
     return true;
 }
 
-void udp_server_run_blocking(FlaschenTaschen *display, ft::Mutex *mutex) {
+void udp_server_run_blocking(CompositeFlaschenTaschen *display,
+                             ft::Mutex *mutex) {
     static const int kBufferSize = 65535;  // maximum UDP has to offer.
     char *packet_buffer = new char[kBufferSize];
     bzero(packet_buffer, kBufferSize);
@@ -153,9 +158,10 @@ void udp_server_run_blocking(FlaschenTaschen *display, ft::Mutex *mutex) {
                 c.r = *pixel_pos++;
                 c.g = *pixel_pos++;
                 c.b = *pixel_pos++;
-                display->SetPixel(x + img_info.offset_x,
-                                  y + img_info.offset_y,
-                                  c);
+                display->SetPixelInLayer(x + img_info.offset_x,
+                                         y + img_info.offset_y,
+                                         img_info.layer,
+                                         c);
             }
         }
         display->Send();

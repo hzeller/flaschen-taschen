@@ -47,7 +47,12 @@ public:
 
     // Set offset where this picture should be displayed on the remote
     // display.
-    void SetOffset(int offset_x, int offset_y);
+    //
+    // Setting a z_offset other than zero allows to layer on top of lower
+    // content. For layers larger than 0, black pixels are regarded transparent,
+    // so if you want to show black, use some very dark gray instead.
+    // This feature allows to implement sprites or overlay text easily.
+    void SetOffset(int offset_x, int offset_y, int offset_z = 0);
 
     // Get pixel color at given position. Coordinates outside the range
     // are wrapped around.
