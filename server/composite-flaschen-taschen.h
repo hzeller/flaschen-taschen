@@ -42,6 +42,7 @@ public:
     virtual int width() const { return width_; }
     virtual int height() const { return height_; }
 
+    // Set pixel to the currently configured layer (see SetLayer()).
     virtual void SetPixel(int x, int y, const Color &col);
     virtual void Send() { delegatee_->Send(); }
 

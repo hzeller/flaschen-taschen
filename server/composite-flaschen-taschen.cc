@@ -58,7 +58,7 @@ public:
 class CompositeFlaschenTaschen::GarbageCollector : public ft::Thread {
 public:
     GarbageCollector(CompositeFlaschenTaschen *owner, ft::Mutex *m,
-                     int max_age)
+                     Ticks max_age)
         : owner_(owner), lock_(m), max_age_(max_age),
           running_(true), ticks_(0) {}
 
@@ -71,7 +71,7 @@ public:
                 owner_->SetTimeTicks(ticks_);
             }
             sleep(1);
-            ++ticks_;
+            ++ticks_;  // one tick, roughly one second.
         }
     }
 
@@ -83,9 +83,9 @@ public:
 private:
     CompositeFlaschenTaschen *const owner_;
     ft::Mutex *const lock_;
-    const int max_age_;
+    const Ticks max_age_;
     bool running_;
-    int ticks_;
+    Ticks ticks_;
 };
 
 CompositeFlaschenTaschen::CompositeFlaschenTaschen(FlaschenTaschen *delegatee,

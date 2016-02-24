@@ -165,6 +165,7 @@ void udp_server_run_blocking(CompositeFlaschenTaschen *display,
             }
         }
         display->Send();
+        display->SetLayer(0);  // Back to sane default.
         mutex->Unlock();
     }
     delete [] packet_buffer;
