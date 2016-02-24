@@ -46,6 +46,8 @@ namespace {
 }
 
 void CopyImage(const Magick::Image &img, FlaschenTaschen *result) {
+    assert(result->width() >= (int) img.columns()
+           && result->height() >= (int) img.rows());
     for (size_t y = 0; y < img.rows(); ++y) {
         for (size_t x = 0; x < img.columns(); ++x) {
             const Magick::Color &c = img.pixelColor(x, y);
@@ -62,28 +64,20 @@ void CopyImage(const Magick::Image &img, FlaschenTaschen *result) {
 class PreprocessedFrame {
 public:
     PreprocessedFrame(const Magick::Image &img,
-                      int width, int height,
-                      int offset_x, int offset_y, int offset_z)
-        : width_(width), content_(-1, width, height) {
-        assert(width >= (int) img.columns() && height >= (int) img.rows());
-        content_.SetOffset(offset_x, offset_y, offset_z);
+                      const UDPFlaschenTaschen &display)
+        : content_(display.Clone()) {
         int delay_time = img.animationDelay();  // in 1/100s of a second.
         if (delay_time < 1) delay_time = 1;
         delay_micros_ = delay_time * 10000;
-        CopyImage(img, &content_);
+        CopyImage(img, content_);
     }
- 
-    int width() const { return width_; }
+    ~PreprocessedFrame() { delete content_; }
 
-    void Send(int fd) { content_.Send(fd); }
-
-    int delay_micros() const {
-        return delay_micros_;
-    }
+    void Send() { content_->Send(); }
+    int delay_micros() const { return delay_micros_; }
 
 private:
-    const int width_;
-    UDPFlaschenTaschen content_;
+    UDPFlaschenTaschen *content_;
     int delay_micros_;
 };
 }  // end anonymous namespace
@@ -128,48 +122,41 @@ static bool LoadImageAndScale(const char *filename,
 }
 
 void DisplayAnimation(const std::vector<Magick::Image> &image_sequence,
-                      int display_width, int display_height,
-                      int offset_x, int offset_y, int offset_z,
-                      int fd) {
+                      const UDPFlaschenTaschen &display) {
     std::vector<PreprocessedFrame*> frames;
     // Convert to preprocessed frames.
     for (size_t i = 0; i < image_sequence.size(); ++i) {
-        frames.push_back(new PreprocessedFrame(image_sequence[i],
-                                               display_width, display_height,
-                                               offset_x, offset_y, offset_z));
+        frames.push_back(new PreprocessedFrame(image_sequence[i], display));
     }
 
     for (unsigned int i = 0; !interrupt_received; ++i) {
         if (i == frames.size()) i = 0;
         PreprocessedFrame *frame = frames[i];
-        frame->Send(fd);  // Simple. just send it.
+        frame->Send();  // Simple. just send it.
         if (frames.size() == 1) {
             return;  // We are done.
         } else {
             usleep(frame->delay_micros());
         }
     }
+    // Leaking PreprocessedFrames. Don't care.
 }
 
 void DisplayScrolling(const Magick::Image &img, int scroll_delay_ms,
-                      int display_width, int display_height,
-                      int offset_x, int offset_y, int offset_z,
-                      int fd) {
+                      UDPFlaschenTaschen *display) {
     // Create a copy from which it is faster to extract relevant content.
     UDPFlaschenTaschen copy(-1, img.columns(), img.rows());
     CopyImage(img, &copy);
     
-    UDPFlaschenTaschen display(fd, display_width, img.rows());
-    display.SetOffset(offset_x, offset_y, offset_z);
     while (!interrupt_received) {
         for (int start = 0; start < copy.width(); ++start) {
             if (interrupt_received) break;
-            for (int y = 0; y < display.height(); ++y) {
-                for (int x = 0; x < display.width(); ++x) {
-                    display.SetPixel(x, y, copy.GetPixel(x + start, y));
+            for (int y = 0; y < display->height(); ++y) {
+                for (int x = 0; x < display->width(); ++x) {
+                    display->SetPixel(x, y, copy.GetPixel(x + start, y));
                 }
             }
-            display.Send();
+            display->Send();
             usleep(scroll_delay_ms * 1000);
         }
     }
@@ -253,18 +240,19 @@ int main(int argc, char *argv[]) {
     signal(SIGTERM, InterruptHandler);
     signal(SIGINT, InterruptHandler);
 
+    UDPFlaschenTaschen display(fd, width, height);
+    display.SetOffset(off_x, off_y, off_z);
+
     if (do_scroll) {
-        DisplayScrolling(frames[0], scroll_delay_ms,
-                         width, height, off_x, off_y, off_z, fd);
+        DisplayScrolling(frames[0], scroll_delay_ms, &display);
     } else {
-        DisplayAnimation(frames, width, height, off_x, off_y, off_z, fd);
+        DisplayAnimation(frames, display);
     }
 
     // Don't let leftovers cover up content.
     if (interrupt_received && off_z > 0) {
-        UDPFlaschenTaschen clear_screen(fd, width, height);
-        clear_screen.SetOffset(off_x, off_y, off_z);
-        clear_screen.Send();
+        display.Clear();
+        display.Send();
     }
 
     close(fd);

@@ -97,7 +97,13 @@ const Color &UDPFlaschenTaschen::GetPixel(int x, int y) {
     return pixel_buffer_start_[(x % width_) + (y % height_) * width_];
 }
 
-void UDPFlaschenTaschen::UDPFlaschenTaschen::Send(int fd) {
+void UDPFlaschenTaschen::Send(int fd) {
     // Some fudging to make the compiler shut up about non-used return value
     if (write(fd, buffer_, buf_size_) < 0) return;
+}
+
+UDPFlaschenTaschen* UDPFlaschenTaschen::Clone() const {
+    UDPFlaschenTaschen *result = new UDPFlaschenTaschen(fd_, width_, height_);
+    memcpy(result->buffer_, buffer_, buf_size_);
+    return result;
 }

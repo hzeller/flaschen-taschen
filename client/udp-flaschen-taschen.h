@@ -42,6 +42,7 @@ public:
     virtual void Send() { Send(fd_); } 
 
     // -- Additional features.
+    UDPFlaschenTaschen *Clone() const;  // Create new instance with same content.
     void Send(int fd);     // Send to given file-descriptor.
     void Clear();          // Clear screen (fill with black).
 
