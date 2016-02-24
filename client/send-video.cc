@@ -141,10 +141,7 @@ int main(int argc, char *argv[]) {
 
     // Get a pointer to the codec context for the video stream
     pCodecCtxOrig = pFormatCtx->streams[videoStream]->codec;
-    double fps = av_q2d(pFormatCtx->streams[videoStream]->r_frame_rate);
-    if (fps < 0) {
-        fps = av_q2d(pFormatCtx->streams[videoStream]->avg_frame_rate);
-    }
+    double fps = av_q2d(pFormatCtx->streams[videoStream]->avg_frame_rate);
     if (fps < 0) {
         fps = 1.0 / av_q2d(pFormatCtx->streams[videoStream]->codec->time_base);
     }
