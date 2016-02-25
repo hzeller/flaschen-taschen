@@ -38,6 +38,8 @@ a Raspberry Pi that provides a [network API][protocols] to update the display.
 
 To develop visuals for the FlaschenTaschen display once it is ready, here you
 can already play around writing software that updates the networked display.
+(If you're running a Mac, switch to `mac-os-compilable` branch as it has some
+Linux specifics removed).
 
 #### 1. Check out the project
 
@@ -87,11 +89,20 @@ If you want to implement the simple network protocol in another language
 [check out the protocol description](./doc/protocols.md) or look at the
 [C++ implementation](./client/udp-flaschen-taschen.cc)
 
-For some immediate fun, compile send-image (`make send-image`, see
-[SendImage section in client/](./client/README.md#sendimage) for needed
+For some immediate fun, send a PPM image to your server. Since the server
+already understands that format natively, you can unleash the usual
+[netpbm] toolbox for image manipulation:
+
+```
+bash$ jpegtopnm myimage.jpg | pnmscale -xysize 45 35 > /dev/udp/localhost/1337
+```
+
+For a tool that decodes images (including animated gifs), compile `send-image`
+(`make send-image`, see
+[Send-Image section in client/](./client/README.md#send-image) for needed
 dependencies), then run
 `./send-image -h localhost some-image.png` which reads images and
-sends them to the FlaschenTaschen display (also animated gifs):
+sends them to the FlaschenTaschen display.
 
 <a href="server/#terminal"><img src="img/terminal-screenshot.png" width="200px"></a>
 
@@ -109,3 +120,4 @@ replaced by something [dedicated for the task](./hardware):
 [RGB Matrix Adapter]: https://github.com/hzeller/rpi-rgb-led-matrix/tree/master/adapter/active-3
 [32c3]: https://events.ccc.de/congress/2015/wiki/Static:Main_Page
 [protocols]: ./doc/protocols.md
+[netpbm]: http://netpbm.sourceforge.net/

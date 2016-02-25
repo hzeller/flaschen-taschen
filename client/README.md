@@ -12,7 +12,7 @@ This directory provides:
   * A simple-example.cc code example.
   * (more TBD. Pull requests encouraged, hint hint...)
 
-## SendImage
+## Send-Image
 
 ### Compile
 ```bash
@@ -25,9 +25,9 @@ make send-image
 ```
 usage: ./send-image [options] <image>
 Options:
-        -g <width>x<height>[+<off_x>+<off_y>] : Output geometry. Default 20x20+0+0
-        -h <host>                             : host (default: flaschen-taschen.local)
-        -s                                    : scroll horizontally.
+        -g <width>x<height>[+<off_x>+<off_y>[+<layer>]] : Output geometry. Default 20x20+0+0+0
+        -h <host>       : host (default: flaschen-taschen.local)
+        -s[<ms>]        : scroll horizontally (optionally: delay ms; default 60).
 ```
 
 Essentially just send the FlaschenTaschen display an image over the network:
@@ -51,6 +51,23 @@ Let's try this with an example image:
 
 ```
 ./send-image -s ../img/flaschen-taschen-black.ppm
+```
+
+## Send-Video
+
+### Compile
+```bash
+# Need some devel libs
+sudo aptitude install libavcodec-dev libavformat-dev libswscale-dev
+make send-video
+```
+
+### Use
+```
+usage: ./send-video [options] <video>
+Options:
+        -g <width>x<height>[+<off_x>+<off_y>] : Output geometry. Default 20x20+0+0
+        -h <host>                             : host (default: flaschen-taschen.local)
 ```
 
 ## Example Code

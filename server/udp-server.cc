@@ -24,7 +24,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "flaschen-taschen.h"
+#include "composite-flaschen-taschen.h"
 #include "ft-thread.h"
 #include "servers.h"
 
@@ -34,6 +34,7 @@ struct ImageInfo {
     int range;
     int offset_x;
     int offset_y;
+    int layer;
 };
 
 static const char *skipWhitespace(const char *buffer, const char *end) {
@@ -98,6 +99,9 @@ static const char *GetImageData(const char *in_buffer, size_t buf_len,
         if (offset_data != NULL) {
             info->offset_y = readNextNumber(&offset_data, end);
         }
+        if (offset_data != NULL) {
+            info->layer = readNextNumber(&offset_data, end);
+        }
     }
     info->width = width;
     info->height = height;
@@ -108,15 +112,17 @@ static const char *GetImageData(const char *in_buffer, size_t buf_len,
 // public interface
 static int server_socket = -1;
 bool udp_server_init(int port) {
-    if ((server_socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0) {
+    if ((server_socket = socket(PF_INET6, SOCK_DGRAM, IPPROTO_UDP)) < 0) {
         perror("creating listen socket");
         return false;
     }
+    int opt = 0;   // Unset IPv6-only, in case it is set. Best effort.
+    setsockopt(server_socket, IPPROTO_IPV6, IPV6_V6ONLY, &opt, sizeof(opt));
 
-    struct sockaddr_in addr = {0};
-    addr.sin_family = AF_INET;
-    addr.sin_addr.s_addr = htonl(INADDR_ANY);
-    addr.sin_port = htons(port);
+    struct sockaddr_in6 addr = {0};
+    addr.sin6_family = AF_INET6;
+    addr.sin6_addr = in6addr_any;
+    addr.sin6_port = htons(port);
     if (bind(server_socket, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
         perror("bind");
         return false;
@@ -126,7 +132,8 @@ bool udp_server_init(int port) {
     return true;
 }
 
-void udp_server_run_blocking(FlaschenTaschen *display, ft::Mutex *mutex) {
+void udp_server_run_blocking(CompositeFlaschenTaschen *display,
+                             ft::Mutex *mutex) {
     static const int kBufferSize = 65535;  // maximum UDP has to offer.
     char *packet_buffer = new char[kBufferSize];
     bzero(packet_buffer, kBufferSize);
@@ -147,6 +154,7 @@ void udp_server_run_blocking(FlaschenTaschen *display, ft::Mutex *mutex) {
         const char *pixel_pos = GetImageData(packet_buffer, received_bytes,
                                              &img_info);
         mutex->Lock();
+        display->SetLayer(img_info.layer);
         for (int y = 0; y < img_info.height; ++y) {
             for (int x = 0; x < img_info.width; ++x) {
                 Color c;
@@ -159,6 +167,7 @@ void udp_server_run_blocking(FlaschenTaschen *display, ft::Mutex *mutex) {
             }
         }
         display->Send();
+        display->SetLayer(0);  // Back to sane default.
         mutex->Unlock();
     }
     delete [] packet_buffer;

@@ -79,8 +79,6 @@ $EndComp
 Wire Wire Line
 	2450 2650 2450 2800
 Wire Wire Line
-	2400 2700 2650 2700
-Wire Wire Line
 	2450 2800 2400 2800
 Connection ~ 2450 2700
 $Comp
@@ -154,7 +152,7 @@ Text GLabel 1900 4100 0    51   Output ~ 0
 D8
 Text GLabel 2400 4200 2    51   Output ~ 0
 D9
-Text GLabel 1900 4300 0    51   Output ~ 0
+Text GLabel 1900 4200 0    51   Output ~ 0
 D10
 Text GLabel 1900 4400 0    51   Output ~ 0
 D13
@@ -162,7 +160,7 @@ Text GLabel 1900 3300 0    51   Output ~ 0
 clock
 Text GLabel 1900 4500 0    51   Output ~ 0
 D14
-Text GLabel 2400 3700 2    51   Output ~ 0
+Text GLabel 2400 3500 2    51   Output ~ 0
 D6
 Text GLabel 2400 4600 2    51   Output ~ 0
 D16
@@ -170,7 +168,7 @@ Text GLabel 2400 4500 2    51   Output ~ 0
 D15
 Text GLabel 2400 4400 2    51   Output ~ 0
 D12
-Text GLabel 1900 4200 0    51   Output ~ 0
+Text GLabel 1900 4300 0    51   Output ~ 0
 D11
 Text GLabel 1900 3400 0    51   Output ~ 0
 D5
@@ -382,17 +380,6 @@ NoConn ~ 2400 4000
 NoConn ~ 2400 4100
 NoConn ~ 1900 3500
 $Comp
-L PWR_FLAG #FLG016
-U 1 1 557B1FD6
-P 2650 2700
-F 0 "#FLG016" H 2650 2795 50  0001 C CNN
-F 1 "PWR_FLAG" H 2650 2880 50  0000 C CNN
-F 2 "" H 2650 2700 60  0000 C CNN
-F 3 "" H 2650 2700 60  0000 C CNN
-	1    2650 2700
-	1    0    0    -1  
-$EndComp
-$Comp
 L PWR_FLAG #FLG017
 U 1 1 557B23A7
 P 1850 4700
@@ -420,12 +407,12 @@ $EndComp
 $Comp
 L VCC #PWR019
 U 1 1 562B12CC
-P 1950 1600
-F 0 "#PWR019" H 1950 1700 30  0001 C CNN
-F 1 "VCC" H 1950 1700 30  0000 C CNN
-F 2 "" H 1950 1600 60  0000 C CNN
-F 3 "" H 1950 1600 60  0000 C CNN
-	1    1950 1600
+P 1950 1400
+F 0 "#PWR019" H 1950 1500 30  0001 C CNN
+F 1 "VCC" H 1950 1500 30  0000 C CNN
+F 2 "" H 1950 1400 60  0000 C CNN
+F 3 "" H 1950 1400 60  0000 C CNN
+	1    1950 1400
 	1    0    0    -1  
 $EndComp
 Text Notes 1150 1750 0    60   ~ 0
@@ -641,7 +628,7 @@ Wire Wire Line
 Wire Wire Line
 	1600 3100 1600 3000
 Connection ~ 1600 3100
-Text GLabel 2400 3500 2    51   Output ~ 0
+Text GLabel 2400 3700 2    51   Output ~ 0
 D7
 Text GLabel 3850 1850 0    51   Input ~ 0
 D1
@@ -653,17 +640,17 @@ Text GLabel 3850 1350 0    51   Input ~ 0
 D4
 Text GLabel 3850 3550 0    51   Input ~ 0
 D5
-Text GLabel 3850 3250 0    51   Input ~ 0
-D6
 Text GLabel 3850 3350 0    51   Input ~ 0
+D6
+Text GLabel 3850 3250 0    51   Input ~ 0
 D7
 Text GLabel 3850 3050 0    51   Input ~ 0
 D8
 Text GLabel 3850 5250 0    51   Input ~ 0
 D9
-Text GLabel 3850 4950 0    51   Input ~ 0
-D10
 Text GLabel 3850 5050 0    51   Input ~ 0
+D10
+Text GLabel 3850 4950 0    51   Input ~ 0
 D11
 Text GLabel 3850 4750 0    51   Input ~ 0
 D12
@@ -1109,4 +1096,32 @@ Text Label 1500 3700 0    60   ~ 0
 MISO
 Text Label 1500 3800 0    60   ~ 0
 SCLK
+$Comp
+L PWR_FLAG #FLG?
+U 1 1 56CA81D8
+P 2550 1600
+F 0 "#FLG?" H 2550 1695 50  0001 C CNN
+F 1 "PWR_FLAG" V 2550 1950 50  0000 C CNN
+F 2 "" H 2550 1600 60  0000 C CNN
+F 3 "" H 2550 1600 60  0000 C CNN
+	1    2550 1600
+	1    0    0    -1  
+$EndComp
+Connection ~ 2550 1600
+Wire Wire Line
+	1950 1400 1950 1600
+$Comp
+L PWR_FLAG #FLG?
+U 1 1 56CA8545
+P 1950 1450
+F 0 "#FLG?" H 1950 1545 50  0001 C CNN
+F 1 "PWR_FLAG" V 1950 1800 50  0000 C CNN
+F 2 "" H 1950 1450 60  0000 C CNN
+F 3 "" H 1950 1450 60  0000 C CNN
+	1    1950 1450
+	0    -1   -1   0   
+$EndComp
+Connection ~ 1950 1450
+Wire Wire Line
+	2400 2700 2450 2700
 $EndSCHEMATC

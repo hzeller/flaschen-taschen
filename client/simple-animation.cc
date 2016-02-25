@@ -73,7 +73,7 @@ int main(int argc, char *argv[]) {
     // Prepare a couple of frames ready to send.
     std::vector<UDPFlaschenTaschen*> frames;
     frames.push_back(CreateFromPattern(invader[0], Color(255, 255, 0)));
-    frames.push_back(CreateFromPattern(invader[1], Color(255, 0, 0)));
+    frames.push_back(CreateFromPattern(invader[1], Color(255, 0, 255)));
 
     const int max_animation_x = 20;
     const int max_animation_y = 20;
@@ -86,7 +86,8 @@ int main(int argc, char *argv[]) {
 
         // Our animation offset determines where on the FlaschenTaschen
         // display our frame will be displayed.
-        current_frame->SetOffset(animation_x, animation_y);
+        // We use the z-layering here: we are always one above the background.
+        current_frame->SetOffset(animation_x, animation_y, 1);
 
         current_frame->Send(socket);      // Send the framebuffer.
         usleep(300 * 1000);               // wait until we show next frame.

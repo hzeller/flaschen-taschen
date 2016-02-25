@@ -60,7 +60,7 @@ int OpenFlaschenTaschenSocket(const char *host) {
 }
 
 // Let's have a fixed-size footer for fixed buffer calculation.
-static const int kFooterLen = strlen("\n0001 0001\n") + 1;  // offset-x and y
+static const int kFooterLen = strlen("\n0001 0001 0001\n") + 1; // offsets.
 
 UDPFlaschenTaschen::UDPFlaschenTaschen(int socket, int width, int height)
     : fd_(socket), width_(width), height_(height) {
@@ -81,10 +81,11 @@ void UDPFlaschenTaschen::Clear() {
     bzero(pixel_buffer_start_, width_ * height_ * sizeof(Color));
 }
 
-void UDPFlaschenTaschen::SetOffset(int offset_x, int offset_y){
+void UDPFlaschenTaschen::SetOffset(int offset_x, int offset_y, int offset_z){
     // Our extension to the PPM format adds additional information after the
     // image data.
-    snprintf(footer_start_, kFooterLen, "\n%4d %4d\n", offset_x, offset_y);
+    snprintf(footer_start_, kFooterLen, "\n%4d %4d %4d\n",
+             offset_x, offset_y, offset_z);
 }
 
 void UDPFlaschenTaschen::SetPixel(int x, int y, const Color &col) {
@@ -96,7 +97,13 @@ const Color &UDPFlaschenTaschen::GetPixel(int x, int y) {
     return pixel_buffer_start_[(x % width_) + (y % height_) * width_];
 }
 
-void UDPFlaschenTaschen::UDPFlaschenTaschen::Send(int fd) {
+void UDPFlaschenTaschen::Send(int fd) {
     // Some fudging to make the compiler shut up about non-used return value
     if (write(fd, buffer_, buf_size_) < 0) return;
+}
+
+UDPFlaschenTaschen* UDPFlaschenTaschen::Clone() const {
+    UDPFlaschenTaschen *result = new UDPFlaschenTaschen(fd_, width_, height_);
+    memcpy(result->buffer_, buffer_, buf_size_);
+    return result;
 }
