@@ -228,6 +228,12 @@ int main(int argc, char *argv[]) {
         av_free_packet(&packet);
     }
 
+    if (interrupt_received) {
+        // Feedback for Ctrl-C, but most importantly, force a newline
+        // at the output, so that commandline-shell editing is not messed up.
+        fprintf(stderr, "Got interrupt. Exiting\n");
+    }
+
     if (off_z > 0) {
         display.Clear();
         display.Send();
