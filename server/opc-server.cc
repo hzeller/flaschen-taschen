@@ -48,32 +48,29 @@ static bool reliable_read(int fd, void *buf, size_t count) {
 }
 
 // Open server. Return file-descriptor or -1 if listen fails.
-// Bind to "bind_addr" (can be NULL, then it is 0.0.0.0) and "port".
-static int open_server(const char *bind_addr, int port) {
+static int open_server(int port) {
     if (port > 65535) {
         fprintf(stderr, "OPC: Invalid port %d\n", port);
         return -1;
     }
-    int s = socket(AF_INET, SOCK_STREAM, 0);
+    int s = socket(AF_INET6, SOCK_STREAM, 0);
     if (s < 0) {
         fprintf(stderr, "OPC: creating socket: %s", strerror(errno));
         return -1;
     }
 
-    struct sockaddr_in serv_addr = {0};
-    serv_addr.sin_family = AF_INET;
-    serv_addr.sin_addr.s_addr = INADDR_ANY;
-    if (bind_addr && !inet_pton(AF_INET, bind_addr, &serv_addr.sin_addr.s_addr)) {
-        fprintf(stderr, "OPC: Invalid bind IP address %s\n", bind_addr);
-        return -1;
-    }
-    serv_addr.sin_port = htons(port);
-    int on = 1;
-    setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
-    if (bind(s, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) {
-        fprintf(stderr, "OPC: Trouble binding to %s:%d: %s",
-                bind_addr ? bind_addr : "0.0.0.0", port,
-                strerror(errno));
+    struct sockaddr_in6 addr = {0};
+    addr.sin6_family = AF_INET6;
+    addr.sin6_addr = in6addr_any;
+    addr.sin6_port = htons(port);
+    int sock_opt = 1;
+    setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &sock_opt, sizeof(sock_opt));
+
+    sock_opt = 0;
+    setsockopt(s, IPPROTO_IPV6, IPV6_V6ONLY, &sock_opt, sizeof(sock_opt));
+    if (bind(s, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
+        fprintf(stderr, "OPC: Trouble binding to port %d: %s",
+                port, strerror(errno));
         return -1;
     }
     return s;
@@ -150,7 +147,7 @@ static void run_server(int listen_socket,
 // public interface
 static int server_socket = -1;
 bool opc_server_init(int port) {
-    server_socket = open_server(NULL, port);
+    server_socket = open_server(port);
     if (server_socket < 0) {
         perror("Listening on opc socket");
         return false;

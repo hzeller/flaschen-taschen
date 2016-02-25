@@ -112,15 +112,17 @@ static const char *GetImageData(const char *in_buffer, size_t buf_len,
 // public interface
 static int server_socket = -1;
 bool udp_server_init(int port) {
-    if ((server_socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0) {
+    if ((server_socket = socket(PF_INET6, SOCK_DGRAM, IPPROTO_UDP)) < 0) {
         perror("creating listen socket");
         return false;
     }
+    int opt = 0;   // Unset IPv6-only, in case it is set. Best effort.
+    setsockopt(server_socket, IPPROTO_IPV6, IPV6_V6ONLY, &opt, sizeof(opt));
 
-    struct sockaddr_in addr = {0};
-    addr.sin_family = AF_INET;
-    addr.sin_addr.s_addr = htonl(INADDR_ANY);
-    addr.sin_port = htons(port);
+    struct sockaddr_in6 addr = {0};
+    addr.sin6_family = AF_INET6;
+    addr.sin6_addr = in6addr_any;
+    addr.sin6_port = htons(port);
     if (bind(server_socket, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
         perror("bind");
         return false;
