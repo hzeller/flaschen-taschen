@@ -94,7 +94,7 @@ already understands that format natively, you can unleash the usual
 [netpbm] toolbox for image manipulation:
 
 ```
-bash$ jpegtopnm myimage.jpg | pnmscale -xysize 45 35 > /dev/udp/127.0.0.1/1337
+bash$ jpegtopnm myimage.jpg | pnmscale -xysize 45 35 > /dev/udp/localhost/1337
 ```
 
 For a tool that decodes images (including animated gifs), compile `send-image`
