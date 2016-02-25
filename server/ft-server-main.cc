@@ -14,6 +14,7 @@
 // Flaschen Taschen Server
 
 #include <arpa/inet.h>
+#include <errno.h>
 #include <getopt.h>
 #include <grp.h>
 #include <linux/netdevice.h>
@@ -22,7 +23,6 @@
 #include <string.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
-#include <sys/types.h>
 #include <sys/types.h>
 #include <unistd.h>
 
@@ -92,7 +92,8 @@ static bool IsInterfaceReady(const std::string &interface) {
         inet_ntop(AF_INET, &s_in->sin_addr, printed_ip, sizeof(printed_ip));
         fprintf(stderr, "%s ip: %s\n", interface.c_str(), printed_ip);
     } else {
-        perror("Getting IP address");
+        fprintf(stderr, "%s ready ? Error: %s\n",
+                interface.c_str(), strerror(errno));
         success = false;
     }
 
