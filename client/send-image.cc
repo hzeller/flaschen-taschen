@@ -168,7 +168,8 @@ static int usage(const char *progname) {
     fprintf(stderr, "Options:\n"
             "\t-g <width>x<height>[+<off_x>+<off_y>[+<layer>]] : Output geometry. Default 20x20+0+0+0\n"
             "\t-h <host>       : host (default: flaschen-taschen.local)\n"
-            "\t-s[<ms>]        : scroll horizontally (optionally: delay ms; default 60).\n");
+            "\t-s[<ms>]        : scroll horizontally (optionally: delay ms; default 60).\n"
+            "\t-C              : Just clear given area and exit.\n");
     return 1;
 }
 
@@ -176,6 +177,7 @@ int main(int argc, char *argv[]) {
     Magick::InitializeMagick(*argv);
 
     bool do_scroll = false;
+    bool do_clear_screen = false;
     int width = 20;
     int height = 20;
     int off_x = 0;
@@ -185,7 +187,7 @@ int main(int argc, char *argv[]) {
     const char *host = "flaschen-taschen.local";
 
     int opt;
-    while ((opt = getopt(argc, argv, "g:h:s::")) != -1) {
+    while ((opt = getopt(argc, argv, "g:h:s::C")) != -1) {
         switch (opt) {
         case 'g':
             if (sscanf(optarg, "%dx%d%d%d%d", &width, &height, &off_x, &off_y, &off_z)
@@ -204,6 +206,9 @@ int main(int argc, char *argv[]) {
                 if (scroll_delay_ms < 5) scroll_delay_ms = 5;
             }
             break;
+        case 'C':
+            do_clear_screen = true;
+            break;
         default:
             return usage(argv[0]);
         }
@@ -214,16 +219,32 @@ int main(int argc, char *argv[]) {
         return usage(argv[0]);
     }
 
-    if (optind >= argc) {
-        fprintf(stderr, "Expected image filename.\n");
-        return usage(argv[0]);
-    }
-
     int fd = OpenFlaschenTaschenSocket(host);
     if (fd < 0) {
         fprintf(stderr, "Cannot connect.");
         return 1;
     }
+
+    UDPFlaschenTaschen display(fd, width, height);
+    display.SetOffset(off_x, off_y, off_z);
+
+    if (do_clear_screen) {
+        display.Send();
+        fprintf(stderr, "Cleared screen area %dx%d%+d%+d%+d.\n",
+                width, height, off_x, off_y, off_z);
+        if (optind < argc) {
+            fprintf(stderr, "FYI: You also supplied filename %s. "
+                    "Ignoring that for clear-screen operation.\n",
+                    argv[optind]);
+        }
+        return 0;
+    }
+
+    if (optind >= argc) {
+        fprintf(stderr, "Expected image filename.\n");
+        return usage(argv[0]);
+    }
+
     const char *filename = argv[optind];
 
     std::vector<Magick::Image> frames;
@@ -239,9 +260,6 @@ int main(int argc, char *argv[]) {
 
     signal(SIGTERM, InterruptHandler);
     signal(SIGINT, InterruptHandler);
-
-    UDPFlaschenTaschen display(fd, width, height);
-    display.SetOffset(off_x, off_y, off_z);
 
     if (do_scroll) {
         DisplayScrolling(frames[0], scroll_delay_ms, &display);

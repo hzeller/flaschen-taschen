@@ -28,6 +28,7 @@ Options:
         -g <width>x<height>[+<off_x>+<off_y>[+<layer>]] : Output geometry. Default 20x20+0+0+0
         -h <host>       : host (default: flaschen-taschen.local)
         -s[<ms>]        : scroll horizontally (optionally: delay ms; default 60).
+        -C              : Just clear given area and exit.
 ```
 
 Essentially just send the FlaschenTaschen display an image over the network:
