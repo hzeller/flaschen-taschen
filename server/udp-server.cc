@@ -113,7 +113,7 @@ static const char *GetImageData(const char *in_buffer, size_t buf_len,
 static int server_socket = -1;
 bool udp_server_init(int port) {
     if ((server_socket = socket(PF_INET6, SOCK_DGRAM, IPPROTO_UDP)) < 0) {
-        perror("creating listen socket");
+        perror("IPv6 enabled ? While reating listen socket");
         return false;
     }
     int opt = 0;   // Unset IPv6-only, in case it is set. Best effort.
