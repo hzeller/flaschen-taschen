@@ -6,13 +6,11 @@ MAGICK_LDFLAGS=`GraphicsMagick++-config --ldflags --libs`
 
 FFMPEG_LDFLAGS=`pkg-config --cflags --libs  libavcodec libavformat libswscale libavutil`
 
-all : simple-example simple-animation mandelbrot
+all : simple-example simple-animation
 
 simple-animation: simple-animation.cc $(OBJECTS)
 
 simple-example: simple-example.cc $(OBJECTS)
-
-mandelbrot: mandelbrot.cc $(OBJECTS)
 
 send-image : send-image.cc $(OBJECTS)
 	$(CXX) $(CXXFLAGS) $(MAGICK_CXXFLAGS) -o $@ $^ $(MAGICK_LDFLAGS)
