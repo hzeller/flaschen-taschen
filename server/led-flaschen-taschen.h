@@ -31,7 +31,8 @@ public:
     ~ColumnAssembly();
 
     // Add column. Takes over ownership of column.
-    // Columns have been added right to left.
+    // Columns have been added right to left, or, if standing
+    // behind the display: leftmost column first.
     void AddColumn(FlaschenTaschen *taschen);
 
     int width() const { return width_; }

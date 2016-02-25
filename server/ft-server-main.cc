@@ -34,14 +34,6 @@
 #include "multi-spi.h"
 #include "servers.h"
 
-// Pin 11 on Pi
-#define MULTI_SPI_COMMON_CLOCK 17
-
-#define LPD_STRIP_GPIO 11
-#define WS_R0_STRIP_GPIO 8
-#define WS_R1_STRIP_GPIO 7
-#define WS_R2_STRIP_GPIO 10
-
 #define DROP_PRIV_USER "daemon"
 #define DROP_PRIV_GROUP "daemon"
 
@@ -167,13 +159,13 @@ int main(int argc, char *argv[]) {
     }
 
 #if FT_BACKEND == 0
-    MultiSPI spi(MULTI_SPI_COMMON_CLOCK);
+    MultiSPI spi;
     ColumnAssembly display(&spi);
-    // From right to left.
-    display.AddColumn(new WS2801FlaschenTaschen(&spi, WS_R0_STRIP_GPIO, 2));
-    display.AddColumn(new WS2801FlaschenTaschen(&spi, WS_R1_STRIP_GPIO, 4));
-    display.AddColumn(new WS2811FlaschenTaschen(2));
-    display.AddColumn(new LPD6803FlaschenTaschen(&spi, LPD_STRIP_GPIO, 2));
+    // Standing on the back of the display: leftmost column first.
+    display.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P19, 4));
+    display.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P20, 4));
+    display.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P15, 4));
+    display.AddColumn(new LPD6803FlaschenTaschen(&spi, MultiSPI::SPI_P16, 2));
 #elif FT_BACKEND == 1
     RGBMatrixFlaschenTaschen display(0, 0, width, height);
 #elif FT_BACKEND == 2
