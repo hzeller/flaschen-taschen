@@ -32,7 +32,15 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#define DEFAULT_FT_DISPLAY_HOST "flaschen-taschen.local"
+
 int OpenFlaschenTaschenSocket(const char *host) {
+    if (host == NULL) {
+        host = getenv("FT_DISPLAY");     // Take from environment.
+    }
+    if (host == NULL || strlen(host) == 0) {
+        host = DEFAULT_FT_DISPLAY_HOST; // Fallback.
+    }
     struct addrinfo addr_hints = {0};
     addr_hints.ai_family = AF_INET;
     addr_hints.ai_socktype = SOCK_DGRAM;
@@ -40,7 +48,7 @@ int OpenFlaschenTaschenSocket(const char *host) {
     struct addrinfo *addr_result = NULL;
     int rc;
     if ((rc = getaddrinfo(host, "1337", &addr_hints, &addr_result)) != 0) {
-        fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rc));
+        fprintf(stderr, "Resolving '%s': %s\n", host, gai_strerror(rc));
         return -1;
     }
     if (addr_result == NULL)

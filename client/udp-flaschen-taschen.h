@@ -20,7 +20,11 @@
 #include <stdint.h>
 #include <stddef.h>
 
-// Open a FlaschenTaschen Socket to the flaschen-taschen server.
+// Open a FlaschenTaschen Socket to the flaschen-taschen display
+// hostname.
+// If "host" is NULL, attempts to get the name from environment-variable
+// FT_DISPLAY.
+// If that is not set, uses the default display installation.
 int OpenFlaschenTaschenSocket(const char *host);
 
 // A Framebuffer display interface that sends a frame via UDP. Makes things

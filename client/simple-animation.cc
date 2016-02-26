@@ -4,10 +4,16 @@
 // with one frame of an invader animation each and shows them in sequence
 // while modifying the position on the screen.
 //
-// If you run at Noisebridge, call the binary with the Noisebridge
-// display hostname flaschen-taschen.local:
+// By default, connects to the installation at Noisebridge. If using a
+// different display (e.g. a local terminal display)
+// pass the hostname as parameter:
 //
-// ./simple-animation flaschen-taschen.local
+//  ./simple-animation localhost
+//
+// .. or set the environment variable FT_DISPLAY to not worry about it
+//
+//  export FT_DISPLAY=localhost
+//  ./simple-animation
 
 #include "udp-flaschen-taschen.h"
 
@@ -15,9 +21,16 @@
 #include <unistd.h>
 #include <stdio.h>
 
+// Size of the display.
+#define DISPLAY_WIDTH 20
+#define DISPLAY_HEIGHT 20
+
+// The 'layer' we're showing the space-invaders in. The background layer
+// in a FlaschenTaschen display is 0. With 1, we're hovering above that.
+#define Z_LAYER 1
+
 #define INVADER_ROWS 8
 #define INVADER_WIDTH 11
-
 static const char* invader[][INVADER_ROWS] = {
     {
         "  #     #  ",   // Exercise: how if different characters
@@ -61,11 +74,10 @@ UDPFlaschenTaschen *CreateFromPattern(const char *invader[],
 }
 
 int main(int argc, char *argv[]) {
-    const char *hostname = "127.0.0.1";
+    const char *hostname = NULL;   // Will use default if not set otherwise.
     if (argc > 1) {
-        hostname = argv[1];     // Single command line argument.
+        hostname = argv[1];        // Hostname can be supplied as first arg
     }
-    fprintf(stderr, "Sending to %s\n", hostname);
 
     // Open socket.
     const int socket = OpenFlaschenTaschenSocket(hostname);
@@ -86,8 +98,8 @@ int main(int argc, char *argv[]) {
 
         // Our animation offset determines where on the FlaschenTaschen
         // display our frame will be displayed.
-        // We use the z-layering here: we are always one above the background.
-        current_frame->SetOffset(animation_x, animation_y, 1);
+        // We use the z-layering here to hover above the background.
+        current_frame->SetOffset(animation_x, animation_y, Z_LAYER);
 
         current_frame->Send(socket);      // Send the framebuffer.
         usleep(300 * 1000);               // wait until we show next frame.

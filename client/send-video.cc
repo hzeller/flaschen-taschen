@@ -49,8 +49,8 @@ static int usage(const char *progname) {
     fprintf(stderr, "usage: %s [options] <video>\n", progname);
     fprintf(stderr, "Options:\n"
             "\t-g <width>x<height>[+<off_x>+<off_y>[+<layer>]] : Output geometry. Default 20x20+0+0\n"
-            "\t-h <host>                             : host (default: flaschen-taschen.local)\n"
-            "\t-v                                    : verbose\n");
+            "\t-h <host>                             : Flaschen-Taschen display hostname.\n"
+            "\t-v                                    : verbose.\n");
     return 1;
 }
 
@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
     int off_y = 0;
     int off_z = 0;
     bool verbose = false;
-    const char *ft_host = "flaschen-taschen.local";
+    const char *ft_host = NULL;
 
     int opt;
     while ((opt = getopt(argc, argv, "g:h:v")) != -1) {

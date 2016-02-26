@@ -167,8 +167,8 @@ static int usage(const char *progname) {
     fprintf(stderr, "usage: %s [options] <image>\n", progname);
     fprintf(stderr, "Options:\n"
             "\t-g <width>x<height>[+<off_x>+<off_y>[+<layer>]] : Output geometry. Default 20x20+0+0+0\n"
-            "\t-h <host>       : host (default: flaschen-taschen.local)\n"
-            "\t-s[<ms>]        : scroll horizontally (optionally: delay ms; default 60).\n"
+            "\t-h <host>       : Flaschen-Taschen display hostname.\n"
+            "\t-s[<ms>]        : Scroll horizontally (optionally: delay ms; default 60).\n"
             "\t-C              : Just clear given area and exit.\n");
     return 1;
 }
@@ -184,7 +184,7 @@ int main(int argc, char *argv[]) {
     int off_y = 0;
     int off_z = 0;
     int scroll_delay_ms = 50;
-    const char *host = "flaschen-taschen.local";
+    const char *host = NULL;
 
     int opt;
     while ((opt = getopt(argc, argv, "g:h:s::C")) != -1) {
@@ -221,7 +221,7 @@ int main(int argc, char *argv[]) {
 
     int fd = OpenFlaschenTaschenSocket(host);
     if (fd < 0) {
-        fprintf(stderr, "Cannot connect.");
+        fprintf(stderr, "Cannot connect.\n");
         return 1;
     }
 
