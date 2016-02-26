@@ -22,6 +22,7 @@
 
 // Crate mapping. Strip position at kCrateMapping[4-y][x]
 extern int kCrateMapping[5][5];
+extern int luminance_cie1931(uint8_t output_bits, uint8_t gray_value);
 
 class MultiSPI;
 
