@@ -44,7 +44,7 @@ public:
 
     // Set pixel to the currently configured layer (see SetLayer()).
     virtual void SetPixel(int x, int y, const Color &col);
-    virtual void Send() { delegatee_->Send(); }
+    virtual void Send();
 
     // -- Layering features
 
@@ -62,6 +62,7 @@ private:
     class ZBuffer;
     class GarbageCollector;
     friend class GarbageCollector;
+    class DisplayUpdater;
 
     void SetPixelAtLayer(int x, int y, int layer, const Color &col);
     void SetTimeTicks(Ticks t) { current_time_ = t; }
@@ -79,6 +80,7 @@ private:
     std::vector<Ticks> last_layer_update_time_;
 
     GarbageCollector *garbage_collect_;
+    DisplayUpdater *display_updater_;
 };
 
 #endif // COMPOSITE_FLASCHEN_TASCHEN_H_

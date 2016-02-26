@@ -19,6 +19,7 @@
 #include <limits.h>
 #include <strings.h>
 #include <unistd.h>
+#include <pthread.h>
 
 #include <vector>
 
@@ -88,19 +89,65 @@ private:
     Ticks ticks_;
 };
 
+// We need to do the display update in a high priority thread that
+// shall not be interrupted as the LED strips trigger with a 50usec pause.
+class CompositeFlaschenTaschen::DisplayUpdater : public ft::Thread {
+public:
+    DisplayUpdater(FlaschenTaschen *display) : display_(display),
+                                               state_(READY_TO_SEND) {
+        pthread_cond_init(&send_state_change_, NULL);
+    }
+
+    virtual void Run() {
+        for (;;) {
+            ft::MutexLock l(&mutex_);
+            while (state_ != SEND_QUEUED) {
+                mutex_.WaitOn(&send_state_change_);
+            }
+            display_->Send();
+            state_ = READY_TO_SEND;
+            pthread_cond_signal(&send_state_change_);
+        }
+    }
+
+    void TriggerSend() {
+        ft::MutexLock l(&mutex_);
+        while (state_ != READY_TO_SEND) {
+            mutex_.WaitOn(&send_state_change_);
+        }
+        state_ = SEND_QUEUED;
+        pthread_cond_signal(&send_state_change_);
+        while (state_ != READY_TO_SEND) {
+            mutex_.WaitOn(&send_state_change_);
+        }
+    }
+
+private:
+    FlaschenTaschen *const display_;
+    enum State {
+        SEND_QUEUED,
+        READY_TO_SEND,
+    } state_;
+    pthread_cond_t send_state_change_;
+    ft::Mutex mutex_;
+};
+
 CompositeFlaschenTaschen::CompositeFlaschenTaschen(FlaschenTaschen *delegatee,
                                                    int layers) 
     : delegatee_(delegatee),
       width_(delegatee->width()), height_(delegatee->height()),
       current_layer_(0),
       z_buffer_(new ZBuffer(width_, height_)),
-      garbage_collect_(NULL) {
+      garbage_collect_(NULL),
+      display_updater_(new DisplayUpdater(delegatee_)) {
     assert(layers < 32);  // otherwise could getting slow.
     for (int i = 0; i < layers; ++i) {
         screens_.push_back(new ScreenBuffer(delegatee->width(),
                                             delegatee->height()));
         last_layer_update_time_.push_back(INT_MAX);
     }
+
+    display_updater_->Start(99, 1<<3);
 }
 
 CompositeFlaschenTaschen::~CompositeFlaschenTaschen() {
@@ -110,6 +157,10 @@ CompositeFlaschenTaschen::~CompositeFlaschenTaschen() {
     }
     for (size_t i = 0; i < screens_.size(); ++i) delete screens_[i];
     delete z_buffer_;
+}
+
+void CompositeFlaschenTaschen::Send() {
+    display_updater_->TriggerSend();
 }
 
 void CompositeFlaschenTaschen::SetPixel(int x, int y, const Color &col) {
