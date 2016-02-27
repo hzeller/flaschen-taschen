@@ -49,6 +49,7 @@ public:
     UDPFlaschenTaschen *Clone() const;  // Create new instance with same content.
     void Send(int fd);     // Send to given file-descriptor.
     void Clear();          // Clear screen (fill with black).
+    void Fill(const Color &c);  // Fill screen with color.
 
     // Set offset where this picture should be displayed on the remote
     // display.

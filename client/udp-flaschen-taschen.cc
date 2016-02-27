@@ -32,6 +32,8 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include <algorithm>
+
 #define DEFAULT_FT_DISPLAY_HOST "flaschen-taschen.local"
 
 int OpenFlaschenTaschenSocket(const char *host) {
@@ -87,6 +89,14 @@ UDPFlaschenTaschen::~UDPFlaschenTaschen() { delete [] buffer_; }
 
 void UDPFlaschenTaschen::Clear() {
     bzero(pixel_buffer_start_, width_ * height_ * sizeof(Color));
+}
+
+void UDPFlaschenTaschen::Fill(const Color &c) {
+    if (c.is_black()) {
+        Clear();  // cheaper
+    } else {
+        std::fill(pixel_buffer_start_, pixel_buffer_start_ + width_*height_, c);
+    }
 }
 
 void UDPFlaschenTaschen::SetOffset(int offset_x, int offset_y, int offset_z){
