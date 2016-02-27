@@ -180,6 +180,8 @@ int main(int argc, char *argv[]) {
         sleep(1);
     }
 
+    // Start all the services and report problems (such as sockets already
+    // bound to) before we become a daemon
     if (!udp_server_init(1337))
         return 1;
 
@@ -191,14 +193,13 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    // After hardware is set up and all servers are listening, we can
-    // drop the privileges.
-    if (!drop_privs(DROP_PRIV_USER, DROP_PRIV_GROUP))
-        return 1;
-
     if (as_daemon && daemon(0, 0) != 0) {  // Become daemon.
         fprintf(stderr, "Failed to become daemon");
     }
+
+    // Only after we have become a daemon, we can do all the things that
+    // require starting threads. These can be various realtime priorities,
+    // we so need to stay root until all threads are set up.
 
 #if FT_BACKEND == 1
     display.PostDaemonInit();
@@ -214,6 +215,12 @@ int main(int argc, char *argv[]) {
     // Optional services as thread.
     if (run_opc) opc_server_run_thread(&layered_display, &mutex);
     if (run_pixel_pusher) pixel_pusher_run_thread(&layered_display, &mutex);
+
+    // After hardware is set up, all servers are listening and all
+    // threads are started with their respective priorities, we can drop
+    // privileges.
+    if (!drop_privs(DROP_PRIV_USER, DROP_PRIV_GROUP))
+        return 1;
 
     udp_server_run_blocking(&layered_display, &mutex);  // last server blocks.
 }

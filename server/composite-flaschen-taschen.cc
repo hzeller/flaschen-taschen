@@ -147,7 +147,7 @@ CompositeFlaschenTaschen::CompositeFlaschenTaschen(FlaschenTaschen *delegatee,
         last_layer_update_time_.push_back(INT_MAX);
     }
 
-    display_updater_->Start(99, 1<<3);
+    display_updater_->Start(sched_get_priority_max(SCHED_FIFO), 1<<3);
 }
 
 CompositeFlaschenTaschen::~CompositeFlaschenTaschen() {
