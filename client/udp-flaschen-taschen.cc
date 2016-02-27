@@ -83,7 +83,7 @@ UDPFlaschenTaschen::UDPFlaschenTaschen(int socket, int width, int height)
     strcpy(buffer_, header);
     pixel_buffer_start_ = reinterpret_cast<Color*>(buffer_ + header_len);
     footer_start_ = buffer_ + buf_size_ - kFooterLen;
-    SetOffset(0, 0);
+    SetOffset(0, 0, 0);
 }
 UDPFlaschenTaschen::~UDPFlaschenTaschen() { delete [] buffer_; }
 
@@ -99,11 +99,9 @@ void UDPFlaschenTaschen::Fill(const Color &c) {
     }
 }
 
-void UDPFlaschenTaschen::SetOffset(int offset_x, int offset_y, int offset_z){
-    // Our extension to the PPM format adds additional information after the
-    // image data.
-    snprintf(footer_start_, kFooterLen, "\n%4d %4d %4d\n",
-             offset_x, offset_y, offset_z);
+void UDPFlaschenTaschen::SetOffset(int off_x, int off_y, int off_z){
+    // Our extension to the PPM format adds footers after the image data.
+    snprintf(footer_start_, kFooterLen, "\n%4d %4d %4d\n", off_x, off_y, off_z);
 }
 
 void UDPFlaschenTaschen::SetPixel(int x, int y, const Color &col) {
