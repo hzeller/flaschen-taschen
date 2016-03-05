@@ -17,7 +17,6 @@
 #include <errno.h>
 #include <getopt.h>
 #include <grp.h>
-#include <linux/netdevice.h>
 #include <pwd.h>
 #include <stdio.h>
 #include <string.h>
@@ -63,35 +62,6 @@ bool drop_privs(const char *priv_user, const char *priv_group) {
         return false;
     }
     return true;
-}
-
-// Figuring out if a particular interface is already initialized.
-static bool IsInterfaceReady(const std::string &interface) {
-    if (interface.empty())
-        return true;
-    int s;
-    if ((s = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-        return false;
-    }
-
-    bool success = true;
-
-    struct ifreq ip_addr_query;
-    strcpy(ip_addr_query.ifr_name, interface.c_str());
-    if (ioctl(s, SIOCGIFADDR, &ip_addr_query) == 0) {
-        struct sockaddr_in *s_in = (struct sockaddr_in *) &ip_addr_query.ifr_addr;
-        char printed_ip[64];
-        inet_ntop(AF_INET, &s_in->sin_addr, printed_ip, sizeof(printed_ip));
-        fprintf(stderr, "%s ip: %s\n", interface.c_str(), printed_ip);
-    } else {
-        fprintf(stderr, "%s ready ? Error: %s\n",
-                interface.c_str(), strerror(errno));
-        success = false;
-    }
-
-    close(s);
-
-    return success;
 }
 
 static int usage(const char *progname) {
@@ -161,7 +131,7 @@ int main(int argc, char *argv[]) {
 #if FT_BACKEND == 0
     MultiSPI spi;
     ColumnAssembly display(&spi);
-    // Standing on the back of the display: leftmost column first.
+    // Looking from the back of the display: leftmost column first.
     display.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P19, 4));
     display.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P20, 4));
     display.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P15, 4));
@@ -172,29 +142,24 @@ int main(int argc, char *argv[]) {
     TerminalFlaschenTaschen display(width, height);
 #endif
 
-    // Wait up to a minute for the network to show up before we start
-    // our servers that listen on 0.0.0.0
-    // TODO: maybe we should fork/exec already first stage here (but still stay
-    // root) to not have this happen in foreground ?
-    for (int i = 0; !IsInterfaceReady(interface) && i < 60; ++i) {
-        sleep(1);
-    }
-
     // Start all the services and report problems (such as sockets already
     // bound to) before we become a daemon
-    if (!udp_server_init(1337))
+    if (!udp_server_init(1337)) {
         return 1;
+    }
 
     // Optional services.
-    if (run_opc && !opc_server_init(7890))
+    if (run_opc && !opc_server_init(7890)) {
         return 1;
+    }
     if (run_pixel_pusher
         && !pixel_pusher_init(interface.c_str(), &display)) {
         return 1;
     }
 
+    // Commandline parsed, immediate errors reported. Time to become daemon.
     if (as_daemon && daemon(0, 0) != 0) {  // Become daemon.
-        fprintf(stderr, "Failed to become daemon");
+        perror("Failed to become daemon");
     }
 
     // Only after we have become a daemon, we can do all the things that

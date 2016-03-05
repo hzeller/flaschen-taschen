@@ -14,8 +14,10 @@
 
 #include <arpa/inet.h>
 #include <ctype.h>
+#include <errno.h>
 #include <limits.h>
 #include <pthread.h>
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -27,6 +29,11 @@
 #include "composite-flaschen-taschen.h"
 #include "ft-thread.h"
 #include "servers.h"
+
+volatile bool interrupt_received = false;
+static void InterruptHandler(int signo) {
+  interrupt_received = true;
+}
 
 struct ImageInfo {
     int width;
@@ -138,10 +145,23 @@ void udp_server_run_blocking(CompositeFlaschenTaschen *display,
     char *packet_buffer = new char[kBufferSize];
     bzero(packet_buffer, kBufferSize);
 
+    struct sigaction sa = {0};
+    sa.sa_handler = InterruptHandler;
+    sigaction(SIGTERM, &sa, NULL);
+    sigaction(SIGINT, &sa, NULL);
+
     for (;;) {
+        // TODO: also store src-address in case we want to do rate-limiting
+        // per source-address.
         ssize_t received_bytes = recvfrom(server_socket,
                                           packet_buffer, kBufferSize,
                                           0, NULL, 0);
+        if (interrupt_received)
+            break;
+
+        if (received_bytes < 0 && errno == EINTR) // Other signals. Don't care.
+            continue;
+
         if (received_bytes < 0) {
             perror("Trouble receiving.");
             break;

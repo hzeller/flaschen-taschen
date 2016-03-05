@@ -140,6 +140,7 @@ private:
 class TerminalFlaschenTaschen : public FlaschenTaschen {
 public:
     TerminalFlaschenTaschen(int width, int heigh);
+    virtual ~TerminalFlaschenTaschen();
 
     int width() const { return width_; }
     int height() const { return height_; }

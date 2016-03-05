@@ -55,6 +55,9 @@ TerminalFlaschenTaschen::TerminalFlaschenTaschen(int width, int height)
     snprintf(scratch, sizeof(scratch), SCREEN_CURSOR_UP_FORMAT, height + 1);
     buffer_.append(scratch);
 }
+TerminalFlaschenTaschen::~TerminalFlaschenTaschen() {
+    (void) write(STDOUT_FILENO, SCREEN_CLEAR, strlen(SCREEN_CLEAR));
+}
 
 void TerminalFlaschenTaschen::SetPixel(int x, int y, const Color &col) {
     if (x < 0 || x >= width_ || y < 0 || y >= height_) return;
