@@ -34,6 +34,11 @@ class Thread;
 //
 // Layers above the background can automatically be garbage collected so that
 // leftover content does not permanently obstruct the view.
+//
+// The Send() operation is delegated to the delegatee but executed in a
+// high-priority thread to prevent timing glitches (pauses longer than 50µsec
+// are considered 'end of LED strip'). This aspect should arguably be done
+// in a separate FlaschenTaschen delegator.
 class CompositeFlaschenTaschen : public FlaschenTaschen {
 public:
     CompositeFlaschenTaschen(FlaschenTaschen *delegatee, int layers);

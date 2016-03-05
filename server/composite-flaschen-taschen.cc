@@ -61,30 +61,32 @@ public:
     GarbageCollector(CompositeFlaschenTaschen *owner, ft::Mutex *m,
                      Ticks max_age)
         : owner_(owner), lock_(m), max_age_(max_age),
-          running_(true), ticks_(0) {}
+          running_(true), ticks_(0) {
+        pthread_cond_init(&running_cond_, NULL);
+    }
 
     void Run() {
         for (;;) {
-            {
-                ft::MutexLock m(lock_);
-                if (!running_) break;
-                owner_->ClearLayersOlderThan(ticks_ - max_age_);
-                owner_->SetTimeTicks(ticks_);
-            }
-            sleep(1);
+            ft::MutexLock m(lock_);
+            lock_->WaitOnWithTimeout(&running_cond_, 1000);
+            if (!running_) break;
+            owner_->ClearLayersOlderThan(ticks_ - max_age_);
+            owner_->SetTimeTicks(ticks_);
             ++ticks_;  // one tick, roughly one second.
         }
     }
 
-    void SetStopped() {
+    void TriggerExit() {
         ft::MutexLock m(lock_);
         running_ = false;
+        pthread_cond_signal(&running_cond_);
     }
 
 private:
     CompositeFlaschenTaschen *const owner_;
     ft::Mutex *const lock_;
     const Ticks max_age_;
+    pthread_cond_t running_cond_;
     bool running_;
     Ticks ticks_;
 };
@@ -101,9 +103,11 @@ public:
     virtual void Run() {
         for (;;) {
             ft::MutexLock l(&mutex_);
-            while (state_ != SEND_QUEUED) {
+            while (state_ == READY_TO_SEND) {
                 mutex_.WaitOn(&send_state_change_);
             }
+            if (state_ == EXIT_UPDATER)
+                break;
             display_->Send();
             state_ = READY_TO_SEND;
             pthread_cond_signal(&send_state_change_);
@@ -122,11 +126,18 @@ public:
         }
     }
 
+    void TriggerExit() {
+        ft::MutexLock l(&mutex_);
+        state_ = EXIT_UPDATER;
+        pthread_cond_signal(&send_state_change_);
+    }
+
 private:
     FlaschenTaschen *const display_;
     enum State {
         SEND_QUEUED,
         READY_TO_SEND,
+        EXIT_UPDATER
     } state_;
     pthread_cond_t send_state_change_;
     ft::Mutex mutex_;
@@ -151,10 +162,12 @@ CompositeFlaschenTaschen::CompositeFlaschenTaschen(FlaschenTaschen *delegatee,
 }
 
 CompositeFlaschenTaschen::~CompositeFlaschenTaschen() {
+    display_updater_->TriggerExit();
     if (garbage_collect_) {
-        garbage_collect_->SetStopped();
+        garbage_collect_->TriggerExit();
         garbage_collect_->WaitStopped();
     }
+    display_updater_->WaitStopped();
     for (size_t i = 0; i < screens_.size(); ++i) delete screens_[i];
     delete z_buffer_;
 }
