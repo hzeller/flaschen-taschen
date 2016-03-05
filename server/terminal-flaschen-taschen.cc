@@ -39,8 +39,8 @@
 // So, let's just send two spaces. First space here, rest separate below.
 #define PIXEL_FORMAT   "\033[48;2;%03d;%03d;%03dm "   // Sent per pixel.
 
-TerminalFlaschenTaschen::TerminalFlaschenTaschen(int width, int height)
-    : width_(width), height_(height), is_first_(true) {
+TerminalFlaschenTaschen::TerminalFlaschenTaschen(int fd, int width, int height)
+    : terminal_fd_(fd), width_(width), height_(height), is_first_(true) {
     buffer_.append(SCREEN_PREFIX);
     initial_offset_ = buffer_.size();
     char scratch[64];
@@ -58,8 +58,8 @@ TerminalFlaschenTaschen::TerminalFlaschenTaschen(int width, int height)
     buffer_.append(scratch);
 }
 TerminalFlaschenTaschen::~TerminalFlaschenTaschen() {
-    (void) write(STDOUT_FILENO, SCREEN_CLEAR, strlen(SCREEN_CLEAR));
-    (void) write(STDOUT_FILENO, CURSOR_ON, strlen(CURSOR_ON));
+    write(terminal_fd_, SCREEN_CLEAR, strlen(SCREEN_CLEAR));
+    write(terminal_fd_, CURSOR_ON, strlen(CURSOR_ON));
 }
 
 void TerminalFlaschenTaschen::SetPixel(int x, int y, const Color &col) {
@@ -74,9 +74,9 @@ void TerminalFlaschenTaschen::SetPixel(int x, int y, const Color &col) {
 
 void TerminalFlaschenTaschen::Send() {
     if (is_first_) {
-        (void) write(STDOUT_FILENO, SCREEN_CLEAR, strlen(SCREEN_CLEAR));
-        (void) write(STDOUT_FILENO, CURSOR_OFF, strlen(CURSOR_OFF));
+        write(terminal_fd_, SCREEN_CLEAR, strlen(SCREEN_CLEAR));
+        write(terminal_fd_, CURSOR_OFF, strlen(CURSOR_OFF));
         is_first_ = false;
     }
-    (void)write(STDOUT_FILENO, buffer_.data(), buffer_.size());
+    write(terminal_fd_, buffer_.data(), buffer_.size());
 }

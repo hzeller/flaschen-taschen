@@ -140,7 +140,7 @@ int main(int argc, char *argv[]) {
 #elif FT_BACKEND == 1
     RGBMatrixFlaschenTaschen display(0, 0, width, height);
 #elif FT_BACKEND == 2
-    TerminalFlaschenTaschen display(width, height);
+    TerminalFlaschenTaschen display(STDOUT_FILENO, width, height);
 #endif
 
     // Start all the services and report problems (such as sockets already

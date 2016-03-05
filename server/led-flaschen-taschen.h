@@ -139,7 +139,7 @@ private:
 
 class TerminalFlaschenTaschen : public FlaschenTaschen {
 public:
-    TerminalFlaschenTaschen(int width, int heigh);
+    TerminalFlaschenTaschen(int terminal_fd, int width, int heigh);
     virtual ~TerminalFlaschenTaschen();
 
     int width() const { return width_; }
@@ -149,6 +149,7 @@ public:
     void Send();
 
 private:
+    const int terminal_fd_;
     const int width_;
     const int height_;
     size_t initial_offset_;
