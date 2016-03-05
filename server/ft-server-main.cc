@@ -37,6 +37,30 @@
 #define DROP_PRIV_USER "daemon"
 #define DROP_PRIV_GROUP "daemon"
 
+// Temporary code: we have two types of columns we want to stack.
+namespace {
+class StackedColumn : public FlaschenTaschen {
+public:
+    StackedColumn(FlaschenTaschen *lower, FlaschenTaschen *upper)
+        : lower_(lower), upper_(upper) {}
+
+    int width() const { return lower_->width(); } // both same width.
+    int height() const { return lower_->height() + upper_->height(); }
+    void SetPixel(int x, int y, const Color &col) {
+        if (y < lower_->height()) {
+            lower_->SetPixel(x, y, col);
+        } else {
+            upper_->SetPixel(x, y - lower_->height(), col);
+        }
+    }
+    void Send() {}
+
+private:
+    FlaschenTaschen *const lower_;
+    FlaschenTaschen *const upper_;
+};
+}  // namespace
+
 bool drop_privs(const char *priv_user, const char *priv_group) {
     uid_t ruid, euid, suid;
     if (getresuid(&ruid, &euid, &suid) >= 0) {
@@ -136,7 +160,10 @@ int main(int argc, char *argv[]) {
     display.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P19, 4));
     display.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P20, 4));
     display.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P15, 4));
-    display.AddColumn(new LPD6803FlaschenTaschen(&spi, MultiSPI::SPI_P16, 2));
+    display.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P16, 4));
+    display.AddColumn(new StackedColumn(
+           new LPD6803FlaschenTaschen(&spi, MultiSPI::SPI_P11, 2),
+           new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P12, 2)));
 #elif FT_BACKEND == 1
     RGBMatrixFlaschenTaschen display(0, 0, width, height);
 #elif FT_BACKEND == 2
