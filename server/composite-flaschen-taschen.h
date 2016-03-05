@@ -22,7 +22,6 @@
 
 namespace ft {
 class Mutex;
-class Thread;
 }
 
 // A composite screen allows a layered screen: The lowest layer is the
@@ -34,13 +33,9 @@ class Thread;
 //
 // Layers above the background can automatically be garbage collected so that
 // leftover content does not permanently obstruct the view.
-//
-// The Send() operation is delegated to the delegatee but executed in a
-// high-priority thread to prevent timing glitches (pauses longer than 50µsec
-// are considered 'end of LED strip'). This aspect should arguably be done
-// in a separate FlaschenTaschen delegator.
 class CompositeFlaschenTaschen : public FlaschenTaschen {
 public:
+    // Does _not_ take over ownership of delegatee.
     CompositeFlaschenTaschen(FlaschenTaschen *delegatee, int layers);
     ~CompositeFlaschenTaschen();
 
@@ -49,7 +44,7 @@ public:
 
     // Set pixel to the currently configured layer (see SetLayer()).
     virtual void SetPixel(int x, int y, const Color &col);
-    virtual void Send();
+    virtual void Send() { delegatee_->Send(); }
 
     // -- Layering features
 
@@ -58,16 +53,15 @@ public:
 
     // Start a garbage collection thread that cleans
     // overlay layers if they haven't been touched in more than
-    // "timeout_seconds". Uses mutex for exclusive access.
+    // "timeout_seconds". Uses mutex for exclusive access to display.
     void StartLayerGarbageCollection(ft::Mutex *lock,
                                      int timeout_seconds);
 private:
     typedef int Ticks;
     class ScreenBuffer;
     class ZBuffer;
-    class GarbageCollector;
-    friend class GarbageCollector;
-    class DisplayUpdater;
+    class LayerGarbageCollector;
+    friend class LayerGarbageCollector;
 
     void SetPixelAtLayer(int x, int y, int layer, const Color &col);
     void SetTimeTicks(Ticks t) { current_time_ = t; }
@@ -84,8 +78,7 @@ private:
     ZBuffer *z_buffer_;
     std::vector<Ticks> last_layer_update_time_;
 
-    GarbageCollector *garbage_collect_;
-    DisplayUpdater *display_updater_;
+    LayerGarbageCollector *garbage_collect_;
 };
 
 #endif // COMPOSITE_FLASCHEN_TASCHEN_H_

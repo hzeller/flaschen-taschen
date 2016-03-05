@@ -47,5 +47,5 @@ void ColumnAssembly::Send() {
         columns_[i]->Send();
     }
     spi_->SendBuffers();
-    usleep(1 * 1000);  // Some strips need some low 
+    usleep(200);  // WS2801 triggers on 50usec no data.
 }

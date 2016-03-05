@@ -17,9 +17,9 @@
 
 #include <assert.h>
 #include <limits.h>
+#include <pthread.h>
 #include <strings.h>
 #include <unistd.h>
-#include <pthread.h>
 
 #include <vector>
 
@@ -56,10 +56,10 @@ public:
     ZBuffer(int w, int h) : TypedScreenBuffer(w, h){}
 };
 
-class CompositeFlaschenTaschen::GarbageCollector : public ft::Thread {
+class CompositeFlaschenTaschen::LayerGarbageCollector : public ft::Thread {
 public:
-    GarbageCollector(CompositeFlaschenTaschen *owner, ft::Mutex *m,
-                     Ticks max_age)
+    LayerGarbageCollector(CompositeFlaschenTaschen *owner, ft::Mutex *m,
+                          Ticks max_age)
         : owner_(owner), lock_(m), max_age_(max_age),
           running_(true), ticks_(0) {
         pthread_cond_init(&running_cond_, NULL);
@@ -91,89 +91,28 @@ private:
     Ticks ticks_;
 };
 
-// We need to do the display update in a high priority thread that
-// shall not be interrupted as the LED strips trigger with a 50usec pause.
-class CompositeFlaschenTaschen::DisplayUpdater : public ft::Thread {
-public:
-    DisplayUpdater(FlaschenTaschen *display) : display_(display),
-                                               state_(READY_TO_SEND) {
-        pthread_cond_init(&send_state_change_, NULL);
-    }
-
-    virtual void Run() {
-        for (;;) {
-            ft::MutexLock l(&mutex_);
-            while (state_ == READY_TO_SEND) {
-                mutex_.WaitOn(&send_state_change_);
-            }
-            if (state_ == EXIT_UPDATER)
-                break;
-            display_->Send();
-            state_ = READY_TO_SEND;
-            pthread_cond_signal(&send_state_change_);
-        }
-    }
-
-    void TriggerSend() {
-        ft::MutexLock l(&mutex_);
-        while (state_ != READY_TO_SEND) {
-            mutex_.WaitOn(&send_state_change_);
-        }
-        state_ = SEND_QUEUED;
-        pthread_cond_signal(&send_state_change_);
-        while (state_ != READY_TO_SEND) {
-            mutex_.WaitOn(&send_state_change_);
-        }
-    }
-
-    void TriggerExit() {
-        ft::MutexLock l(&mutex_);
-        state_ = EXIT_UPDATER;
-        pthread_cond_signal(&send_state_change_);
-    }
-
-private:
-    FlaschenTaschen *const display_;
-    enum State {
-        SEND_QUEUED,
-        READY_TO_SEND,
-        EXIT_UPDATER
-    } state_;
-    pthread_cond_t send_state_change_;
-    ft::Mutex mutex_;
-};
-
 CompositeFlaschenTaschen::CompositeFlaschenTaschen(FlaschenTaschen *delegatee,
                                                    int layers) 
     : delegatee_(delegatee),
       width_(delegatee->width()), height_(delegatee->height()),
       current_layer_(0),
       z_buffer_(new ZBuffer(width_, height_)),
-      garbage_collect_(NULL),
-      display_updater_(new DisplayUpdater(delegatee_)) {
+      garbage_collect_(NULL) {
     assert(layers < 32);  // otherwise could getting slow.
     for (int i = 0; i < layers; ++i) {
         screens_.push_back(new ScreenBuffer(delegatee->width(),
                                             delegatee->height()));
         last_layer_update_time_.push_back(INT_MAX);
     }
-
-    display_updater_->Start(sched_get_priority_max(SCHED_FIFO), 1<<3);
 }
 
 CompositeFlaschenTaschen::~CompositeFlaschenTaschen() {
-    display_updater_->TriggerExit();
     if (garbage_collect_) {
         garbage_collect_->TriggerExit();
         garbage_collect_->WaitStopped();
     }
-    display_updater_->WaitStopped();
     for (size_t i = 0; i < screens_.size(); ++i) delete screens_[i];
     delete z_buffer_;
-}
-
-void CompositeFlaschenTaschen::Send() {
-    display_updater_->TriggerSend();
 }
 
 void CompositeFlaschenTaschen::SetPixel(int x, int y, const Color &col) {
@@ -210,7 +149,7 @@ void CompositeFlaschenTaschen::StartLayerGarbageCollection(ft::Mutex *lock,
                                                            int timeout_seconds) {
     assert(garbage_collect_ == NULL);  // only start once.
     assert(lock != NULL);  // Must provide mutex.
-    garbage_collect_ = new GarbageCollector(this, lock, timeout_seconds);
+    garbage_collect_ = new LayerGarbageCollector(this, lock, timeout_seconds);
     garbage_collect_->Start();
 }
 

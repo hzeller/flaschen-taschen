@@ -28,6 +28,7 @@
 #include <string>
 
 #include "composite-flaschen-taschen.h"
+#include "priority-flaschen-taschen-sender.h"
 #include "ft-thread.h"
 #include "led-flaschen-taschen.h"
 #include "multi-spi.h"
@@ -174,7 +175,13 @@ int main(int argc, char *argv[]) {
 
     ft::Mutex mutex;
 
-    CompositeFlaschenTaschen layered_display(&display, 16);
+    // Execute Send() method in high-priority thread to prevent possible timing
+    // glitches.
+    PriorityFlaschenTaschenSender realtime_display_sender(&display);
+
+    // The display we expose to the user provides composite layering which can
+    // be used by the UDP server.
+    CompositeFlaschenTaschen layered_display(&realtime_display_sender, 16);
     layered_display.StartLayerGarbageCollection(&mutex, 10);
 
     // Optional services as thread.
