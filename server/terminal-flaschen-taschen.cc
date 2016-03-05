@@ -22,6 +22,8 @@
 #define SCREEN_PREFIX   "\033[48;2;0;0;0m"  // set black background
 #define SCREEN_POSTFIX  "\033[0m\n"         // reset terminal settings
 #define SCREEN_CURSOR_UP_FORMAT "\033[%dA"  // Move cursor up given lines.
+#define CURSOR_OFF      "\033[?25l"
+#define CURSOR_ON       "\033[?25h"
 
 // Idea is that we have all colors same width for fast in-place updates.
 // so each pixel needs to be fixed width. Thus we do %03 (which luckily is
@@ -57,6 +59,7 @@ TerminalFlaschenTaschen::TerminalFlaschenTaschen(int width, int height)
 }
 TerminalFlaschenTaschen::~TerminalFlaschenTaschen() {
     (void) write(STDOUT_FILENO, SCREEN_CLEAR, strlen(SCREEN_CLEAR));
+    (void) write(STDOUT_FILENO, CURSOR_ON, strlen(CURSOR_ON));
 }
 
 void TerminalFlaschenTaschen::SetPixel(int x, int y, const Color &col) {
@@ -72,6 +75,7 @@ void TerminalFlaschenTaschen::SetPixel(int x, int y, const Color &col) {
 void TerminalFlaschenTaschen::Send() {
     if (is_first_) {
         (void) write(STDOUT_FILENO, SCREEN_CLEAR, strlen(SCREEN_CLEAR));
+        (void) write(STDOUT_FILENO, CURSOR_OFF, strlen(CURSOR_OFF));
         is_first_ = false;
     }
     (void)write(STDOUT_FILENO, buffer_.data(), buffer_.size());
