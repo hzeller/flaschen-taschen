@@ -2,7 +2,7 @@ Noisebridge Flaschen Taschen Project
 ====================================
 
 
-<a href="https://noisebridge.net/wiki/Flaschen_Taschen"><img src="img/flaschen-taschen-logo.jpg"></a>
+<a href="https://noisebridge.net/wiki/Flaschen_Taschen"><img src="img/flaschen-taschen-logo.png"></a>
 
 Software and Raspberry Pi interface hardware for [FlaschenTaschen].
 
