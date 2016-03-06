@@ -1,12 +1,14 @@
 Noisebridge Flaschen Taschen Project
 ====================================
 
-![](./img/flaschen-taschen-logo.jpg)
 
-Software for [FlaschenTaschen].
+<a href="https://noisebridge.net/wiki/Flaschen_Taschen"><img src="img/flaschen-taschen-logo.jpg"></a>
 
-FlaschenTaschn is inspired by [MateLight]: a bunch of us have
-seen Mate Light in action at [32c3] and got excited :)
+Software and Raspberry Pi interface hardware for [FlaschenTaschen].
+
+FlaschenTaschen is inspired by projects such as the [Schweppes bottle display]
+or [MateLight]. A bunch of us have seen Mate Light in action at [32c3] and got
+excited :)
 So our Noisebridge interpretation of it has a German influenced name.
 
 Unfortunately, in the US, bottle reuse is not at all a thing, so there
@@ -108,13 +110,14 @@ sends them to the FlaschenTaschen display.
 
 ## Connecting LED strips to the Pi
 
-Right now, LED strips are wired up with some ad-hoc level shifter
-(re-using a [RGB Matrix Adapter] board). In the near future, this will be
-replaced by something [dedicated for the task](./hardware):
+LED strips are controlled by a Raspberry Pi, connected via
+a [custom level shifter](./hardware) for up to 16 strips (of which we only
+use 9 for our installation right now):
 
 <a href="hardware/"><img src="img/pi-adapter-pcb.png" width="200px"></a>
 
 [FlaschenTaschen]: https://noisebridge.net/wiki/Flaschen_Taschen
+[Schweppes Bottle Display]: http://www.zuloark.com/muro-de-botellas/
 [MateLight]: https://github.com/jaseg/matelight
 [ExperimentalStage]: http://blog.noisebridge.net/post/139304835544/i-walked-into-noisebridge-yesterday-and-was
 [RGB Matrix Adapter]: https://github.com/hzeller/rpi-rgb-led-matrix/tree/master/adapter/active-3
