@@ -17,6 +17,7 @@
 #define FT_SERVER_H
 
 class FlaschenTaschen;
+class CompositeFlaschenTaschen;
 
 namespace ft {
 class Mutex;
@@ -24,13 +25,14 @@ class Mutex;
 
 // Our main service that we always support.
 bool udp_server_init(int port);
-void udp_server_run_blocking(FlaschenTaschen *display, ft::Mutex *mutex);
+void udp_server_run_blocking(CompositeFlaschenTaschen *display,
+                             ft::Mutex *mutex);
 
 // Optional services, chosen on command-line
 bool opc_server_init(int port);
 void opc_server_run_thread(FlaschenTaschen *display, ft::Mutex *mutex);
 
-bool pixel_pusher_init(FlaschenTaschen *canvas);
+bool pixel_pusher_init(const char *interface, FlaschenTaschen *canvas);
 void pixel_pusher_run_thread(FlaschenTaschen *display, ft::Mutex *mutex);
 
 #endif // OPC_SERVER_H

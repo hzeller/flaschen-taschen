@@ -36,6 +36,9 @@ void ColumnAssembly::SetPixel(int x, int y, const Color &col) {
         return;
     const int crate_from_left = x / 5;
     FlaschenTaschen *column = columns_[columns_.size() - crate_from_left - 1];
+
+    // Our physical display has the (0,0) at the bottom right corner.
+    // Flip it around.
     column->SetPixel(4 - x % 5, height() - y - 1, col);
 }
 
@@ -44,5 +47,5 @@ void ColumnAssembly::Send() {
         columns_[i]->Send();
     }
     spi_->SendBuffers();
-    usleep(1 * 1000);  // Some strips need some low 
+    usleep(200);  // WS2801 triggers on 50usec no data.
 }

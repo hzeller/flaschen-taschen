@@ -13,11 +13,8 @@
 
 // Flaschen Taschen Server
 
-#include "servers.h"
-#include "led-flaschen-taschen.h"
-#include "multi-spi.h"
-
 #include <arpa/inet.h>
+#include <errno.h>
 #include <getopt.h>
 #include <grp.h>
 #include <pwd.h>
@@ -26,31 +23,51 @@
 #include <sys/ioctl.h>
 #include <sys/socket.h>
 #include <sys/types.h>
-#include <sys/types.h>
 #include <unistd.h>
 
 #include <string>
 
+#include "composite-flaschen-taschen.h"
+#include "priority-flaschen-taschen-sender.h"
 #include "ft-thread.h"
+#include "led-flaschen-taschen.h"
+#include "multi-spi.h"
+#include "servers.h"
 
-// Pin 11 on Pi
-#define MULTI_SPI_COMMON_CLOCK 17
+// Temporary code: we have two types of columns we want to stack.
+namespace {
+class StackedColumn : public FlaschenTaschen {
+public:
+    StackedColumn(FlaschenTaschen *lower, FlaschenTaschen *upper)
+        : lower_(lower), upper_(upper) {}
 
-#define LPD_STRIP_GPIO 11
-#define WS_R0_STRIP_GPIO 8
-#define WS_R1_STRIP_GPIO 7
-#define WS_R2_STRIP_GPIO 10
+    int width() const { return lower_->width(); } // both same width.
+    int height() const { return lower_->height() + upper_->height(); }
+    void SetPixel(int x, int y, const Color &col) {
+        if (y < lower_->height()) {
+            lower_->SetPixel(x, y, col);
+        } else {
+            upper_->SetPixel(x, y - lower_->height(), col);
+        }
+    }
+    void Send() {}
+
+private:
+    FlaschenTaschen *const lower_;
+    FlaschenTaschen *const upper_;
+};
+}  // namespace
 
 static int usage(const char *progname) {
     fprintf(stderr, "usage: %s [options]\n", progname);
     fprintf(stderr, "Options:\n"
             "\t-D <width>x<height> : Output dimension. Default 45x35\n"
             "\t-I <interface>      : Which network interface to wait for\n"
-            "\t                      to be ready (Empty string '' for no "
+            "\t                      to be ready (e.g eth0. Empty string '' for no "
             "waiting).\n"
-            "\t                      Default 'eth0'\n"
+            "\t                      Default ''\n"
             "\t-d                  : Become daemon\n"
-            "\t--pixel_pusher      : Run PixelPusher protocol (default: false)\n"
+            "\t--pixel-pusher      : Run PixelPusher protocol (default: false)\n"
             "\t--opc               : Run OpenPixelControl protocol (default: false)\n"
             "(By default, only the FlaschenTaschen UDP protocol is enabled)\n"
             );
@@ -58,7 +75,7 @@ static int usage(const char *progname) {
 }
 
 int main(int argc, char *argv[]) {
-    std::string interface = "eth0";
+    std::string interface = "";
     int width = 45;
     int height = 35;
     bool run_opc = false;
@@ -96,22 +113,36 @@ int main(int argc, char *argv[]) {
     }
 
 #if FT_BACKEND == 0
-    MultiSPI spi(MULTI_SPI_COMMON_CLOCK);
+    MultiSPI spi;
     ColumnAssembly display(&spi);
-    // From right to left.
-    display.AddColumn(new WS2801FlaschenTaschen(&spi, WS_R0_STRIP_GPIO, 2));
-    display.AddColumn(new WS2801FlaschenTaschen(&spi, WS_R1_STRIP_GPIO, 4));
-    display.AddColumn(new WS2811FlaschenTaschen(2));
-    display.AddColumn(new LPD6803FlaschenTaschen(&spi, LPD_STRIP_GPIO, 2));
+    // Looking from the back of the display: leftmost column first.
+    display.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P19, 4));
+    display.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P20, 4));
+    display.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P15, 4));
+    display.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P16, 4));
+    display.AddColumn(new StackedColumn(
+           new LPD6803FlaschenTaschen(&spi, MultiSPI::SPI_P11, 2),
+           new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P12, 2)));
 #elif FT_BACKEND == 1
     RGBMatrixFlaschenTaschen display(0, 0, width, height);
 #elif FT_BACKEND == 2
-    TerminalFlaschenTaschen display(width, height);
+    TerminalFlaschenTaschen display(STDOUT_FILENO, width, height);
 #endif
 
-    udp_server_init(1337);
+    // Start all the services and report problems (such as sockets already
+    // bound to) before we become a daemon
+    if (!udp_server_init(1337)) {
+        return 1;
+    }
+
     // Optional services.
-    if (run_opc) opc_server_init(7890);
+    if (run_opc && !opc_server_init(7890)) {
+        return 1;
+    }
+
+    // Only after we have become a daemon, we can do all the things that
+    // require starting threads. These can be various realtime priorities,
+    // we so need to stay root until all threads are set up.
 
 #if FT_BACKEND == 1
     display.PostDaemonInit();
@@ -121,8 +152,17 @@ int main(int argc, char *argv[]) {
 
     ft::Mutex mutex;
 
-    // Optional services as thread.
-    if (run_opc) opc_server_run_thread(&display, &mutex);
+    // Execute Send() method in high-priority thread to prevent possible timing
+    // glitches.
+    PriorityFlaschenTaschenSender realtime_display_sender(&display);
 
-    udp_server_run_blocking(&display, &mutex);  // last server blocks.
+    // The display we expose to the user provides composite layering which can
+    // be used by the UDP server.
+    CompositeFlaschenTaschen layered_display(&realtime_display_sender, 16);
+    layered_display.StartLayerGarbageCollection(&mutex, 10);
+
+    // Optional services as thread.
+    if (run_opc) opc_server_run_thread(&layered_display, &mutex);
+
+    udp_server_run_blocking(&layered_display, &mutex);  // last server blocks.
 }

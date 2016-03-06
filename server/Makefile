@@ -30,7 +30,7 @@ RGB_LDFLAGS=-lrt -lm -lpthread
 WS2812LIB_OBJECTS=$(addprefix rpi_ws281x/, dma.o mailbox.o pwm.o rpihw.o ws2811.o)
 
 INCLUDES=-I../common
-OBJECTS=ft-thread.o opc-server.o udp-server.o
+OBJECTS=ft-thread.o opc-server.o udp-server.o composite-flaschen-taschen.o priority-flaschen-taschen-sender.o cie1931.o
 
 # Nested if/else are very awkward, so we just compare each possible outcome
 ifeq ($(FT_BACKEND), ft)
@@ -60,7 +60,7 @@ LDFLAGS+=-lpthread
 
 all : ft-server
 
-ft-server: ft-server-main.o $(OBJECTS) $(STATIC_LIBS)
+ft-server: main.o $(OBJECTS) $(STATIC_LIBS)
 	$(CXX) -o $@ $^ $(LDFLAGS)
 
 %.o : %.cc compiler-flags
@@ -83,4 +83,4 @@ compiler-flags: FORCE
 .PHONY: FORCE
 
 clean:
-	rm -f libws281x.a ft-server ft-server-main.o $(OBJECTS) $(WS2812LIB_OBJECTS) ft-server-main.o
+	rm -f libws281x.a ft-server main.o $(OBJECTS) $(WS2812LIB_OBJECTS)

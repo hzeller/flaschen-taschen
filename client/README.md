@@ -9,10 +9,28 @@ directory [README.md](../README.md#getting-pixels-on-flaschen-taschen).
 This directory provides:
   * `send-image` binary, that reads an arbitrary image (including
     animated *.gifs), scales it and sends to FlaschenTaschen.
-  * A simple-example.cc code example.
-  * (more TBD. Pull requests encouraged, hint hint...)
+  * `send-video` binary, that reads an arbitrary video, scales it and
+    sends to FlaschenTaschen.
+  * A simple-example.cc and simple-animation.cc code example.
 
-## SendImage
+### Network destination
+
+The clients connect to the display over the network. The
+default hostname is pointing to the installation within Noisebridge
+(currently `ft.noise`).
+
+You can change that with commandline flags (e.g. `send-image` and `send-video`
+both have a `-h <host>` option) or via the environment variable `FT_DISPLAY`.
+
+So if you are working with a particular instance of FlaschenTaschen (e.g.
+a [local terminal](../server/README.md#terminal)), just set the environment
+variable for ease of playing.
+
+```
+export FT_DISPLAY=localhost
+```
+
+## Send-Image
 
 ### Compile
 ```bash
@@ -25,20 +43,21 @@ make send-image
 ```
 usage: ./send-image [options] <image>
 Options:
-        -D <width>x<height> : Output dimension. Default 20x20
-        -h <host>           : host (default: flaschen-taschen.local)
-        -s                  : scroll horizontally.
+        -g <width>x<height>[+<off_x>+<off_y>[+<layer>]] : Output geometry. Default 20x20+0+0+0
+        -h <host>       : Flaschen-Taschen display hostname.
+        -s[<ms>]        : Scroll horizontally (optionally: delay ms; default 60).
+        -C              : Just clear given area and exit.
 ```
 
 Essentially just send the FlaschenTaschen display an image over the network:
 
 ```
-./send-image some-image.png
+./send-image -g10x20+15+7 some-image.png
 ```
 
-Images will be scaled to the display dimensions and shown.
-(You can give display dimensions with `-D` option, but they are already pre-set
-to the current FlaschenTaschen installation).
+Image will be scaled to the given size (here 10x20) and shown
+on the FlaschenTaschen display at the given offset (here 15 pixels x-offset,
+7 pixels y-offset).
 
 The program exits as soon as the image is sent unless it is an animated gif in
 which case `send-image` keeps streaming until interrupted with `Ctrl-C`.
@@ -52,6 +71,26 @@ Let's try this with an example image:
 ```
 ./send-image -s ../img/flaschen-taschen-black.ppm
 ```
+
+## Send-Video
+
+### Compile
+```bash
+# Need some devel libs
+sudo aptitude install libavcodec-dev libavformat-dev libswscale-dev
+make send-video
+```
+
+### Use
+```
+usage: ./send-video [options] <video>
+Options:
+        -g <width>x<height>[+<off_x>+<off_y>[+<layer>]] : Output geometry. Default 20x20+0+0
+        -h <host>                             : Flaschen-Taschen display hostname.
+        -v                                    : verbose.
+```
+
+![](../img/ft-movie-night.jpg)
 
 ## Example Code
 
@@ -70,7 +109,7 @@ For C++, there is a simple implementation of such a 'client display', the
 
 int main() {
     // Open socket and create our canvas.
-    const int socket = OpenFlaschenTaschenSocket("flaschen-taschen.local");
+    const int socket = OpenFlaschenTaschenSocket("ft.noise");
     UDPFlaschenTaschen canvas(socket, DISPLAY_WIDTH, DISPLAY_HEIGHT);
 
     const Color red(255, 0, 0);
@@ -80,3 +119,6 @@ int main() {
     canvas.Send();                           // Send the framebuffer.
 }
 ```
+
+Next step, try a [simple-animation.cc](./simple-animation.cc)
+<a href="./simple-animation.cc"><img src="../img/invader.png" width="50px"></a>

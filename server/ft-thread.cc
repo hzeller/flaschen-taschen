@@ -53,4 +53,17 @@ void Thread::Start(int priority, uint32_t affinity_mask) {
     started_ = true;
 }
 
+bool Mutex::WaitOnWithTimeout(pthread_cond_t *cond, int wait_ms) {
+    if (wait_ms <= 0) return 1;  // already expired.
+    struct timespec abs_time;
+    clock_gettime(CLOCK_REALTIME, &abs_time);
+    abs_time.tv_sec += wait_ms / 1000;
+    abs_time.tv_nsec += 1000000 * (wait_ms % 1000);
+    if (abs_time.tv_nsec > 1000000000) {
+        abs_time.tv_sec += 1;
+        abs_time.tv_nsec -= 1000000000;
+    }
+    return pthread_cond_timedwait(cond, &mutex_, &abs_time) == 0;
+}
+
 }  // namespace ft

@@ -20,7 +20,11 @@
 #include <stdint.h>
 #include <stddef.h>
 
-// Open a FlaschenTaschen Socket to the flaschen-taschen server.
+// Open a FlaschenTaschen Socket to the flaschen-taschen display
+// hostname.
+// If "host" is NULL, attempts to get the name from environment-variable
+// FT_DISPLAY.
+// If that is not set, uses the default display installation.
 int OpenFlaschenTaschenSocket(const char *host);
 
 // A Framebuffer display interface that sends a frame via UDP. Makes things
@@ -42,8 +46,19 @@ public:
     virtual void Send() { Send(fd_); } 
 
     // -- Additional features.
+    UDPFlaschenTaschen *Clone() const;  // Create new instance with same content.
     void Send(int fd);     // Send to given file-descriptor.
     void Clear();          // Clear screen (fill with black).
+    void Fill(const Color &c);  // Fill screen with color.
+
+    // Set offset where this picture should be displayed on the remote
+    // display.
+    //
+    // Setting a z_offset other than zero allows to layer on top of lower
+    // content. For layers larger than 0, black pixels are regarded transparent,
+    // so if you want to show black, use some very dark gray instead.
+    // This feature allows to implement sprites or overlay text easily.
+    void SetOffset(int offset_x, int offset_y, int offset_z = 0);
 
     // Get pixel color at given position. Coordinates outside the range
     // are wrapped around.
@@ -53,8 +68,14 @@ private:
     const int fd_;
     const int width_;
     const int height_;
-    const size_t buf_size_;
-    Color *const buffer_;
+
+    // Raw transmit buffer
+    size_t buf_size_;
+    char *buffer_;
+
+    // pointers into the buffer.
+    Color *pixel_buffer_start_;
+    char *footer_start_;
 };
 
 #endif  // UDP_FLASCHEN_TASCHEN_H

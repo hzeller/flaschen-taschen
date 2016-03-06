@@ -4,13 +4,22 @@ OBJECTS=udp-flaschen-taschen.o
 MAGICK_CXXFLAGS=`GraphicsMagick++-config --cppflags --cxxflags`
 MAGICK_LDFLAGS=`GraphicsMagick++-config --ldflags --libs`
 
-all : send-image simple-example
+FFMPEG_LDFLAGS=`pkg-config --cflags --libs  libavcodec libavformat libswscale libavutil`
+
+all : simple-example simple-animation
+
+simple-animation: simple-animation.cc $(OBJECTS)
+
+simple-example: simple-example.cc $(OBJECTS)
 
 send-image : send-image.cc $(OBJECTS)
 	$(CXX) $(CXXFLAGS) $(MAGICK_CXXFLAGS) -o $@ $^ $(MAGICK_LDFLAGS)
 
-simple-example : simple-example.cc $(OBJECTS)
+send-video: send-video.cc $(OBJECTS)
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(FFMPEG_LDFLAGS)
+
+% : %.cc
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
 clean:
-	rm -f send-image simple-example
+	rm -f send-image send-video simple-example simple-animation $(OBJECTS)
