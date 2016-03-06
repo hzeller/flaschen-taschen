@@ -58,8 +58,10 @@ TerminalFlaschenTaschen::TerminalFlaschenTaschen(int fd, int width, int height)
     buffer_.append(scratch);
 }
 TerminalFlaschenTaschen::~TerminalFlaschenTaschen() {
-    write(terminal_fd_, SCREEN_CLEAR, strlen(SCREEN_CLEAR));
-    write(terminal_fd_, CURSOR_ON, strlen(CURSOR_ON));
+    if (!is_first_) {
+        write(terminal_fd_, SCREEN_CLEAR, strlen(SCREEN_CLEAR));
+        write(terminal_fd_, CURSOR_ON, strlen(CURSOR_ON));
+    }
 }
 
 void TerminalFlaschenTaschen::SetPixel(int x, int y, const Color &col) {
