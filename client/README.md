@@ -17,7 +17,7 @@ This directory provides:
 
 The clients connect to the display over the network. The
 default hostname is pointing to the installation within Noisebridge
-(currently `flaschen-taschen.local`).
+(currently `ft.noise`).
 
 You can change that with commandline flags (e.g. `send-image` and `send-video`
 both have a `-h <host>` option) or via the environment variable `FT_DISPLAY`.
@@ -107,7 +107,7 @@ For C++, there is a simple implementation of such a 'client display', the
 
 int main() {
     // Open socket and create our canvas.
-    const int socket = OpenFlaschenTaschenSocket("flaschen-taschen.local");
+    const int socket = OpenFlaschenTaschenSocket("ft.noise");
     UDPFlaschenTaschen canvas(socket, DISPLAY_WIDTH, DISPLAY_HEIGHT);
 
     const Color red(255, 0, 0);
