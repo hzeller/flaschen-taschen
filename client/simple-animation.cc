@@ -55,11 +55,11 @@ static const char* invader[][INVADER_ROWS] = {
 };
 
 // Fill invader from pattern above.
-UDPFlaschenTaschen *CreateFromPattern(const char *invader[],
+UDPFlaschenTaschen *CreateFromPattern(int socket, const char *invader[],
                                       const Color &color) {
     // We leave a frame of one pixel around the sprite, so that if we move
     // them around by one pixel, previous pixels are overwritten with black.
-    UDPFlaschenTaschen *result = new UDPFlaschenTaschen(-1,
+    UDPFlaschenTaschen *result = new UDPFlaschenTaschen(socket,
                                                         INVADER_WIDTH + 2,
                                                         INVADER_ROWS + 2);
     for (int row = 0; row < INVADER_ROWS; ++row) {
@@ -84,8 +84,8 @@ int main(int argc, char *argv[]) {
 
     // Prepare a couple of frames ready to send.
     std::vector<UDPFlaschenTaschen*> frames;
-    frames.push_back(CreateFromPattern(invader[0], Color(255, 255, 0)));
-    frames.push_back(CreateFromPattern(invader[1], Color(255, 0, 255)));
+    frames.push_back(CreateFromPattern(socket, invader[0], Color(255, 255, 0)));
+    frames.push_back(CreateFromPattern(socket, invader[1], Color(255, 0, 255)));
 
     const int max_animation_x = 20;
     const int max_animation_y = 20;
@@ -101,8 +101,8 @@ int main(int argc, char *argv[]) {
         // We use the z-layering here to hover above the background.
         current_frame->SetOffset(animation_x, animation_y, Z_LAYER);
 
-        current_frame->Send(socket);      // Send the framebuffer.
-        usleep(300 * 1000);               // wait until we show next frame.
+        current_frame->Send();      // Send the framebuffer.
+        usleep(300 * 1000);         // wait until we show next frame.
 
         // Update position of space invader.
         if (i % 2 == 0) {
