@@ -60,7 +60,7 @@ LDFLAGS+=-lpthread
 
 all : ft-server
 
-ft-server: ft-server-main.o $(OBJECTS) $(STATIC_LIBS)
+ft-server: main.o $(OBJECTS) $(STATIC_LIBS)
 	$(CXX) -o $@ $^ $(LDFLAGS)
 
 %.o : %.cc compiler-flags
@@ -83,4 +83,4 @@ compiler-flags: FORCE
 .PHONY: FORCE
 
 clean:
-	rm -f libws281x.a ft-server ft-server-main.o $(OBJECTS) $(WS2812LIB_OBJECTS) ft-server-main.o
+	rm -f libws281x.a ft-server main.o $(OBJECTS) $(WS2812LIB_OBJECTS)
