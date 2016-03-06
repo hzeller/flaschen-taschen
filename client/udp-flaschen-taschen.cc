@@ -34,7 +34,7 @@
 
 #include <algorithm>
 
-#define DEFAULT_FT_DISPLAY_HOST "flaschen-taschen.local"
+#define DEFAULT_FT_DISPLAY_HOST "ft.noise"
 
 int OpenFlaschenTaschenSocket(const char *host) {
     if (host == NULL) {
