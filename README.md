@@ -6,7 +6,7 @@ Noisebridge Flaschen Taschen Project
 
 Software and Raspberry Pi interface hardware for [FlaschenTaschen].
 
-FlaschenTaschen is inspired by projects such as the [Schweppes bottle display]
+FlaschenTaschen is inspired by projects such as the [Muro de botellas]
 or [MateLight]. A bunch of us have seen Mate Light in action at [32c3] and got
 excited :)
 So our Noisebridge interpretation of it has a German influenced name.
@@ -117,7 +117,7 @@ use 9 for our installation right now):
 <a href="hardware/"><img src="img/pi-adapter-pcb.png" width="200px"></a>
 
 [FlaschenTaschen]: https://noisebridge.net/wiki/Flaschen_Taschen
-[Schweppes Bottle Display]: http://www.zuloark.com/muro-de-botellas/
+[Muro de botellas]: http://www.zuloark.com/muro-de-botellas/
 [MateLight]: https://github.com/jaseg/matelight
 [ExperimentalStage]: http://blog.noisebridge.net/post/139304835544/i-walked-into-noisebridge-yesterday-and-was
 [RGB Matrix Adapter]: https://github.com/hzeller/rpi-rgb-led-matrix/tree/master/adapter/active-3
