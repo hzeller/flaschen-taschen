@@ -73,6 +73,9 @@ PriorityFlaschenTaschenSender
     : delegatee_(delegatee),
       width_(delegatee->width()), height_(delegatee->height()),
       display_updater_(new DisplayUpdater(delegatee_)) {
+}
+
+void PriorityFlaschenTaschenSender::PostDaemonInit() {
     // Realtime-priority, tie to CPU 3
     display_updater_->Start(sched_get_priority_max(SCHED_FIFO), 1 << 3);
 }

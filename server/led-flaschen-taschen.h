@@ -141,6 +141,7 @@ class TerminalFlaschenTaschen : public FlaschenTaschen {
 public:
     TerminalFlaschenTaschen(int terminal_fd, int width, int heigh);
     virtual ~TerminalFlaschenTaschen();
+    void PostDaemonInit() {}
 
     int width() const { return width_; }
     int height() const { return height_; }

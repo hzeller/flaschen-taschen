@@ -155,15 +155,18 @@ int main(int argc, char *argv[]) {
 
 #if FT_BACKEND == 0
     MultiSPI spi;
-    ColumnAssembly display(&spi);
+    ColumnAssembly column_disp(&spi);
     // Looking from the back of the display: leftmost column first.
-    display.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P19, 4));
-    display.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P20, 4));
-    display.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P15, 4));
-    display.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P16, 4));
-    display.AddColumn(new StackedColumn(
+    column_disp.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P19, 4));
+    column_disp.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P20, 4));
+    column_disp.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P15, 4));
+    column_disp.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P16, 4));
+    column_disp.AddColumn(new StackedColumn(
            new LPD6803FlaschenTaschen(&spi, MultiSPI::SPI_P11, 2),
            new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P12, 2)));
+    // Wrap in an implementation that executes Send() in high-priority thread
+    // to prevent possible timing glitches.
+    PriorityFlaschenTaschenSender display(&column_disp);
 #elif FT_BACKEND == 1
     RGBMatrixFlaschenTaschen display(0, 0, width, height);
 #elif FT_BACKEND == 2
@@ -193,22 +196,15 @@ int main(int argc, char *argv[]) {
     // Only after we have become a daemon, we can do all the things that
     // require starting threads. These can be various realtime priorities,
     // we so need to stay root until all threads are set up.
-
-#if FT_BACKEND == 1
     display.PostDaemonInit();
-#endif
 
     display.Send();  // Clear screen.
 
     ft::Mutex mutex;
 
-    // Execute Send() method in high-priority thread to prevent possible timing
-    // glitches.
-    PriorityFlaschenTaschenSender realtime_display_sender(&display);
-
     // The display we expose to the user provides composite layering which can
     // be used by the UDP server.
-    CompositeFlaschenTaschen layered_display(&realtime_display_sender, 16);
+    CompositeFlaschenTaschen layered_display(&display, 16);
     layered_display.StartLayerGarbageCollection(&mutex, 10);
 
     // Optional services as thread.

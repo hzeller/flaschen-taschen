@@ -26,11 +26,13 @@
 // The Send() operation is delegated to the delegatee but executed in a
 // high-priority thread to prevent timing glitches (pauses longer than 50µsec
 // are considered 'end of LED strip').
+// (TODO: merge with ColumnAssembly, the only place where we need this ?)
 class PriorityFlaschenTaschenSender : public FlaschenTaschen {
 public:
     // Does _not_ take over ownership of delegatee.
     PriorityFlaschenTaschenSender(FlaschenTaschen *delegatee);
     ~PriorityFlaschenTaschenSender();
+    void PostDaemonInit();
 
     virtual int width() const { return width_; }
     virtual int height() const { return height_; }

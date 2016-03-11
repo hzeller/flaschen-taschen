@@ -74,7 +74,7 @@ libws281x.a : $(WS2812LIB_OBJECTS)
 	ar rcs $@ $^
 
 $(RGB_LIBRARY):
-	DEFINES=-DRGB_CLASSIC_PINOUT $(MAKE) -C $(RGB_LIBDIR)
+	$(MAKE) -C $(RGB_LIBDIR)
 
 # Make sure to re-compile when the compiler flags change.
 compiler-flags: FORCE
