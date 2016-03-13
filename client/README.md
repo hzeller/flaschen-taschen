@@ -7,11 +7,13 @@ FlaschenTaschen; see toplevel
 directory [README.md](../README.md#getting-pixels-on-flaschen-taschen).
 
 This directory provides:
+  * `send-text` binary, that prints a static or scrolling text.
   * `send-image` binary, that reads an arbitrary image (including
     animated *.gifs), scales it and sends to FlaschenTaschen.
   * `send-video` binary, that reads an arbitrary video, scales it and
     sends to FlaschenTaschen.
-  * A simple-example.cc and simple-animation.cc code example.
+  * A [simple-example.cc](./simple-example.cc) and [simple-animation.cc](./simple-animation.cc)
+    code example.
 
 ### Network destination
 
