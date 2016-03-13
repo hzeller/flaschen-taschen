@@ -43,8 +43,9 @@ make
 usage: ./send-text [options] <TEXT>
 Options:
         -g <width>x<height>[+<off_x>+<off_y>[+<layer>]] : Output geometry. Default 45x<font-height>+0+0+1
+        -l <layer>      : Layer 0..15. Default 1 (note if also given in -g, then last counts)
         -h <host>       : Flaschen-Taschen display hostname.
-        -f<fontfile>    : Path to *.bdf font file
+        -f <fontfile>   : Path to *.bdf font file
         -s<ms>          : Scroll milliseconds per pixel (default 60). 0 for no-scroll.
         -o              : Only run once, don't scroll forever.
         -c<RRGGBB>      : Text color as hex (default: FFFFFF)
@@ -77,6 +78,7 @@ make send-image
 usage: ./send-image [options] <image>
 Options:
         -g <width>x<height>[+<off_x>+<off_y>[+<layer>]] : Output geometry. Default 20x20+0+0+0
+        -l <layer>      : Layer 0..15. Default 0 (note if also given in -g, then last counts)
         -h <host>       : Flaschen-Taschen display hostname.
         -s[<ms>]        : Scroll horizontally (optionally: delay ms; default 60).
         -C              : Just clear given area and exit.
@@ -119,8 +121,9 @@ make send-video
 usage: ./send-video [options] <video>
 Options:
         -g <width>x<height>[+<off_x>+<off_y>[+<layer>]] : Output geometry. Default 20x20+0+0
-        -h <host>                             : Flaschen-Taschen display hostname.
-        -v                                    : verbose.
+        -h <host>          : Flaschen-Taschen display hostname.
+        -l <layer>         : Layer 0..15. Default 0 (note if also given in -g, then last counts)
+        -v                 : verbose.
 ```
 
 ![](../img/ft-movie-night.jpg)

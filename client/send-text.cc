@@ -35,8 +35,9 @@ static int usage(const char *progname) {
     fprintf(stderr, "usage: %s [options] <TEXT>\n", progname);
     fprintf(stderr, "Options:\n"
             "\t-g <width>x<height>[+<off_x>+<off_y>[+<layer>]] : Output geometry. Default 45x<font-height>+0+0+1\n"
+            "\t-l <layer>      : Layer 0..15. Default 1 (note if also given in -g, then last counts)\n"
             "\t-h <host>       : Flaschen-Taschen display hostname.\n"
-            "\t-f<fontfile>    : Path to *.bdf font file\n"
+            "\t-f <fontfile>   : Path to *.bdf font file\n"
             "\t-s<ms>          : Scroll milliseconds per pixel (default 60). 0 for no-scroll.\n"
             "\t-o              : Only run once, don't scroll forever.\n"
             "\t-c<RRGGBB>      : Text color as hex (default: FFFFFF)\n"
@@ -62,7 +63,7 @@ int main(int argc, char *argv[]) {
 
     ft::Font font;
     int opt;
-    while ((opt = getopt(argc, argv, "f:g:h:s:oc:b:")) != -1) {
+    while ((opt = getopt(argc, argv, "f:g:h:s:oc:b:l:")) != -1) {
         switch (opt) {
         case 'g':
             if (sscanf(optarg, "%dx%d%d%d%d", &width, &height, &off_x, &off_y, &off_z)
@@ -81,6 +82,9 @@ int main(int argc, char *argv[]) {
             break;
         case 'o':
             run_forever = false;
+            break;
+        case 'l':
+            off_z = atoi(optarg);
             break;
         case 's':
             scroll_delay_ms = atoi(optarg);
