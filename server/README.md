@@ -89,6 +89,7 @@ as Flaschen Taschen backend:
 ```
 
 [![RGB-MatrixImpl][ft-rgb-vid]](https://www.youtube.com/watch?v=XeJBcNevuJE)
+(this is a larger 160x96 display).
 
 This runs on a Raspberry Pi; see the
 [documentation in the RGB-Matrix project][rgb-matrix]
