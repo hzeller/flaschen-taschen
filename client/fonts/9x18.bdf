@@ -1,4 +1,4 @@
-fSTARTFONT 2.1
+STARTFONT 2.1
 COMMENT "$Id: 9x18.bdf,v 1.53 2009-04-06 18:50:15+01 mgk25 Rel $"
 COMMENT "Send bug reports to Markus Kuhn <http://www.cl.cam.ac.uk/~mgk25/>"
 FONT -Misc-Fixed-Medium-R-Normal--18-120-100-100-C-90-ISO10646-1
@@ -103779,7 +103779,7 @@ BITMAP
 0000
 0000
 ENDCHAR
-STARTCHAR Heart
+STARTCHAR heart
 ENCODING 9829
 SWIDTH 540 0
 DWIDTH 9 0
