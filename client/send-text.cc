@@ -37,12 +37,12 @@ static int usage(const char *progname) {
             "\t-g <width>x<height>[+<off_x>+<off_y>[+<layer>]] : Output geometry. Default 45x<font-height>+0+0+1\n"
             "\t-h <host>       : Flaschen-Taschen display hostname.\n"
             "\t-f<fontfile>    : Path to *.bdf font file\n"
-            "\t-s<ms>          : Scroll milliseconds per pixel (default 60).\n"
-            "\t-o              : Only run once, don't scroll.\n"
+            "\t-s<ms>          : Scroll milliseconds per pixel (default 60). 0 for no-scroll.\n"
+            "\t-o              : Only run once, don't scroll forever.\n"
             "\t-c<RRGGBB>      : Text color as hex (default: FFFFFF)\n"
             "\t-b<RRGGBB>      : Background color as hex (default: 000000)\n"
             );
-    
+
     return 1;
 }
 
@@ -84,7 +84,10 @@ int main(int argc, char *argv[]) {
             break;
         case 's':
             scroll_delay_ms = atoi(optarg);
-            if (scroll_delay_ms < 5) scroll_delay_ms = 5;
+            if (scroll_delay_ms > 0 && scroll_delay_ms < 10) {
+                // Don't do crazy packet sending.
+                scroll_delay_ms = 10;
+            }
             break;
         case 'c':
             if (sscanf(optarg, "%02x%02x%02x", &r, &g, &b) != 3) {
@@ -155,23 +158,33 @@ int main(int argc, char *argv[]) {
     signal(SIGTERM, InterruptHandler);
     signal(SIGINT, InterruptHandler);
 
-    do {
+    if (scroll_delay_ms > 0) {
+        do {
+            display.Fill(bg);
+            for (int s = 0; s < total_len + width && !interrupt_received; ++s) {
+                DrawText(&display, font, width - s, y_pos, fg, &bg, text);
+                display.Send();
+                usleep(scroll_delay_ms * 1000);
+            }
+        } while (run_forever && !interrupt_received);
+    }
+    else {
+        // No scrolling, just show directly and once.
         display.Fill(bg);
-        for (int s = 0; s < total_len + width && !interrupt_received; ++s) {
-            DrawText(&display, font, width - s, y_pos, fg, &bg, text);
-            display.Send();
-            usleep(scroll_delay_ms * 1000);
-        }
-    } while (run_forever && !interrupt_received);
+        DrawText(&display, font, 0, y_pos, fg, &bg, text);
+        display.Send();
+    }
 
     // Don't let leftovers cover up content.
-    if (off_z > 0) {
+    if (off_z > 0 && interrupt_received) {
         display.Clear();
         display.Send();
     }
 
     close(fd);
 
-    fprintf(stderr, "Exit.\n");
+    if (interrupt_received) {
+        fprintf(stderr, "Interrupted. Exit.\n");
+    }
     return 0;
 }

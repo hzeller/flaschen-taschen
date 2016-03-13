@@ -45,15 +45,18 @@ Options:
         -g <width>x<height>[+<off_x>+<off_y>[+<layer>]] : Output geometry. Default 45x<font-height>+0+0+1
         -h <host>       : Flaschen-Taschen display hostname.
         -f<fontfile>    : Path to *.bdf font file
-        -s<ms>          : Scroll milliseconds per pixel (default 60).
-        -o              : Only run once, don't scroll.
+        -s<ms>          : Scroll milliseconds per pixel (default 60). 0 for no-scroll.
+        -o              : Only run once, don't scroll forever.
         -c<RRGGBB>      : Text color as hex (default: FFFFFF)
         -b<RRGGBB>      : Background color as hex (default: 000000)
 ```
 
 Sample
-```
+```bash
 ./send-text -f fonts/6x10.bdf "We ♥ Flaschen Taschen"
+
+# Or, how about showing the time
+while : ; do sleep 1 ; ./send-text -f fonts/9x18.bdf -s0 `date +%H:%M` ; done
 ```
 
 Text has a default layer of 1, so it is hovering above the background image.
