@@ -49,8 +49,9 @@ static int usage(const char *progname) {
     fprintf(stderr, "usage: %s [options] <video>\n", progname);
     fprintf(stderr, "Options:\n"
             "\t-g <width>x<height>[+<off_x>+<off_y>[+<layer>]] : Output geometry. Default 20x20+0+0\n"
-            "\t-h <host>                             : Flaschen-Taschen display hostname.\n"
-            "\t-v                                    : verbose.\n");
+            "\t-h <host>          : Flaschen-Taschen display hostname.\n"
+            "\t-l <layer>         : Layer 0..15. Default 0 (note if also given in -g, then last counts)\n"
+            "\t-v                 : verbose.\n");
     return 1;
 }
 
@@ -64,7 +65,7 @@ int main(int argc, char *argv[]) {
     const char *ft_host = NULL;
 
     int opt;
-    while ((opt = getopt(argc, argv, "g:h:v")) != -1) {
+    while ((opt = getopt(argc, argv, "g:h:vl:")) != -1) {
         switch (opt) {
         case 'g':
             if (sscanf(optarg, "%dx%d%d%d%d",
@@ -75,6 +76,9 @@ int main(int argc, char *argv[]) {
             break;
         case 'h':
             ft_host = strdup(optarg); // leaking. Ignore.
+            break;
+        case 'l':
+            off_z = atoi(optarg);
             break;
         case 'v':
             verbose = true;
