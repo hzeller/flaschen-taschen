@@ -88,8 +88,11 @@ as Flaschen Taschen backend:
   sudo ./ft-server -D45x35
 ```
 
+[![RGB-MatrixImpl][ft-rgb-vid]](https://www.youtube.com/watch?v=XeJBcNevuJE)
+
 This runs on a Raspberry Pi; see the
 [documentation in the RGB-Matrix project][rgb-matrix]
 
 [rgb-matrix]: https://github.com/hzeller/rpi-rgb-led-matrix
+[ft-rgb-vid]: ../img/rgb-matrix-sample-vid.jpg
 [term-color]: https://gist.github.com/XVilka/8346728
