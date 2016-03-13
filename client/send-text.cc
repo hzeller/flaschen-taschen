@@ -179,8 +179,9 @@ int main(int argc, char *argv[]) {
         display.Send();
     }
 
-    // Don't let leftovers cover up content.
-    if (off_z > 0 && interrupt_received) {
+    // Don't let leftovers cover up content unless we set a no-scrolling
+    // text explicitly
+    if (off_z > 0 && scroll_delay_ms > 0) {
         display.Clear();
         display.Send();
     }
