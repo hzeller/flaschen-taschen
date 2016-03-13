@@ -22,4 +22,4 @@ send-video: send-video.cc $(OBJECTS)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
 clean:
-	rm -f send-image send-video simple-example simple-animation $(OBJECTS)
+	rm -f send-text send-image send-video simple-example simple-animation $(OBJECTS)
