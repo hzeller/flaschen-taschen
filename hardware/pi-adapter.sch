@@ -321,7 +321,7 @@ Text GLabel 1900 3200 0    51   Output ~ 0
 D3
 Text GLabel 2400 3400 2    51   Output ~ 0
 D4
-Text GLabel 2400 3000 2    51   Output ~ 0
+Text GLabel 2400 3200 2    51   Output ~ 0
 D1
 $Comp
 L C C4
@@ -377,7 +377,6 @@ Wire Wire Line
 	3650 7350 3850 7350
 NoConn ~ 1900 4000
 NoConn ~ 2400 4000
-NoConn ~ 2400 4100
 NoConn ~ 1900 3500
 $Comp
 L PWR_FLAG #FLG017
@@ -571,18 +570,14 @@ $EndComp
 $Comp
 L CONN_01X03 P5
 U 1 1 56C196A7
-P 3000 3200
-F 0 "P5" H 3077 3238 50  0000 L CNN
-F 1 "CONN_01X03" H 3077 3146 50  0000 L CNN
-F 2 "Pin_Headers:Pin_Header_Straight_1x03" H 3000 3200 50  0001 C CNN
-F 3 "" H 3000 3200 50  0000 C CNN
-	1    3000 3200
+P 3000 3100
+F 0 "P5" H 3077 3138 50  0000 L CNN
+F 1 "CONN_01X03" H 3077 3046 50  0000 L CNN
+F 2 "Pin_Headers:Pin_Header_Straight_1x03" H 3000 3100 50  0001 C CNN
+F 3 "" H 3000 3100 50  0000 C CNN
+	1    3000 3100
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	2400 3100 2800 3100
-Wire Wire Line
-	2400 3200 2800 3200
 $Comp
 L GND #PWR021
 U 1 1 56C198BA
@@ -594,9 +589,6 @@ F 3 "" H 2800 3300 60  0000 C CNN
 	1    2800 3300
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	2400 3300 2800 3300
-Connection ~ 2800 3300
 $Comp
 L CONN_01X03 P3
 U 1 1 56C19AA9
@@ -690,7 +682,7 @@ $EndComp
 Text GLabel 2700 1500 1    60   Input ~ 0
 Fused5V
 Wire Wire Line
-	2700 1500 2700 1600
+	2700 1600 2700 1500
 Text GLabel 6250 1600 2    60   Input ~ 0
 Fused5V
 Wire Wire Line
@@ -700,7 +692,7 @@ Wire Wire Line
 	1300 5700 1300 5750
 Connection ~ 1600 5750
 Wire Wire Line
-	2700 1600 2500 1600
+	2500 1600 2700 1600
 Wire Wire Line
 	1900 1800 2700 1800
 Wire Wire Line
@@ -1124,4 +1116,27 @@ $EndComp
 Connection ~ 1950 1450
 Wire Wire Line
 	2400 2700 2450 2700
+$Comp
+L GND #PWR?
+U 1 1 56CF0349
+P 2500 4100
+F 0 "#PWR?" H 2500 4100 30  0001 C CNN
+F 1 "GND" H 2500 4030 30  0001 C CNN
+F 2 "" H 2500 4100 60  0000 C CNN
+F 3 "" H 2500 4100 60  0000 C CNN
+	1    2500 4100
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	2400 4100 2500 4100
+NoConn ~ 1900 2700
+Wire Wire Line
+	2800 3200 2800 3300
+Wire Wire Line
+	2800 3300 2400 3300
+Connection ~ 2800 3300
+Wire Wire Line
+	2400 3000 2800 3000
+Wire Wire Line
+	2400 3100 2800 3100
 $EndSCHEMATC

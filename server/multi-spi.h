@@ -26,11 +26,36 @@
 // Also, there is no chip-select at this point (not needed for the LED strips).
 class MultiSPI {
 public:
+    // Names of the pin-headers on the breakout board.
+    enum {
+        SPI_CLOCK = 27,
+
+        SPI_P6  = 23,
+        SPI_P7  = 17,
+        SPI_P8  =  4,
+        SPI_P9  = 14,  // This will be 18 with the new board.
+
+        SPI_P10 =  5,
+        SPI_P11 = 25,
+        SPI_P12 = 24,
+        SPI_P13 = 22,
+
+        SPI_P14 = 16,
+        SPI_P15 = 13,
+        SPI_P16 =  6,
+        SPI_P17 = 12,
+
+        SPI_P18 = 21,
+        SPI_P19 = 20,
+        SPI_P20 = 26,
+        SPI_P21 = 19,
+    };
+
     // Create MultiSPI that outputs clock on the "clock_gpio" pin. The
     // "serial_bytes_per_stream" define the length of the transmission in
     // each stream. This creates the necessary buffers for streams, all
     // initialized to zero.
-    explicit MultiSPI(int clock_gpio);
+    explicit MultiSPI(int clock_gpio = SPI_CLOCK);
     ~MultiSPI();
 
     // Register a new data stream for the given GPIO. The SPI data is

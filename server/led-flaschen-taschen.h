@@ -22,6 +22,7 @@
 
 // Crate mapping. Strip position at kCrateMapping[4-y][x]
 extern int kCrateMapping[5][5];
+extern int luminance_cie1931(uint8_t output_bits, uint8_t gray_value);
 
 class MultiSPI;
 
@@ -31,7 +32,8 @@ public:
     ~ColumnAssembly();
 
     // Add column. Takes over ownership of column.
-    // Columns have been added right to left.
+    // Columns have been added right to left, or, if standing
+    // behind the display: leftmost column first.
     void AddColumn(FlaschenTaschen *taschen);
 
     int width() const { return width_; }
@@ -137,7 +139,9 @@ private:
 
 class TerminalFlaschenTaschen : public FlaschenTaschen {
 public:
-    TerminalFlaschenTaschen(int width, int heigh);
+    TerminalFlaschenTaschen(int terminal_fd, int width, int heigh);
+    virtual ~TerminalFlaschenTaschen();
+    void PostDaemonInit() {}
 
     int width() const { return width_; }
     int height() const { return height_; }
@@ -146,6 +150,7 @@ public:
     void Send();
 
 private:
+    const int terminal_fd_;
     const int width_;
     const int height_;
     size_t initial_offset_;

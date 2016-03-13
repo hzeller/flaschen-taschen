@@ -65,9 +65,9 @@ void LPD6803FlaschenTaschen::SetPixel(int x, int y, const Color &col) {
     const int b = b_correct * col.b;
     uint16_t data = 0;
     data |= (1<<15);  // start bit
-    data |= ((r >> 3) & 0x1F) << 10;
-    data |= ((g >> 3) & 0x1F) <<  5;
-    data |= ((b >> 3) & 0x1F) <<  0;
+    data |= luminance_cie1931(5, r) << 10;
+    data |= luminance_cie1931(5, g) <<  5;
+    data |= luminance_cie1931(5, b) <<  0;
 
     spi_->SetBufferedByte(gpio_pin_, 2 * pos + 4 + 0, data >> 8);
     spi_->SetBufferedByte(gpio_pin_, 2 * pos + 4 + 1, data & 0xFF);

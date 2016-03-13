@@ -28,18 +28,11 @@
 #include <string>
 
 #include "composite-flaschen-taschen.h"
+#include "priority-flaschen-taschen-sender.h"
 #include "ft-thread.h"
 #include "led-flaschen-taschen.h"
 #include "multi-spi.h"
 #include "servers.h"
-
-// Pin 11 on Pi
-#define MULTI_SPI_COMMON_CLOCK 17
-
-#define LPD_STRIP_GPIO 11
-#define WS_R0_STRIP_GPIO 8
-#define WS_R1_STRIP_GPIO 7
-#define WS_R2_STRIP_GPIO 10
 
 static int usage(const char *progname) {
     fprintf(stderr, "usage: %s [options]\n", progname);
@@ -96,34 +89,47 @@ int main(int argc, char *argv[]) {
     }
 
 #if FT_BACKEND == 0
-    MultiSPI spi(MULTI_SPI_COMMON_CLOCK);
-    ColumnAssembly display(&spi);
-    // From right to left.
-    display.AddColumn(new WS2801FlaschenTaschen(&spi, WS_R0_STRIP_GPIO, 2));
-    display.AddColumn(new WS2801FlaschenTaschen(&spi, WS_R1_STRIP_GPIO, 4));
-    display.AddColumn(new WS2811FlaschenTaschen(2));
-    display.AddColumn(new LPD6803FlaschenTaschen(&spi, LPD_STRIP_GPIO, 2));
+    MultiSPI spi;
+    ColumnAssembly column_disp(&spi);
+    // Looking from the back of the display: leftmost column first.
+    column_disp.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P19, 4));
+    column_disp.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P20, 4));
+    column_disp.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P15, 4));
+    column_disp.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P16, 4));
+    column_disp.AddColumn(new StackedColumn(
+           new LPD6803FlaschenTaschen(&spi, MultiSPI::SPI_P11, 2),
+           new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P12, 2)));
+    // Wrap in an implementation that executes Send() in high-priority thread
+    // to prevent possible timing glitches.
+    PriorityFlaschenTaschenSender display(&column_disp);
 #elif FT_BACKEND == 1
     RGBMatrixFlaschenTaschen display(0, 0, width, height);
 #elif FT_BACKEND == 2
-    TerminalFlaschenTaschen display(width, height);
+    TerminalFlaschenTaschen display(STDOUT_FILENO, width, height);
 #endif
 
-    if (!udp_server_init(1337))
+    // Start all the services and report problems (such as sockets already
+    // bound to) before we become a daemon
+    if (!udp_server_init(1337)) {
         return 1;
+    }
 
     // Optional services.
-    if (run_opc && !opc_server_init(7890))
+    if (run_opc && !opc_server_init(7890)) {
         return 1;
+    }
 
-#if FT_BACKEND == 1
+    // Only after we have become a daemon, we can do all the things that
+    // require starting threads. These can be various realtime priorities,
+    // we so need to stay root until all threads are set up.
     display.PostDaemonInit();
-#endif
 
     display.Send();  // Clear screen.
 
     ft::Mutex mutex;
 
+    // The display we expose to the user provides composite layering which can
+    // be used by the UDP server.
     CompositeFlaschenTaschen layered_display(&display, 16);
     layered_display.StartLayerGarbageCollection(&mutex, 10);
 

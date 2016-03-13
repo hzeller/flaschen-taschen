@@ -36,8 +36,8 @@ void WS2801FlaschenTaschen::SetPixel(int x, int y, const Color &col) {
     y %= 5;
     const int pos = 25 * crate + kCrateMapping[4-y][x];
 
-    spi_->SetBufferedByte(gpio_pin_, 3 * pos + 0, col.r);
-    spi_->SetBufferedByte(gpio_pin_, 3 * pos + 1, col.g);
-    spi_->SetBufferedByte(gpio_pin_, 3 * pos + 2, col.b);
+    spi_->SetBufferedByte(gpio_pin_, 3 * pos + 0, luminance_cie1931(8, col.r));
+    spi_->SetBufferedByte(gpio_pin_, 3 * pos + 1, luminance_cie1931(8, col.g));
+    spi_->SetBufferedByte(gpio_pin_, 3 * pos + 2, luminance_cie1931(8, col.b));
 }
 

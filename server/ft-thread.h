@@ -57,7 +57,14 @@ public:
     ~Mutex() { pthread_mutex_destroy(&mutex_); }
     void Lock() { pthread_mutex_lock(&mutex_); }
     void Unlock() { pthread_mutex_unlock(&mutex_); }
+
+    // Wait on condition signal.
     void WaitOn(pthread_cond_t *cond) { pthread_cond_wait(cond, &mutex_); }
+
+    // Wait on condition. Returns 'true' if condition was signalled.
+    // Times out after "wait_ms" if condition is not met until then and
+    // returns 'false'.
+    bool WaitOnWithTimeout(pthread_cond_t *cond, int wait_ms);
 
 private:
     pthread_mutex_t mutex_;
@@ -68,6 +75,7 @@ class MutexLock {
 public:
     MutexLock(Mutex *m) : mutex_(m) { mutex_->Lock(); }
     ~MutexLock() { mutex_->Unlock(); }
+
 private:
     Mutex *const mutex_;
 };

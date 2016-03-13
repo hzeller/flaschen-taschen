@@ -32,7 +32,17 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include <algorithm>
+
+#define DEFAULT_FT_DISPLAY_HOST "ft.noise"
+
 int OpenFlaschenTaschenSocket(const char *host) {
+    if (host == NULL) {
+        host = getenv("FT_DISPLAY");     // Take from environment.
+    }
+    if (host == NULL || strlen(host) == 0) {
+        host = DEFAULT_FT_DISPLAY_HOST; // Fallback.
+    }
     struct addrinfo addr_hints = {0};
     addr_hints.ai_family = AF_INET;
     addr_hints.ai_socktype = SOCK_DGRAM;
@@ -40,7 +50,7 @@ int OpenFlaschenTaschenSocket(const char *host) {
     struct addrinfo *addr_result = NULL;
     int rc;
     if ((rc = getaddrinfo(host, "1337", &addr_hints, &addr_result)) != 0) {
-        fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rc));
+        fprintf(stderr, "Resolving '%s': %s\n", host, gai_strerror(rc));
         return -1;
     }
     if (addr_result == NULL)
@@ -73,7 +83,7 @@ UDPFlaschenTaschen::UDPFlaschenTaschen(int socket, int width, int height)
     strcpy(buffer_, header);
     pixel_buffer_start_ = reinterpret_cast<Color*>(buffer_ + header_len);
     footer_start_ = buffer_ + buf_size_ - kFooterLen;
-    SetOffset(0, 0);
+    SetOffset(0, 0, 0);
 }
 UDPFlaschenTaschen::~UDPFlaschenTaschen() { delete [] buffer_; }
 
@@ -81,11 +91,17 @@ void UDPFlaschenTaschen::Clear() {
     bzero(pixel_buffer_start_, width_ * height_ * sizeof(Color));
 }
 
-void UDPFlaschenTaschen::SetOffset(int offset_x, int offset_y, int offset_z){
-    // Our extension to the PPM format adds additional information after the
-    // image data.
-    snprintf(footer_start_, kFooterLen, "\n%4d %4d %4d\n",
-             offset_x, offset_y, offset_z);
+void UDPFlaschenTaschen::Fill(const Color &c) {
+    if (c.is_black()) {
+        Clear();  // cheaper
+    } else {
+        std::fill(pixel_buffer_start_, pixel_buffer_start_ + width_*height_, c);
+    }
+}
+
+void UDPFlaschenTaschen::SetOffset(int off_x, int off_y, int off_z){
+    // Our extension to the PPM format adds footers after the image data.
+    snprintf(footer_start_, kFooterLen, "\n%4d %4d %4d\n", off_x, off_y, off_z);
 }
 
 void UDPFlaschenTaschen::SetPixel(int x, int y, const Color &col) {

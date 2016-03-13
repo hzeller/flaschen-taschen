@@ -17,6 +17,7 @@
 
 #include <assert.h>
 #include <limits.h>
+#include <pthread.h>
 #include <strings.h>
 #include <unistd.h>
 
@@ -55,35 +56,37 @@ public:
     ZBuffer(int w, int h) : TypedScreenBuffer(w, h){}
 };
 
-class CompositeFlaschenTaschen::GarbageCollector : public ft::Thread {
+class CompositeFlaschenTaschen::LayerGarbageCollector : public ft::Thread {
 public:
-    GarbageCollector(CompositeFlaschenTaschen *owner, ft::Mutex *m,
-                     Ticks max_age)
+    LayerGarbageCollector(CompositeFlaschenTaschen *owner, ft::Mutex *m,
+                          Ticks max_age)
         : owner_(owner), lock_(m), max_age_(max_age),
-          running_(true), ticks_(0) {}
+          running_(true), ticks_(0) {
+        pthread_cond_init(&running_cond_, NULL);
+    }
 
     void Run() {
         for (;;) {
-            {
-                ft::MutexLock m(lock_);
-                if (!running_) break;
-                owner_->ClearLayersOlderThan(ticks_ - max_age_);
-                owner_->SetTimeTicks(ticks_);
-            }
-            sleep(1);
+            ft::MutexLock m(lock_);
+            lock_->WaitOnWithTimeout(&running_cond_, 1000);
+            if (!running_) break;
+            owner_->ClearLayersOlderThan(ticks_ - max_age_);
+            owner_->SetTimeTicks(ticks_);
             ++ticks_;  // one tick, roughly one second.
         }
     }
 
-    void SetStopped() {
+    void TriggerExit() {
         ft::MutexLock m(lock_);
         running_ = false;
+        pthread_cond_signal(&running_cond_);
     }
 
 private:
     CompositeFlaschenTaschen *const owner_;
     ft::Mutex *const lock_;
     const Ticks max_age_;
+    pthread_cond_t running_cond_;
     bool running_;
     Ticks ticks_;
 };
@@ -105,7 +108,7 @@ CompositeFlaschenTaschen::CompositeFlaschenTaschen(FlaschenTaschen *delegatee,
 
 CompositeFlaschenTaschen::~CompositeFlaschenTaschen() {
     if (garbage_collect_) {
-        garbage_collect_->SetStopped();
+        garbage_collect_->TriggerExit();
         garbage_collect_->WaitStopped();
     }
     for (size_t i = 0; i < screens_.size(); ++i) delete screens_[i];
@@ -146,7 +149,7 @@ void CompositeFlaschenTaschen::StartLayerGarbageCollection(ft::Mutex *lock,
                                                            int timeout_seconds) {
     assert(garbage_collect_ == NULL);  // only start once.
     assert(lock != NULL);  // Must provide mutex.
-    garbage_collect_ = new GarbageCollector(this, lock, timeout_seconds);
+    garbage_collect_ = new LayerGarbageCollector(this, lock, timeout_seconds);
     garbage_collect_->Start();
 }
 

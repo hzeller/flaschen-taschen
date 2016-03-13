@@ -9,8 +9,56 @@ directory [README.md](../README.md#getting-pixels-on-flaschen-taschen).
 This directory provides:
   * `send-image` binary, that reads an arbitrary image (including
     animated *.gifs), scales it and sends to FlaschenTaschen.
-  * A simple-example.cc code example.
-  * (more TBD. Pull requests encouraged, hint hint...)
+  * `send-video` binary, that reads an arbitrary video, scales it and
+    sends to FlaschenTaschen.
+  * A simple-example.cc and simple-animation.cc code example.
+
+### Network destination
+
+The clients connect to the display over the network. The
+default hostname is pointing to the installation within Noisebridge
+(currently `ft.noise`).
+
+You can change that with commandline flags (e.g. `send-text`, `send-image`,
+and `send-video` all have a `-h <host>` option) or via the environment
+variable `FT_DISPLAY`.
+
+So if you are working with a particular instance of FlaschenTaschen (e.g.
+a [local terminal](../server/README.md#terminal)), just set the environment
+variable for ease of playing.
+
+```
+export FT_DISPLAY=localhost
+```
+
+## Send-Text
+
+### Compile
+```bash
+make
+```
+
+### Use
+```
+usage: ./send-text [options] <TEXT>
+Options:
+        -g <width>x<height>[+<off_x>+<off_y>[+<layer>]] : Output geometry. Default 45x<font-height>+0+0+1
+        -h <host>       : Flaschen-Taschen display hostname.
+        -f<fontfile>    : Path to *.bdf font file
+        -s<ms>          : Scroll milliseconds per pixel (default 60).
+        -o              : Only run once, don't scroll.
+        -c<RRGGBB>      : Text color as hex (default: FFFFFF)
+        -b<RRGGBB>      : Background color as hex (default: 000000)
+```
+
+Sample
+```
+./send-text -f fonts/6x10.bdf "We ♥ Flaschen Taschen"
+```
+
+Text has a default layer of 1, so it is hovering above the background image.
+If you don't want that, you can explicitly set it as last value in the geometry
+specification.
 
 ## Send-Image
 
@@ -26,8 +74,9 @@ make send-image
 usage: ./send-image [options] <image>
 Options:
         -g <width>x<height>[+<off_x>+<off_y>[+<layer>]] : Output geometry. Default 20x20+0+0+0
-        -h <host>       : host (default: flaschen-taschen.local)
-        -s[<ms>]        : scroll horizontally (optionally: delay ms; default 60).
+        -h <host>       : Flaschen-Taschen display hostname.
+        -s[<ms>]        : Scroll horizontally (optionally: delay ms; default 60).
+        -C              : Just clear given area and exit.
 ```
 
 Essentially just send the FlaschenTaschen display an image over the network:
@@ -66,9 +115,12 @@ make send-video
 ```
 usage: ./send-video [options] <video>
 Options:
-        -g <width>x<height>[+<off_x>+<off_y>] : Output geometry. Default 20x20+0+0
-        -h <host>                             : host (default: flaschen-taschen.local)
+        -g <width>x<height>[+<off_x>+<off_y>[+<layer>]] : Output geometry. Default 20x20+0+0
+        -h <host>                             : Flaschen-Taschen display hostname.
+        -v                                    : verbose.
 ```
+
+![](../img/ft-movie-night.jpg)
 
 ## Example Code
 
@@ -87,7 +139,7 @@ For C++, there is a simple implementation of such a 'client display', the
 
 int main() {
     // Open socket and create our canvas.
-    const int socket = OpenFlaschenTaschenSocket("flaschen-taschen.local");
+    const int socket = OpenFlaschenTaschenSocket("ft.noise");
     UDPFlaschenTaschen canvas(socket, DISPLAY_WIDTH, DISPLAY_HEIGHT);
 
     const Color red(255, 0, 0);

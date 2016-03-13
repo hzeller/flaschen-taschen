@@ -3,10 +3,16 @@
 // Simple example how to write a client.
 // This sets two points. A red at (0,0); a blue dot at (5,5)
 //
-// If you run at Noisebridge, call the binary with the Noisebridge
-// display hostname flaschen-taschen.local:
+// By default, connects to the installation at Noisebridge. If using a
+// different display (e.g. a local terminal display)
+// pass the hostname as parameter:
 //
-// ./simple-example flaschen-taschen.local
+//  ./simple-example localhost
+//
+// .. or set the environment variable FT_DISPLAY to not worry about it
+//
+//  export FT_DISPLAY=localhost
+//  ./simple-example
 
 #include "udp-flaschen-taschen.h"
 
@@ -16,11 +22,10 @@
 #define DISPLAY_HEIGHT 20
 
 int main(int argc, char *argv[]) {
-    const char *hostname = "127.0.0.1";
+    const char *hostname = NULL;   // Will use default if not set otherwise.
     if (argc > 1) {
-        hostname = argv[1];     // Single command line argument.
+        hostname = argv[1];        // Hostname can be supplied as first arg
     }
-    fprintf(stderr, "Sending to %s\n", hostname);
 
     // Open socket and create our canvas.
     const int socket = OpenFlaschenTaschenSocket(hostname);

@@ -22,6 +22,8 @@
 #define SCREEN_PREFIX   "\033[48;2;0;0;0m"  // set black background
 #define SCREEN_POSTFIX  "\033[0m\n"         // reset terminal settings
 #define SCREEN_CURSOR_UP_FORMAT "\033[%dA"  // Move cursor up given lines.
+#define CURSOR_OFF      "\033[?25l"
+#define CURSOR_ON       "\033[?25h"
 
 // Idea is that we have all colors same width for fast in-place updates.
 // so each pixel needs to be fixed width. Thus we do %03 (which luckily is
@@ -37,8 +39,8 @@
 // So, let's just send two spaces. First space here, rest separate below.
 #define PIXEL_FORMAT   "\033[48;2;%03d;%03d;%03dm "   // Sent per pixel.
 
-TerminalFlaschenTaschen::TerminalFlaschenTaschen(int width, int height)
-    : width_(width), height_(height), is_first_(true) {
+TerminalFlaschenTaschen::TerminalFlaschenTaschen(int fd, int width, int height)
+    : terminal_fd_(fd), width_(width), height_(height), is_first_(true) {
     buffer_.append(SCREEN_PREFIX);
     initial_offset_ = buffer_.size();
     char scratch[64];
@@ -55,6 +57,12 @@ TerminalFlaschenTaschen::TerminalFlaschenTaschen(int width, int height)
     snprintf(scratch, sizeof(scratch), SCREEN_CURSOR_UP_FORMAT, height + 1);
     buffer_.append(scratch);
 }
+TerminalFlaschenTaschen::~TerminalFlaschenTaschen() {
+    if (!is_first_) {
+        write(terminal_fd_, SCREEN_CLEAR, strlen(SCREEN_CLEAR));
+        write(terminal_fd_, CURSOR_ON, strlen(CURSOR_ON));
+    }
+}
 
 void TerminalFlaschenTaschen::SetPixel(int x, int y, const Color &col) {
     if (x < 0 || x >= width_ || y < 0 || y >= height_) return;
@@ -68,8 +76,9 @@ void TerminalFlaschenTaschen::SetPixel(int x, int y, const Color &col) {
 
 void TerminalFlaschenTaschen::Send() {
     if (is_first_) {
-        (void) write(STDOUT_FILENO, SCREEN_CLEAR, strlen(SCREEN_CLEAR));
+        write(terminal_fd_, SCREEN_CLEAR, strlen(SCREEN_CLEAR));
+        write(terminal_fd_, CURSOR_OFF, strlen(CURSOR_OFF));
         is_first_ = false;
     }
-    (void)write(STDOUT_FILENO, buffer_.data(), buffer_.size());
+    write(terminal_fd_, buffer_.data(), buffer_.size());
 }
