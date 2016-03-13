@@ -19,8 +19,9 @@ The clients connect to the display over the network. The
 default hostname is pointing to the installation within Noisebridge
 (currently `ft.noise`).
 
-You can change that with commandline flags (e.g. `send-image` and `send-video`
-both have a `-h <host>` option) or via the environment variable `FT_DISPLAY`.
+You can change that with commandline flags (e.g. `send-text`, `send-image`,
+and `send-video` all have a `-h <host>` option) or via the environment
+variable `FT_DISPLAY`.
 
 So if you are working with a particular instance of FlaschenTaschen (e.g.
 a [local terminal](../server/README.md#terminal)), just set the environment
@@ -29,6 +30,35 @@ variable for ease of playing.
 ```
 export FT_DISPLAY=localhost
 ```
+
+## Send-Text
+
+### Compile
+```bash
+make
+```
+
+### Use
+```
+usage: ./send-text [options] <TEXT>
+Options:
+        -g <width>x<height>[+<off_x>+<off_y>[+<layer>]] : Output geometry. Default 45x<font-height>+0+0+1
+        -h <host>       : Flaschen-Taschen display hostname.
+        -f<fontfile>    : Path to *.bdf font file
+        -s<ms>          : Scroll milliseconds per pixel (default 60).
+        -o              : Only run once, don't scroll.
+        -c<RRGGBB>      : Text color as hex (default: FFFFFF)
+        -b<RRGGBB>      : Background color as hex (default: 000000)
+```
+
+Sample
+```
+./send-text -f fonts/6x10.bdf "We ♥ Flaschen Taschen"
+```
+
+Text has a default layer of 1, so it is hovering above the background image.
+If you don't want that, you can explicitly set it as last value in the geometry
+specification.
 
 ## Send-Image
 

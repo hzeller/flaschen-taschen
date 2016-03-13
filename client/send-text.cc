@@ -34,10 +34,10 @@ static void InterruptHandler(int signo) {
 static int usage(const char *progname) {
     fprintf(stderr, "usage: %s [options] <TEXT>\n", progname);
     fprintf(stderr, "Options:\n"
-            "\t-g <width>x<height>[+<off_x>+<off_y>[+<layer>]] : Output geometry. Default 20x20+0+0+0\n"
+            "\t-g <width>x<height>[+<off_x>+<off_y>[+<layer>]] : Output geometry. Default 45x<font-height>+0+0+1\n"
             "\t-h <host>       : Flaschen-Taschen display hostname.\n"
             "\t-f<fontfile>    : Path to *.bdf font file\n"
-            "\t-s<ms>          : Scroll milliseconds (default 60).\n"
+            "\t-s<ms>          : Scroll milliseconds per pixel (default 60).\n"
             "\t-o              : Only run once, don't scroll.\n"
             "\t-c<RRGGBB>      : Text color as hex (default: FFFFFF)\n"
             "\t-b<RRGGBB>      : Background color as hex (default: 000000)\n"
@@ -47,11 +47,11 @@ static int usage(const char *progname) {
 }
 
 int main(int argc, char *argv[]) {
-    int width = 20;
-    int height = 20;
+    int width = 45;
+    int height = -1;
     int off_x = 0;
     int off_y = 0;
-    int off_z = 0;
+    int off_z = 1;
     int scroll_delay_ms = 50;
     bool run_forever = true;
     const char *host = NULL;
@@ -105,14 +105,18 @@ int main(int argc, char *argv[]) {
             return usage(argv[0]);
         }
     }
-    
-    if (width < 1 || height < 1) {
-        fprintf(stderr, "%dx%d is a rather unusual size\n", width, height);
-        return usage(argv[0]);
-    }
 
     if (font.height() < 0) {
         fprintf(stderr, "Need to provide a font.\n");
+        return usage(argv[0]);
+    }
+
+    if (height < 0) {
+        height = font.height();
+    }
+
+    if (width < 1 || height < 1) {
+        fprintf(stderr, "%dx%d is a rather unusual size\n", width, height);
         return usage(argv[0]);
     }
 
