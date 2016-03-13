@@ -20,6 +20,10 @@
 #include <string.h>
 #include <assert.h>
 
+#ifdef __APPLE__
+#  include <sys/time.h>
+#endif
+
 namespace ft {
 void *Thread::PthreadCallRun(void *tobject) {
     reinterpret_cast<Thread*>(tobject)->Run();
@@ -53,10 +57,23 @@ void Thread::Start(int priority, uint32_t affinity_mask) {
     started_ = true;
 }
 
+#ifdef __APPLE__
+static void apple_gettime(struct timespec *ts) {
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    ts->tv_sec = tv.tv_sec;
+    ts->tv_nsec = tv.tv_usec * 1000;
+}
+#endif
+
 bool Mutex::WaitOnWithTimeout(pthread_cond_t *cond, int wait_ms) {
     if (wait_ms <= 0) return 1;  // already expired.
     struct timespec abs_time;
-    clock_gettime(CLOCK_REALTIME, &abs_time);
+#ifdef __APPLE__
+    apple_gettime(&abs_time);
+#else
+    clock_gettime(CLOCK_REALTIME, &abs_time);   // sane operating system
+#endif
     abs_time.tv_sec += wait_ms / 1000;
     abs_time.tv_nsec += 1000000 * (wait_ms % 1000);
     if (abs_time.tv_nsec > 1000000000) {
