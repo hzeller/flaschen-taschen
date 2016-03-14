@@ -147,7 +147,7 @@ void DisplayScrolling(const Magick::Image &img, int scroll_delay_ms,
     // Create a copy from which it is faster to extract relevant content.
     UDPFlaschenTaschen copy(-1, img.columns(), img.rows());
     CopyImage(img, &copy);
-    
+
     while (!interrupt_received) {
         for (int start = 0; start < copy.width(); ++start) {
             if (interrupt_received) break;
@@ -167,6 +167,7 @@ static int usage(const char *progname) {
     fprintf(stderr, "usage: %s [options] <image>\n", progname);
     fprintf(stderr, "Options:\n"
             "\t-g <width>x<height>[+<off_x>+<off_y>[+<layer>]] : Output geometry. Default 20x20+0+0+0\n"
+            "\t-l <layer>      : Layer 0..15. Default 0 (note if also given in -g, then last counts)\n"
             "\t-h <host>       : Flaschen-Taschen display hostname.\n"
             "\t-s[<ms>]        : Scroll horizontally (optionally: delay ms; default 60).\n"
             "\t-C              : Just clear given area and exit.\n");
@@ -187,7 +188,7 @@ int main(int argc, char *argv[]) {
     const char *host = NULL;
 
     int opt;
-    while ((opt = getopt(argc, argv, "g:h:s::C")) != -1) {
+    while ((opt = getopt(argc, argv, "g:h:s::Cl:")) != -1) {
         switch (opt) {
         case 'g':
             if (sscanf(optarg, "%dx%d%d%d%d", &width, &height, &off_x, &off_y, &off_z)
@@ -198,6 +199,9 @@ int main(int argc, char *argv[]) {
             break;
         case 'h':
             host = strdup(optarg); // leaking. Ignore.
+            break;
+        case 'l':
+            off_z = atoi(optarg);
             break;
         case 's':
             do_scroll = true;
@@ -213,9 +217,14 @@ int main(int argc, char *argv[]) {
             return usage(argv[0]);
         }
     }
-    
+
     if (width < 1 || height < 1) {
         fprintf(stderr, "%dx%d is a rather unusual size\n", width, height);
+        return usage(argv[0]);
+    }
+
+    if (!do_clear_screen && optind >= argc) {
+        fprintf(stderr, "Expected image filename.\n");
         return usage(argv[0]);
     }
 
@@ -238,11 +247,6 @@ int main(int argc, char *argv[]) {
                     argv[optind]);
         }
         return 0;
-    }
-
-    if (optind >= argc) {
-        fprintf(stderr, "Expected image filename.\n");
-        return usage(argv[0]);
     }
 
     const char *filename = argv[optind];

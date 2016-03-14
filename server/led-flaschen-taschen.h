@@ -26,6 +26,9 @@ extern int luminance_cie1931(uint8_t output_bits, uint8_t gray_value);
 
 class MultiSPI;
 
+// Column helps assembling the various columns of width 5 (the width of a crate)
+// to one big display. Since all SPI based strips are necessary upated in
+// parallel, that SPI send command is triggered within here.
 class ColumnAssembly : public FlaschenTaschen {
 public:
     ColumnAssembly(MultiSPI *spi);
@@ -60,7 +63,7 @@ public:
     int height() const { return height_; }
 
     void SetPixel(int x, int y, const Color &col);
-    void Send() {}  // This happens in SPI sending.
+    void Send() {}  // This happens in SPI sending in ColumnAssembly
 
 private:
     MultiSPI *const spi_;
@@ -69,22 +72,6 @@ private:
 };
 
 // -- experimental other strips.
-
-// Needs to be connected to GPIO 18 (pin 12 on RPi header)
-class WS2811FlaschenTaschen : public FlaschenTaschen {
-public:
-    WS2811FlaschenTaschen(int crate_stack_height);
-    virtual ~WS2811FlaschenTaschen();
-
-    int width() const { return 5; }
-    int height() const { return height_; }
-
-    void SetPixel(int x, int y, const Color &col);
-    void Send();
-
-private:
-    const int height_;
-};
 
 // CLK is GPIO 17 (RPI header pin 11). Rest of pin user chosen.
 class LPD6803FlaschenTaschen : public FlaschenTaschen {
@@ -96,7 +83,7 @@ public:
     int height() const { return height_; }
 
     void SetPixel(int x, int y, const Color &col);
-    void Send() {}  // Done by ColumnAssembly
+    void Send() {}  // This happens in SPI sending in ColumnAssembly
 
     void SetColorCorrect(float r, float g, float b) {
         r_correct = r; g_correct = g; b_correct = b;
@@ -126,7 +113,7 @@ public:
     int height() const { return height_; }
 
     void SetPixel(int x, int y, const Color &col);
-    void Send() { }
+    void Send() { /* update directly */ }
 
 private:
     const int off_x_;

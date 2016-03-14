@@ -26,19 +26,13 @@ RGB_LIBRARY_NAME=rgbmatrix
 RGB_LIBRARY=$(RGB_LIBDIR)/lib$(RGB_LIBRARY_NAME).a
 RGB_LDFLAGS=-lrt -lm -lpthread
 
-# The WS281x uses a library checked out as a submodule in rpi_ws281x/
-WS2812LIB_OBJECTS=$(addprefix rpi_ws281x/, dma.o mailbox.o pwm.o rpihw.o ws2811.o)
-
 INCLUDES=-I../common
 OBJECTS=ft-thread.o opc-server.o udp-server.o composite-flaschen-taschen.o priority-flaschen-taschen-sender.o cie1931.o
 
 # Nested if/else are very awkward, so we just compare each possible outcome
 ifeq ($(FT_BACKEND), ft)
    DEFINES=-DFT_BACKEND=0
-   INCLUDES+=-I./rpi_ws281x
-   OBJECTS+=ws2811-flaschen-taschen.o ws2801-flaschen-taschen.o lpd6803-flaschen-taschen.o ft-gpio.o multi-spi.o crate-mapping.o column-assembly.o
-   STATIC_LIBS+=libws281x.a
-   LDFLAGS+=$(WS2812_LDFLAGS)
+   OBJECTS+=ws2801-flaschen-taschen.o lpd6803-flaschen-taschen.o ft-gpio.o multi-spi.o crate-mapping.o column-assembly.o
 endif
 
 ifeq ($(FT_BACKEND), rgb-matrix)
@@ -69,10 +63,6 @@ ft-server: main.o $(OBJECTS) $(STATIC_LIBS)
 %.o : %.c compiler-flags
 	$(CC) $(CXXFLAGS) -c -o $@ $<
 
-# ws281x does not provide makefile, so build it out-of-band.
-libws281x.a : $(WS2812LIB_OBJECTS)
-	ar rcs $@ $^
-
 $(RGB_LIBRARY):
 	$(MAKE) -C $(RGB_LIBDIR)
 
@@ -83,4 +73,4 @@ compiler-flags: FORCE
 .PHONY: FORCE
 
 clean:
-	rm -f libws281x.a ft-server main.o $(OBJECTS) $(WS2812LIB_OBJECTS)
+	rm -f ft-server main.o $(OBJECTS)

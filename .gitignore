@@ -1,5 +1,10 @@
 *.o
 *.a
 *~
+compiler-flags
 ft-server
+send-text
 send-image
+send-video
+simple-animation
+simple-example
