@@ -147,7 +147,7 @@ void DisplayScrolling(const Magick::Image &img, int scroll_delay_ms,
     // Create a copy from which it is faster to extract relevant content.
     UDPFlaschenTaschen copy(-1, img.columns(), img.rows());
     CopyImage(img, &copy);
-    
+
     while (!interrupt_received) {
         for (int start = 0; start < copy.width(); ++start) {
             if (interrupt_received) break;
@@ -217,9 +217,14 @@ int main(int argc, char *argv[]) {
             return usage(argv[0]);
         }
     }
-    
+
     if (width < 1 || height < 1) {
         fprintf(stderr, "%dx%d is a rather unusual size\n", width, height);
+        return usage(argv[0]);
+    }
+
+    if (!do_clear_screen && optind >= argc) {
+        fprintf(stderr, "Expected image filename.\n");
         return usage(argv[0]);
     }
 
@@ -242,11 +247,6 @@ int main(int argc, char *argv[]) {
                     argv[optind]);
         }
         return 0;
-    }
-
-    if (optind >= argc) {
-        fprintf(stderr, "Expected image filename.\n");
-        return usage(argv[0]);
     }
 
     const char *filename = argv[optind];
