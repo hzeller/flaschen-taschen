@@ -145,7 +145,7 @@ void udp_server_run_blocking(CompositeFlaschenTaschen *display,
     char *packet_buffer = new char[kBufferSize];
     bzero(packet_buffer, kBufferSize);
 
-    struct sigaction sa = {0};
+    struct sigaction sa = {{0}};  // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53119
     sa.sa_handler = InterruptHandler;
     sigaction(SIGTERM, &sa, NULL);
     sigaction(SIGINT, &sa, NULL);
