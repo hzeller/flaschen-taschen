@@ -78,7 +78,7 @@ int main(int argc, char *argv[]) {
             ft_host = strdup(optarg); // leaking. Ignore.
             break;
         case 'l':
-            if (sscanf(optarg, "%d", &off_z) != 1 || off_z < 0 || off_z > 16) {
+            if (sscanf(optarg, "%d", &off_z) != 1 || off_z < 0 || off_z >= 16) {
                 fprintf(stderr, "Invalid layer '%s'\n", optarg);
                 return usage(argv[0]);
             }
