@@ -207,7 +207,10 @@ int main(int argc, char *argv[]) {
             host = strdup(optarg); // leaking. Ignore.
             break;
         case 'l':
-            off_z = atoi(optarg);
+            if (sscanf(optarg, "%d", &off_z) != 1 || off_z < 0 || off_z > 16) {
+                fprintf(stderr, "Invalid layer '%s'\n", optarg);
+                return usage(argv[0]);
+            }
             break;
         case 's':
             do_scroll = true;
