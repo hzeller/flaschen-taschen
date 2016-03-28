@@ -615,11 +615,6 @@ F 3 "" H 1600 3100 60  0000 C CNN
 	1    1600 3100
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	1900 3100 1600 3100
-Wire Wire Line
-	1600 3100 1600 3000
-Connection ~ 1600 3100
 Text GLabel 2400 3700 2    51   Output ~ 0
 D7
 Text GLabel 3850 1850 0    51   Input ~ 0
@@ -1139,4 +1134,7 @@ Wire Wire Line
 	2400 3000 2800 3000
 Wire Wire Line
 	2400 3100 2800 3100
+Wire Wire Line
+	1600 3100 1600 3000
+NoConn ~ 1900 3100
 $EndSCHEMATC
