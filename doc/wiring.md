@@ -34,7 +34,7 @@ the wiring between them. You can retrace that in the picture below.
 ## The power connection
 
 The LED power inputs are long loose cables on both ends of the strip that we
-combine and solder to a barrel-jack receptible pig-tail, see image below.
+combine and solder to a barrel-jack receptacle pig-tail, see image below.
 Make sure to thread the wires from the LED _under_ the data wiring between the bottles.
 
 As a preparation for soldering, the pigtail needs to be shortened about 10cm (4 inches),
@@ -66,7 +66,7 @@ Let it cool so that it is hand-warm again. Then move the heat-shrink parked on t
 up so that it squeezes the other heat-shrunk connection together and on the other end covers the
 outer insulation of the pigtail. Shrink that. Now we have a sturdy connection.
 
-(Use the heat shrink of which we have large rolls in the elecronic area on the
+(Use the heat shrink of which we have large rolls in the electronic area on the
 left side on the shelf).
 
 The Pigtail should be cable-tied to the crate for now. Later on we might want
