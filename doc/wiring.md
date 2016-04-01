@@ -58,9 +58,10 @@ twisting, the whole length of the splice is now probably about 1/2 inch).
 Move the heat-shrink that we have parked on the LED cables to each connection and shrink with
 quick movements with a lighter (or, if that is not at hand, with the hot-air gun).
 
-Here some intermediate state:
+  Splice before solder.  |  Heat Shrunk.           | Heat Shrink overall.      | Done.
+-------------------------|-------------------------|---------------------------|--------------------------|
+![](../img/power-one.jpg)|![](../img/power-two.jpg)|![](../img/power-three.jpg)|![](../img/power-four.jpg)|
 
-![](../img/power-conn.jpg)
 
 Let it cool so that it is hand-warm again. Then move the heat-shrink parked on the pigtail
 up so that it squeezes the other heat-shrunk connection together and on the other end covers the
