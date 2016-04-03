@@ -217,6 +217,7 @@ int main(int argc, char *argv[]) {
             if (optarg != NULL) {
                 scroll_delay_ms = atoi(optarg);
                 if (scroll_delay_ms < 5) scroll_delay_ms = 5;
+                if (scroll_delay_ms > 999) scroll_delay_ms = 999;
             }
             break;
         case 'b':
@@ -282,7 +283,7 @@ int main(int argc, char *argv[]) {
 
     const float bright = brighness_percent / 100.0f;
     if (do_scroll) {
-        DisplayScrolling(frames[0], bright, scroll_delay_ms, &display);
+        DisplayScrolling(frames[0], scroll_delay_ms, bright, &display);
     } else {
         DisplayAnimation(frames, bright, display);
     }
