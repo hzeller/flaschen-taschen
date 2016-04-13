@@ -48,12 +48,12 @@ private:
 
 class CompositeFlaschenTaschen::ScreenBuffer : public TypedScreenBuffer<Color> {
 public:
-    ScreenBuffer(int w, int h) : TypedScreenBuffer(w, h){}
+    ScreenBuffer(int w, int h) : TypedScreenBuffer<Color>(w, h){}
 };
 
 class CompositeFlaschenTaschen::ZBuffer : public TypedScreenBuffer<int> {
 public:
-    ZBuffer(int w, int h) : TypedScreenBuffer(w, h){}
+    ZBuffer(int w, int h) : TypedScreenBuffer<int>(w, h){}
 };
 
 class CompositeFlaschenTaschen::LayerGarbageCollector : public ft::Thread {
@@ -92,7 +92,7 @@ private:
 };
 
 CompositeFlaschenTaschen::CompositeFlaschenTaschen(FlaschenTaschen *delegatee,
-                                                   int layers) 
+                                                   int layers)
     : delegatee_(delegatee),
       width_(delegatee->width()), height_(delegatee->height()),
       current_layer_(0),
