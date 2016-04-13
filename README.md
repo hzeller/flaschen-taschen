@@ -17,24 +17,18 @@ So we use milk crates (which is a thing) and put common, clear 12oz (355ml)
 bottles in (Mate, Corona,..) inside. Wrapped in aluminum foil, they
 make nice pixels.
 
-Right now, we're playing with multiple different types of strips to settle
-before a larger order.
-
-Current hardware setup:
-
-   1. column: LDP6803  (<- 5 bit grayscale, meh).
-   2. column: WS2811   (<- nasty timing sensitive single line serial)
-   3. column and 4. column: WS2801  (<- most likely the type to settle on)
-
 ![](./img/ft-work-in-progress.jpg)
 
-See little video in the [ExperimentalStage] blog post. Ideally, we'd like to
-have APA102, but they don't seem to be available wired up in the way we'd need
-for the bottles.
+In [this video][2025-video], you see a test-setup with 5x4 creates (25x20 pixel).
 
 Final set-up will be 9 crates wide and 7 crates high for a total of 63 crates
 with 25 'pixels' each. 45x35 pixels or 1575 pixels total. All operated by
 a Raspberry Pi that provides a [network API][protocols] to update the display.
+
+Current stage: we have received all the LEDs, but are still in the process of aquiring bottles
+and crates. We are now starting to wire up the crates; if you want to help, check out
+[the documentation](./doc/wiring.md).
+<a href="doc/wiring.md"><img src="img/crate-descriptions.jpg" height="80px"></a>
 
 ## Tutorial: getting started
 
@@ -119,8 +113,8 @@ use 9 for our installation right now):
 [FlaschenTaschen]: https://noisebridge.net/wiki/Flaschen_Taschen
 [Muro de botellas]: http://www.zuloark.com/muro-de-botellas/
 [MateLight]: https://github.com/jaseg/matelight
-[ExperimentalStage]: http://blog.noisebridge.net/post/139304835544/i-walked-into-noisebridge-yesterday-and-was
 [RGB Matrix Adapter]: https://github.com/hzeller/rpi-rgb-led-matrix/tree/master/adapter/active-3
 [32c3]: https://events.ccc.de/congress/2015/wiki/Static:Main_Page
 [protocols]: ./doc/protocols.md
 [netpbm]: http://netpbm.sourceforge.net/
+[2025-video]: https://www.youtube.com/watch?v=hs8FoROzE4M

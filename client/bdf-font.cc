@@ -90,7 +90,11 @@ bool Font::LoadFont(const char *path) {
         }
         else if (strncmp(buffer, "ENDCHAR", strlen("ENDCHAR")) == 0) {
             if (current_glyph && row == current_glyph->height) {
-                free(glyphs_[codepoint]);  // just in case there was one.
+                Glyph *old_glyph = glyphs_[codepoint];
+                if (old_glyph) {
+                    fprintf(stderr, "Doubly defined code-point %d\n", codepoint);
+                    free(old_glyph);
+                }
                 glyphs_[codepoint] = current_glyph;
                 current_glyph = NULL;
             }

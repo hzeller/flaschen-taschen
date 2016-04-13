@@ -30,6 +30,16 @@ messing with the LED strip wires in the field do not cause harm. Use a fast 1A f
 advised to separately power the strips though: 20A only powers 300 LEDs
 or so.)
 
+### BOM
+Count | Type                        | Package     | Info
+-----:|-----------------------------|-------------|------------
+    4 | 74HCT245                    | TSSOP-20
+    4 | 100nF ceramic capacitor     | 0805
+    1 | 22µF ceramic capacitor, 6.3V| 1206
+    1 | 20x2 female pin socket      | 0.1" raster  | to connect to Pi GPIO
+   16 | 4x1 male pin header         | 0.1" raster  | to connect to LED strips
+    1 | Fuse holder                 | for 20mm fuse| Optional (see text)
+
 [ As soon as design is tested in the field, there will be an OshPark link here ]
 
 ![](../img/pi-adapter-sch.png)

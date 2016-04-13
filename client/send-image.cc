@@ -39,13 +39,14 @@ static void InterruptHandler(int signo) {
 }
 
 namespace {
-::Color ConvertColor(const Magick::Color &c) {
-    return ::Color(ScaleQuantumToChar(c.redQuantum()),
-                   ScaleQuantumToChar(c.greenQuantum()),
-                   ScaleQuantumToChar(c.blueQuantum()));
+::Color ConvertColor(const Magick::Color &c, float brightness_factor) {
+    return ::Color(brightness_factor * ScaleQuantumToChar(c.redQuantum()),
+                   brightness_factor * ScaleQuantumToChar(c.greenQuantum()),
+                   brightness_factor * ScaleQuantumToChar(c.blueQuantum()));
 }
 
-void CopyImage(const Magick::Image &img, FlaschenTaschen *result) {
+void CopyImage(const Magick::Image &img, float brightness_factor,
+               FlaschenTaschen *result) {
     assert(result->width() >= (int) img.columns()
            && result->height() >= (int) img.rows());
     for (size_t y = 0; y < img.rows(); ++y) {
@@ -53,7 +54,7 @@ void CopyImage(const Magick::Image &img, FlaschenTaschen *result) {
             const Magick::Color &c = img.pixelColor(x, y);
             if (c.alphaQuantum() >= 255)
                 continue;
-            result->SetPixel(x, y, ConvertColor(c));
+            result->SetPixel(x, y, ConvertColor(c, brightness_factor));
         }
     }
 }
@@ -63,13 +64,13 @@ void CopyImage(const Magick::Image &img, FlaschenTaschen *result) {
 // animation delay.
 class PreprocessedFrame {
 public:
-    PreprocessedFrame(const Magick::Image &img,
+    PreprocessedFrame(const Magick::Image &img, float brightness_factor,
                       const UDPFlaschenTaschen &display)
         : content_(display.Clone()) {
         int delay_time = img.animationDelay();  // in 1/100s of a second.
         if (delay_time < 1) delay_time = 1;
         delay_micros_ = delay_time * 10000;
-        CopyImage(img, content_);
+        CopyImage(img, brightness_factor, content_);
     }
     ~PreprocessedFrame() { delete content_; }
 
@@ -122,11 +123,13 @@ static bool LoadImageAndScale(const char *filename,
 }
 
 void DisplayAnimation(const std::vector<Magick::Image> &image_sequence,
+                      float bright,
                       const UDPFlaschenTaschen &display) {
     std::vector<PreprocessedFrame*> frames;
     // Convert to preprocessed frames.
     for (size_t i = 0; i < image_sequence.size(); ++i) {
-        frames.push_back(new PreprocessedFrame(image_sequence[i], display));
+        frames.push_back(new PreprocessedFrame(image_sequence[i], bright,
+                                               display));
     }
 
     for (unsigned int i = 0; !interrupt_received; ++i) {
@@ -143,10 +146,11 @@ void DisplayAnimation(const std::vector<Magick::Image> &image_sequence,
 }
 
 void DisplayScrolling(const Magick::Image &img, int scroll_delay_ms,
+                      float brightness_factor,
                       UDPFlaschenTaschen *display) {
     // Create a copy from which it is faster to extract relevant content.
     UDPFlaschenTaschen copy(-1, img.columns(), img.rows());
-    CopyImage(img, &copy);
+    CopyImage(img, brightness_factor, &copy);
 
     while (!interrupt_received) {
         for (int start = 0; start < copy.width(); ++start) {
@@ -170,6 +174,7 @@ static int usage(const char *progname) {
             "\t-l <layer>      : Layer 0..15. Default 0 (note if also given in -g, then last counts)\n"
             "\t-h <host>       : Flaschen-Taschen display hostname.\n"
             "\t-s[<ms>]        : Scroll horizontally (optionally: delay ms; default 60).\n"
+            "\t-b<brighness%%>  : Brightness percent (default 100)\n"
             "\t-C              : Just clear given area and exit.\n");
     return 1;
 }
@@ -185,10 +190,11 @@ int main(int argc, char *argv[]) {
     int off_y = 0;
     int off_z = 0;
     int scroll_delay_ms = 50;
+    int brighness_percent = 100;
     const char *host = NULL;
 
     int opt;
-    while ((opt = getopt(argc, argv, "g:h:s::Cl:")) != -1) {
+    while ((opt = getopt(argc, argv, "g:h:s::Cl:b:")) != -1) {
         switch (opt) {
         case 'g':
             if (sscanf(optarg, "%dx%d%d%d%d", &width, &height, &off_x, &off_y, &off_z)
@@ -201,14 +207,21 @@ int main(int argc, char *argv[]) {
             host = strdup(optarg); // leaking. Ignore.
             break;
         case 'l':
-            off_z = atoi(optarg);
+            if (sscanf(optarg, "%d", &off_z) != 1 || off_z < 0 || off_z >= 16) {
+                fprintf(stderr, "Invalid layer '%s'\n", optarg);
+                return usage(argv[0]);
+            }
             break;
         case 's':
             do_scroll = true;
             if (optarg != NULL) {
                 scroll_delay_ms = atoi(optarg);
                 if (scroll_delay_ms < 5) scroll_delay_ms = 5;
+                if (scroll_delay_ms > 999) scroll_delay_ms = 999;
             }
+            break;
+        case 'b':
+            brighness_percent = atoi(optarg);
             break;
         case 'C':
             do_clear_screen = true;
@@ -222,6 +235,9 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "%dx%d is a rather unusual size\n", width, height);
         return usage(argv[0]);
     }
+
+    if (brighness_percent < 0) brighness_percent = 0;
+    if (brighness_percent > 100) brighness_percent = 100;
 
     if (!do_clear_screen && optind >= argc) {
         fprintf(stderr, "Expected image filename.\n");
@@ -265,10 +281,11 @@ int main(int argc, char *argv[]) {
     signal(SIGTERM, InterruptHandler);
     signal(SIGINT, InterruptHandler);
 
+    const float bright = brighness_percent / 100.0f;
     if (do_scroll) {
-        DisplayScrolling(frames[0], scroll_delay_ms, &display);
+        DisplayScrolling(frames[0], scroll_delay_ms, bright, &display);
     } else {
-        DisplayAnimation(frames, display);
+        DisplayAnimation(frames, bright, display);
     }
 
     // Don't let leftovers cover up content.
