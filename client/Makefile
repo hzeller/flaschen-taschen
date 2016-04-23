@@ -6,11 +6,12 @@ MAGICK_LDFLAGS=`GraphicsMagick++-config --ldflags --libs`
 
 FFMPEG_LDFLAGS=`pkg-config --cflags --libs  libavcodec libavformat libswscale libavutil`
 
-all : simple-example simple-animation send-text
+all : simple-example simple-animation send-text pong-game
 
 simple-animation: simple-animation.cc $(OBJECTS)
 simple-example: simple-example.cc $(OBJECTS)
 send-text: send-text.cc $(OBJECTS)
+pong-game: pong-game.cc $(OBJECTS)
 
 send-image : send-image.cc $(OBJECTS)
 	$(CXX) $(CXXFLAGS) $(MAGICK_CXXFLAGS) -o $@ $^ $(MAGICK_LDFLAGS)
@@ -22,4 +23,4 @@ send-video: send-video.cc $(OBJECTS)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
 clean:
-	rm -f send-text send-image send-video simple-example simple-animation $(OBJECTS)
+	rm -f send-text send-image send-video simple-example simple-animation pong-game $(OBJECTS)
