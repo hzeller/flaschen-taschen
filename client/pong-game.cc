@@ -83,11 +83,7 @@ void Actor::print_on_buffer(UDPFlaschenTaschen * frame_buffer) {
 }
 
 bool Actor::IsOnMe(float x, float y) {
-
-    char a='a';
-
-    if( (x - pos[0]) > 0 && (x - pos[0]) < width_ && (y - pos[1]) > 0 && (y - pos[1]) < height_ ) {
-        write(0,&a,sizeof(char));
+    if( (x - pos[0]) >= 0 && (x - pos[0]) < width_ && (y - pos[1]) >= 0 && (y - pos[1]) < height_ ) {
         return true;
     }
     return false;
@@ -101,9 +97,9 @@ PongGame::PongGame(const int socket, const int width, const int height) : width_
     ball_ = Actor(ball, BALL_COLUMN, BALL_ROWS);
     //Center the ball
     ball_.pos[0] = width_/2;
-    ball_.pos[1] = height_/2;
-    ball_.speed[0] = 14; // pixels per sec
-    ball_.speed[1] = 20;
+    ball_.pos[1] = height_/2-2;
+    ball_.speed[0] = 10; // pixels per sec
+    ball_.speed[1] = 0;
 
     p1_ = Actor(player, PLAYER_COLUMN, PLAYER_ROWS);
     p1_.pos[0] = width_*2/10;
