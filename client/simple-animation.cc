@@ -22,7 +22,7 @@
 #include <stdio.h>
 
 // Size of the display.
-#define DISPLAY_WIDTH 20
+#define DISPLAY_WIDTH 25
 #define DISPLAY_HEIGHT 20
 
 // The 'layer' we're showing the space-invaders in. The background layer
