@@ -56,8 +56,8 @@ its full final resolution supporting the same protocol.
 
 ### Terminal
 
-On MacOS, install **iTerm2** ( https://www.iterm2.com/ ), which seems to
-be the nicest choice. The standard terminal does *not* work.
+On MacOS, install the **Beta version of iTerm2** ( https://iterm2.com/downloads/beta/iTerm2-2_9_20160313.zip ), which seems to be the nicest choice.
+The standard terminal does *not* work.
 
 ```bash
   # Build with
