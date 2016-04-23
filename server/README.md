@@ -57,7 +57,7 @@ its full final resolution supporting the same protocol.
 ### Terminal
 
 On MacOS, install **iTerm2** ( https://www.iterm2.com/ ), which seems to
-be the nicest choice.
+be the nicest choice. The standard terminal does *not* work.
 
 ```bash
   # Build with
