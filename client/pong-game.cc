@@ -76,16 +76,18 @@ void Actor::print_on_buffer(UDPFlaschenTaschen * frame_buffer) {
         const char *line = repr_[row];
         for (int x = 0; line[x]; ++x) {
             if (line[x] != ' ') {
-                frame_buffer->SetPixel(x +(int) pos[0], row + (int) pos[1],  Color(255,255,255));
+                frame_buffer->SetPixel(x + pos[0], row + pos[1],  Color(255,255,255));
             }
         }
     }
 }
 
 bool Actor::IsOnMe(float x, float y) {
-    char a = 'a';
-    if( (x - pos[0]) <= (unsigned)width_  && (unsigned)(y - pos[1]) <= (unsigned)height_ ) {
-        write(0, &a, sizeof(char));
+
+    char a='a';
+
+    if( (x - pos[0]) > 0 && (x - pos[0]) < width_ && (y - pos[1]) > 0 && (y - pos[1]) < height_ ) {
+        write(0,&a,sizeof(char));
         return true;
     }
     return false;
@@ -127,14 +129,6 @@ void PongGame::start(const int fps) {
     struct timeval tv;
     int retval;
 
-   /* Watch stdin (fd 0) to see when it has input. */
-    FD_ZERO(&rfds);
-    FD_SET(0, &rfds);
-
-   /* Do not wait */
-    tv.tv_sec = 6;
-    tv.tv_usec = 0;
-
     set_conio_terminal_mode();
 
     while(1){
@@ -142,12 +136,17 @@ void PongGame::start(const int fps) {
         t.clear();
         t.start();
 
+        //Asume the calculations to be instant for the sleep
+        sim(dt); // Sim the pong world and handle game logic
+        next_frame(); // Clear the screen, set the pixels, and send them.
+
         FD_ZERO(&rfds);
         FD_SET(0, &rfds);
 
        /* Do not wait */
         tv.tv_sec = 0;
-        tv.tv_usec = 0;
+        tv.tv_usec = 1e6/(float)fps;
+
         retval = select(1, &rfds, NULL, NULL, &tv);
 
         if (retval == -1)
@@ -174,13 +173,7 @@ void PongGame::start(const int fps) {
             }
             command = 0;
         }
-        //std::cout << retval << std::endl;
-        //std::cout << command << std::endl;
-        //Asume the calculations to be instant for the sleep
-        sim(dt/5); // Sim the pong world and handle game logic
-        next_frame(); // Clear the screen, set the pixels, and send them.
 
-        usleep(1e6/(float)fps);
         dt = t.stop();
     }
 
@@ -197,7 +190,7 @@ void PongGame::sim(const float dt) {
     if(p1_.IsOnMe(ball_.pos[0], ball_.pos[1]) || p2_.IsOnMe(ball_.pos[0], ball_.pos[1])) {
         // If is one the cursor reevaluate the new position with the inverted speed( quite bad programming )
         ball_.speed[0] *= -1;
-        ball_.pos[0] -= 2 * dt * ball_.speed[0] / 1e3;
+        ball_.pos[0] += 2 * dt * ball_.speed[0] / 1e3;
     }
 
     // Wall
