@@ -12,7 +12,8 @@ public:
     void print_on_buffer(UDPFlaschenTaschen * frame_buffer);
     float pos[2];
     float speed[2];
-    bool IsOnMe(float x, float y);
+    bool IsOverMe(float x, float y);
+
 private:
     const char ** repr_;
     int width_,height_;
@@ -34,6 +35,8 @@ private:
     // Simply project to pixels the pong world.
     void next_frame();
 
+    // Reset the ball in 0 with random velocity
+    void reset_ball();
 
 private:
     const int width_;
