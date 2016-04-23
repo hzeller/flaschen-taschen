@@ -56,9 +56,8 @@ its full final resolution supporting the same protocol.
 
 ### Terminal
 
-On any development machine with a somewhat decent terminal that allows for
-24Bit [ANSI color][term-color] (konsole, xterm or gnome-terminal, xterm/X11
-on OSX), this `ft-server` allows to display the result in a terminal.
+On MacOS, install **iTerm2** ( https://www.iterm2.com/ ), which seems to
+be the nicest choice.
 
 ```bash
   # Build with
