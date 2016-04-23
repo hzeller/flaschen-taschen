@@ -50,7 +50,7 @@ endif
 
 CFLAGS=-Wall -O3 $(INCLUDES) $(DEFINES)
 CXXFLAGS=$(CFLAGS)
-LDFLAGS+=-lpthread -lrt
+LDFLAGS+=-lpthread
 
 all : ft-server
 
