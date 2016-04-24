@@ -38,7 +38,11 @@
 #define BALL_SPEED 15
 
 #define FRAME_RATE 60
-#define KEYBOARD_STEP 3
+#define KEYBOARD_STEP 2
+
+#define INITIAL_GAME_WAIT (4 * FRAME_RATE)  // First start
+#define NEW_GAME_WAIT     (1 * FRAME_RATE)  // Time when a new game starts
+#define HELP_DISPLAY_TIME (2 * FRAME_RATE)
 
 struct termios orig_termios;
 static void reset_terminal_mode() {
@@ -112,6 +116,38 @@ private:
     Actor(); // no default constructor.
 };
 
+class PuffAnimation {
+public:
+    PuffAnimation(const Color &color, int steps, float radius,
+                  FlaschenTaschen *display)
+        : steps_(steps), radius_(radius),
+          color_(color), display_(display), countdown_(0) {}
+
+    void StartNew(int x, int y) {
+        x_ = x;
+        y_ = y;
+        countdown_ = steps_;
+    }
+
+    void Animate() {
+        if (countdown_ <= 0) return;
+        const float r = (countdown_ - steps_) * radius_ / steps_;
+        // Simplified circle. Could be more efficient.
+        for (float a = 0; a < 2 * M_PI; a += M_PI / 10) {
+            display_->SetPixel(x_ + cos(a) * r, y_ + sin(a) * r, color_);
+        }
+        --countdown_;
+    }
+
+private:
+    const int steps_;
+    const float radius_;
+    const Color color_;
+    FlaschenTaschen *const display_;
+
+    int countdown_;
+    int x_, y_;
+};
 
 class PongGame {
 public:
@@ -137,10 +173,13 @@ private:
     const int height_;
     const ft::Font &font_;
 
-    bool just_started_;
-    int help_countdown_;
+    int start_countdown_;   // Just started a game.
+    int help_countdown_;    // Time displaying help
 
     UDPFlaschenTaschen * frame_buffer_;
+    PuffAnimation edge_animation_;
+    PuffAnimation new_ball_animation_;
+
     Actor ball_;
     Actor p1_;
     Actor p2_;
@@ -149,7 +188,7 @@ private:
     PongGame(); // no default constructor.
 };
 
-void Actor::print_on_buffer(UDPFlaschenTaschen * frame_buffer) {
+void Actor::print_on_buffer(UDPFlaschenTaschen *frame_buffer) {
     for (int row = 0; row < height_; ++row) {
         const char *line = repr_[row];
         for (int x = 0; line[x]; ++x) {
@@ -168,8 +207,10 @@ bool Actor::IsOverMe(float x, float y) {
 PongGame::PongGame(const int socket, const int width, const int height,
                    const ft::Font &font)
     : width_(width), height_(height), font_(font),
-      just_started_(true), help_countdown_(4 * FRAME_RATE),
+      start_countdown_(INITIAL_GAME_WAIT), help_countdown_(start_countdown_),
       frame_buffer_(new UDPFlaschenTaschen(socket, width, height)),
+      edge_animation_(Color(255, 100, 0), 15, 5.0, frame_buffer_),
+      new_ball_animation_(Color(0, 50, 0), 5, 3.0, frame_buffer_),
       ball_(ball, BALL_COLUMN, BALL_ROWS),
       p1_(player, PLAYER_COLUMN, PLAYER_ROWS),
       p2_(player, PLAYER_COLUMN, PLAYER_ROWS) {
@@ -192,6 +233,7 @@ PongGame::~PongGame() {
 void PongGame::reset_ball() {
     ball_.pos[0] = width_/2;
     ball_.pos[1] = height_/2-1;
+    new_ball_animation_.StartNew(ball_.pos[0], ball_.pos[1]);
 
     // Generate random angle in the range of 1/4 tau
     const float theta = 2 * M_PI / 4 * (rand() % 100 - 50) / 100.0;
@@ -248,7 +290,7 @@ void PongGame::Start(const int fps) {
                 p2_.pos[1] += -KEYBOARD_STEP;
                 break;
             case '?': case '/':
-                help_countdown_ = 2 * FRAME_RATE;
+                help_countdown_ = HELP_DISPLAY_TIME;
                 break;
             case 'q':
                 return;
@@ -259,15 +301,12 @@ void PongGame::Start(const int fps) {
 }
 
 void PongGame::sim(const float dt) {
-    if (help_countdown_ > 0) --help_countdown_;
+    if (help_countdown_ > 0)
+        --help_countdown_;
 
-    // When we just started, we just show initial help.
-    if (just_started_) {
-        if (help_countdown_ == 0) {
-            just_started_ = false;
-        } else {
-            return;
-        }
+    if (start_countdown_ > 0) {
+        --start_countdown_;
+        return;
     }
 
     // Evaluate the new ball delta
@@ -286,15 +325,19 @@ void PongGame::sim(const float dt) {
 
     // Score
     if (ball_.pos[0] < 0) {
+        edge_animation_.StartNew(0, ball_.pos[1]);
         score_[1] += 1;
         ball_.pos[0] = width_ / 2;
         ball_.pos[1] = height_ / 2;
         reset_ball();
+        start_countdown_ = NEW_GAME_WAIT;
     } else if (ball_.pos[0] > width_){
+        edge_animation_.StartNew(width_ - 1, ball_.pos[1]);
         score_[0] += 1;
         ball_.pos[0] = width_ / 2;
         ball_.pos[1] = height_ / 2;
         reset_ball();
+        start_countdown_ = NEW_GAME_WAIT;
     }
 }
 
@@ -303,9 +346,9 @@ void PongGame::next_frame() {
     frame_buffer_->Clear();
 
     // Centerline
-    const Color gray(100, 100, 100);
+    const Color divider_color(50, 100, 50);
     for (int y = 0; y < height_/2; ++y) {
-        frame_buffer_->SetPixel(width_ / 2, 2 * y, gray);
+        frame_buffer_->SetPixel(width_ / 2, 2 * y, divider_color);
     }
 
     // We have crates that are 5 pixels. We want the number aligned to the left
@@ -336,6 +379,9 @@ void PongGame::next_frame() {
         ft::DrawText(frame_buffer_, font_, width_-5, 5 - 1, help_col, NULL, "I");
         ft::DrawText(frame_buffer_, font_, width_-5, height_ - 1, help_col, NULL, "J");
     }
+
+    edge_animation_.Animate();
+    new_ball_animation_.Animate();
 
     // Print the actors
     ball_.print_on_buffer(frame_buffer_);
