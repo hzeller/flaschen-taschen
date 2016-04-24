@@ -38,6 +38,7 @@
 #define BALL_SPEED 15
 
 #define FRAME_RATE 60
+#define KEYBOARD_STEP 3
 
 struct termios orig_termios;
 static void reset_terminal_mode() {
@@ -234,17 +235,17 @@ void PongGame::Start(const int fps) {
         else if (retval){
             read(0, &command, sizeof(char));
             switch (command) {
-            case 's': case 'S':
-                p1_.pos[1] +=1;
+            case 'd': case 'D':
+                p1_.pos[1] += KEYBOARD_STEP;
                 break;
             case 'w': case 'W':
-                p1_.pos[1] +=-1;
+                p1_.pos[1] += -KEYBOARD_STEP;
                 break;
-            case 'k': case 'K':
-                p2_.pos[1] +=1;
+            case 'j': case 'J':
+                p2_.pos[1] += KEYBOARD_STEP;
                 break;
             case 'i': case 'I':
-                p2_.pos[1] +=-1;
+                p2_.pos[1] += -KEYBOARD_STEP;
                 break;
             case '?': case '/':
                 help_countdown_ = 2 * FRAME_RATE;
@@ -330,10 +331,10 @@ void PongGame::next_frame() {
                                : 1.0);
         const Color help_col(fade_fraction * 255, fade_fraction * 255, 0);
         ft::DrawText(frame_buffer_, font_, 0, 5 - 1, help_col, NULL, "W");
-        ft::DrawText(frame_buffer_, font_, 0, height_ - 1, help_col, NULL, "S");
+        ft::DrawText(frame_buffer_, font_, 0, height_ - 1, help_col, NULL, "D");
 
         ft::DrawText(frame_buffer_, font_, width_-5, 5 - 1, help_col, NULL, "I");
-        ft::DrawText(frame_buffer_, font_, width_-5, height_ - 1, help_col, NULL, "K");
+        ft::DrawText(frame_buffer_, font_, width_-5, height_ - 1, help_col, NULL, "J");
     }
 
     // Print the actors
@@ -363,8 +364,8 @@ int main(int argc, char *argv[]) {
                   font);
 
     fprintf(stderr, "Game keys:\n"
-            "Left paddel:  'w' up, 's' down\n"
-            "Right paddel: 'i' up, 'k' down\n\n"
+            "Left paddel:  'w' up; 'd' down\n"
+            "Right paddel: 'i' up; 'j' down\n\n"
             "Quit with 'q'. '?' for help.\n");
     // Start the game with x fps
     pong.Start(FRAME_RATE);
