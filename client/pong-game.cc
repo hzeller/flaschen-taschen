@@ -133,8 +133,11 @@ public:
         if (countdown_ <= 0) return;
         const float r = (countdown_ - steps_) * radius_ / steps_;
         // Simplified circle. Could be more efficient.
-        for (float a = 0; a < 2 * M_PI; a += M_PI / 10) {
+        for (float a = 0; a < M_PI / 2; a += M_PI / 7) {
             display_->SetPixel(x_ + cos(a) * r, y_ + sin(a) * r, color_);
+            display_->SetPixel(x_ - cos(a) * r, y_ + sin(a) * r, color_);
+            display_->SetPixel(x_ - cos(a) * r, y_ - sin(a) * r, color_);
+            display_->SetPixel(x_ + cos(a) * r, y_ - sin(a) * r, color_);
         }
         --countdown_;
     }
