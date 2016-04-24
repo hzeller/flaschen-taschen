@@ -168,20 +168,20 @@ PongGame::PongGame(const int socket, const int width, const int height,
                    const ft::Font &font)
     : width_(width), height_(height), font_(font),
       just_started_(true), help_countdown_(4 * FRAME_RATE),
+      frame_buffer_(new UDPFlaschenTaschen(socket, width, height)),
       ball_(ball, BALL_COLUMN, BALL_ROWS),
       p1_(player, PLAYER_COLUMN, PLAYER_ROWS),
       p2_(player, PLAYER_COLUMN, PLAYER_ROWS) {
-    bzero(score_, sizeof(score_));
 
-    frame_buffer_ = new UDPFlaschenTaschen(socket, width, height);
+    bzero(score_, sizeof(score_));
 
     reset_ball();  // center ball.
 
     p1_.pos[0] = 2;
-    p1_.pos[1] = height_ / 2 - PLAYER_ROWS / 2;
+    p1_.pos[1] = (height_ - PLAYER_ROWS) / 2;
 
     p2_.pos[0] = width_ - 2;
-    p2_.pos[1] = height_ / 2 - PLAYER_ROWS / 2;
+    p2_.pos[1] = (height_ - PLAYER_ROWS) / 2;
 }
 
 PongGame::~PongGame() {
@@ -190,7 +190,7 @@ PongGame::~PongGame() {
 
 void PongGame::reset_ball() {
     ball_.pos[0] = width_/2;
-    ball_.pos[1] = height_/2-2;
+    ball_.pos[1] = height_/2-1;
 
     // Generate random angle in the range of 1/4 tau
     const float theta = 2 * M_PI / 4 * (rand() % 100 - 50) / 100.0;
@@ -301,9 +301,10 @@ void PongGame::next_frame() {
     // Clear the frame
     frame_buffer_->Clear();
 
+    // Centerline
     const Color gray(100, 100, 100);
     for (int y = 0; y < height_/2; ++y) {
-        frame_buffer_->SetPixel(width_ / 2, 2 * y + 1, gray);
+        frame_buffer_->SetPixel(width_ / 2, 2 * y, gray);
     }
 
     // We have crates that are 5 pixels. We want the number aligned to the left
@@ -314,25 +315,25 @@ void PongGame::next_frame() {
     char score_string[5];
     int text_len = snprintf(score_string, sizeof(score_string), "%d", score_[0]);
     ft::DrawText(frame_buffer_, font_,
-                 center_start - 5*text_len, 5,  // Right aligned
+                 center_start - 5*text_len, 4,  // Right aligned
                  score_color, NULL, score_string);
 
     text_len = snprintf(score_string, sizeof(score_string), "%d", score_[1]);
     ft::DrawText(frame_buffer_, font_,
-                 center_start + 5, 5,
+                 center_start + 5, 4,
                  score_color, NULL, score_string);
 
     if (help_countdown_) {
         const int kFadeDuration = 60;
         const float fade_fraction = (help_countdown_ < kFadeDuration
-                               ? 1.0 / (kFadeDuration - help_countdown_)
+                               ? 1.0 * help_countdown_ / kFadeDuration
                                : 1.0);
         const Color help_col(fade_fraction * 255, fade_fraction * 255, 0);
-        ft::DrawText(frame_buffer_, font_, 0, 10, help_col, NULL, "W");
-        ft::DrawText(frame_buffer_, font_, 0, height_ - 5, help_col, NULL, "S");
+        ft::DrawText(frame_buffer_, font_, 0, 5 - 1, help_col, NULL, "W");
+        ft::DrawText(frame_buffer_, font_, 0, height_ - 1, help_col, NULL, "S");
 
-        ft::DrawText(frame_buffer_, font_, width_-5, 10, help_col, NULL, "I");
-        ft::DrawText(frame_buffer_, font_, width_-5, height_ - 5, help_col, NULL, "K");
+        ft::DrawText(frame_buffer_, font_, width_-5, 5 - 1, help_col, NULL, "I");
+        ft::DrawText(frame_buffer_, font_, width_-5, height_ - 1, help_col, NULL, "K");
     }
 
     // Print the actors
