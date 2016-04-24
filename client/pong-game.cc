@@ -11,6 +11,7 @@
 //  ./pong-game
 
 #include "udp-flaschen-taschen.h"
+#include "bdf-font.h"
 
 #include <assert.h>
 #include <iostream>
@@ -25,9 +26,9 @@
 #include <unistd.h>
 #include <vector>
 
-// Size of the display.
-#define DISPLAY_WIDTH 45
-#define DISPLAY_HEIGHT 35
+// Size of the display. 9 x 7 crates.
+#define DISPLAY_WIDTH  (9 * 5)
+#define DISPLAY_HEIGHT (7 * 5)
 
 #define PLAYER_ROWS 5
 #define PLAYER_COLUMN 1
@@ -35,6 +36,8 @@
 #define BALL_ROWS 1
 #define BALL_COLUMN 1
 #define BALL_SPEED 15
+
+#define FRAME_RATE 60
 
 struct termios orig_termios;
 static void reset_terminal_mode() {
@@ -111,7 +114,8 @@ private:
 
 class PongGame {
 public:
-    PongGame(const int socket, const int width, const int height);
+    PongGame(const int socket, const int width, const int height,
+             const ft::Font &font);
     ~PongGame();
 
     void Start(const int fps);
@@ -130,6 +134,11 @@ private:
 private:
     const int width_;
     const int height_;
+    const ft::Font &font_;
+
+    bool just_started_;
+    int help_countdown_;
+
     UDPFlaschenTaschen * frame_buffer_;
     Actor ball_;
     Actor p1_;
@@ -155,8 +164,10 @@ bool Actor::IsOverMe(float x, float y) {
             (y - pos[1]) >= 0 && (y - pos[1]) < height_);
 }
 
-PongGame::PongGame(const int socket, const int width, const int height)
-    : width_(width), height_(height),
+PongGame::PongGame(const int socket, const int width, const int height,
+                   const ft::Font &font)
+    : width_(width), height_(height), font_(font),
+      just_started_(true), help_countdown_(4 * FRAME_RATE),
       ball_(ball, BALL_COLUMN, BALL_ROWS),
       p1_(player, PLAYER_COLUMN, PLAYER_ROWS),
       p2_(player, PLAYER_COLUMN, PLAYER_ROWS) {
@@ -210,6 +221,8 @@ void PongGame::Start(const int fps) {
         next_frame(); // Clear the screen, set the pixels, and send them.
 
         // Handle keypress
+        // TODO: make this a network event thing, so that people can play
+        // over a network.
         FD_ZERO(&rfds);
         FD_SET(0, &rfds);
         tv.tv_sec = 0;
@@ -221,17 +234,20 @@ void PongGame::Start(const int fps) {
         else if (retval){
             read(0, &command, sizeof(char));
             switch (command) {
-            case 's':
+            case 's': case 'S':
                 p1_.pos[1] +=1;
                 break;
-            case 'w':
+            case 'w': case 'W':
                 p1_.pos[1] +=-1;
                 break;
-            case 'k':
+            case 'k': case 'K':
                 p2_.pos[1] +=1;
                 break;
-            case 'i':
+            case 'i': case 'I':
                 p2_.pos[1] +=-1;
+                break;
+            case '?': case '/':
+                help_countdown_ = 2 * FRAME_RATE;
                 break;
             case 'q':
                 return;
@@ -242,6 +258,17 @@ void PongGame::Start(const int fps) {
 }
 
 void PongGame::sim(const float dt) {
+    if (help_countdown_ > 0) --help_countdown_;
+
+    // When we just started, we just show initial help.
+    if (just_started_) {
+        if (help_countdown_ == 0) {
+            just_started_ = false;
+        } else {
+            return;
+        }
+    }
+
     // Evaluate the new ball delta
     ball_.pos[0] += dt * ball_.speed[0] / 1e3;
     ball_.pos[1] += dt * ball_.speed[1] / 1e3;
@@ -258,12 +285,12 @@ void PongGame::sim(const float dt) {
 
     // Score
     if (ball_.pos[0] < 0) {
-        score_[0] += 1;
+        score_[1] += 1;
         ball_.pos[0] = width_ / 2;
         ball_.pos[1] = height_ / 2;
         reset_ball();
     } else if (ball_.pos[0] > width_){
-        score_[1] += 1;
+        score_[0] += 1;
         ball_.pos[0] = width_ / 2;
         ball_.pos[1] = height_ / 2;
         reset_ball();
@@ -273,6 +300,40 @@ void PongGame::sim(const float dt) {
 void PongGame::next_frame() {
     // Clear the frame
     frame_buffer_->Clear();
+
+    const Color gray(100, 100, 100);
+    for (int y = 0; y < height_/2; ++y) {
+        frame_buffer_->SetPixel(width_ / 2, 2 * y + 1, gray);
+    }
+
+    // We have crates that are 5 pixels. We want the number aligned to the left
+    // and right of the center crate.
+    const int center_start = width_ / (2 * 5) * 5;
+    const Color score_color(0, 0, 255);
+
+    char score_string[5];
+    int text_len = snprintf(score_string, sizeof(score_string), "%d", score_[0]);
+    ft::DrawText(frame_buffer_, font_,
+                 center_start - 5*text_len, 5,  // Right aligned
+                 score_color, NULL, score_string);
+
+    text_len = snprintf(score_string, sizeof(score_string), "%d", score_[1]);
+    ft::DrawText(frame_buffer_, font_,
+                 center_start + 5, 5,
+                 score_color, NULL, score_string);
+
+    if (help_countdown_) {
+        const int kFadeDuration = 60;
+        const float fade_fraction = (help_countdown_ < kFadeDuration
+                               ? 1.0 / (kFadeDuration - help_countdown_)
+                               : 1.0);
+        const Color help_col(fade_fraction * 255, fade_fraction * 255, 0);
+        ft::DrawText(frame_buffer_, font_, 0, 10, help_col, NULL, "W");
+        ft::DrawText(frame_buffer_, font_, 0, height_ - 5, help_col, NULL, "S");
+
+        ft::DrawText(frame_buffer_, font_, width_-5, 10, help_col, NULL, "I");
+        ft::DrawText(frame_buffer_, font_, width_-5, height_ - 5, help_col, NULL, "K");
+    }
 
     // Print the actors
     ball_.print_on_buffer(frame_buffer_);
@@ -290,18 +351,22 @@ int main(int argc, char *argv[]) {
         hostname = argv[1];        // Hostname can be supplied as first arg
     }
 
+    ft::Font font;
+    font.LoadFont("fonts/5x5.bdf");  // TODO: don't hardcode.
+
     srand(time(NULL));
 
     // Open socket.
     const int socket = OpenFlaschenTaschenSocket(hostname);
-    PongGame pong(socket, DISPLAY_WIDTH, DISPLAY_HEIGHT);
+    PongGame pong(socket, DISPLAY_WIDTH, DISPLAY_HEIGHT,
+                  font);
 
     fprintf(stderr, "Game keys:\n"
             "Left paddel:  'w' up, 's' down\n"
             "Right paddel: 'i' up, 'k' down\n\n"
-            "Quit with 'q'\n");
+            "Quit with 'q'. '?' for help.\n");
     // Start the game with x fps
-    pong.Start(60);
+    pong.Start(FRAME_RATE);
 
     return 0;
 }
