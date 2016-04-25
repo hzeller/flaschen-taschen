@@ -32,8 +32,9 @@
 #define JS_EVENT_AXIS 0x02
 #define JS_EVENT_INIT 0x80
 
-//Speed factor for now hardcoded
-#define VFACTOR 1e5
+#define VFACTOR -1e-3f // Speed factor, for now hardcoded, -1 to reverse axis dir
+#define AXIS 1 // Joystick pong axis
+
 
 class Timer {
 public:
@@ -136,37 +137,47 @@ void JoyStick::WaitEvent(const float ms) {
     }
 }
 
-//For now just transmitter (we could add vibration if supported when a player lose)
+// For now just transmitter (we could add vibration if supported when a player lose)
 class PongClient : public JoyStick::EventListener {
 public:
     PongClient(const char *host, const char *port);
     void Sim(const float dt);
     void Send();
+    float GetPos();
     virtual void button_pressed(const int button, const int status) {}
     virtual void axis_moving(const int axis, const int value);
-
 private:
     const int udp_fd_;
     int16_t pos_;
-    int16_t speed_;
+    float speed_;
 };
 
 PongClient::PongClient(const char *host, const char *port) :
-    udp_fd_(UDPClient(host, port)), pos_(0) {
+    udp_fd_(UDPClient(host, port)), pos_(0), speed_(0) {
     if (udp_fd_ < 0) {
         std::cerr << "Error on opening udp socket" << std::endl;
         exit(0);
     }
 }
 
+float PongClient::GetPos() {
+    return pos_ / (float)(1 << 15); // Return the position between -1 and 1, useful to debug
+}
+
 void PongClient::axis_moving(const int axis, const int value){
-    if(axis == 1){
-        speed_ = value / VFACTOR;
+    if(axis == AXIS){
+        speed_ = value * VFACTOR;
     }
 }
 
 void PongClient::Sim(const float dt) {
-    pos_ += speed_ * dt;
+    int32_t new_pos = pos_ + speed_ * dt;
+    if (new_pos > (1 << 15) - 1) {
+        new_pos = (1 << 15) - 1;
+    } else if (new_pos < - (1 << 15)) {
+        new_pos = - (1 << 15);
+    }
+    pos_ = new_pos;
 }
 
 void PongClient::Send() {
@@ -188,6 +199,7 @@ int main(int argc, char *argv[]){
         js.WaitEvent();
         pong_client.Sim(dt);
         pong_client.Send();
+        std::cout << pong_client.GetPos() << std::endl;
         dt = t.GetElapsedInMilliseconds();
     }
 
