@@ -32,9 +32,11 @@
 #define JS_EVENT_AXIS 0x02
 #define JS_EVENT_INIT 0x80
 
-#define VFACTOR -1e-3f // Speed factor, for now hardcoded, -1 to reverse axis dir
+#define VFACTOR -1e-3f // Speed factor, for now hardcoded, -1 to reverse axis dir,
+                       // it UpdatePosply rescale the maximum speed.
 #define AXIS 1 // Joystick pong axis
 
+#define SHRT_MAX 32768
 
 class Timer {
 public:
@@ -58,7 +60,7 @@ private:
     int64_t start_;
 };
 
-int UDPClient(const char *host, const char *port) {
+int OpenClientSocket(const char *host, const char *port) {
     struct addrinfo addr_hints = {0};
     addr_hints.ai_family = AF_INET;
     addr_hints.ai_socktype = SOCK_DGRAM;
@@ -89,29 +91,28 @@ class JoyStick {
 public:
     class EventListener {
     public:
-        virtual void button_pressed(const int button, const int status) = 0;
-        virtual void axis_moving(const int axis, const int value) = 0;
+        virtual ~EventListener() {}
+        virtual void button_pressed(int button, int status) = 0;
+        virtual void axis_moving(int axis, int value) = 0;
     };
 
-    JoyStick(const char *js, EventListener &handler);
+    JoyStick(const char *js, EventListener *handler);
     ~JoyStick() { close(fd_); }
-    void WaitEvent( const float ms = 1);
+    void WaitEvent(unsigned int us = 1000);
 private:
     const int fd_;
-    EventListener &handler_;
+    EventListener *handler_;
     JoyStick();
 };
 
-JoyStick::JoyStick(const char *js, EventListener &handler) : fd_(open(js, O_RDONLY)), handler_(handler){
+JoyStick::JoyStick(const char *js, EventListener *handler) : fd_(open(js, O_RDONLY)), handler_(handler){
     if (fd_ < 0) {
         std::cerr << "Error opening joystick" << std::endl;
-        exit(0);
+        exit(1);
     }
 }
 
-void JoyStick::WaitEvent(const float ms) {
-    assert(ms >= 0);
-    const unsigned int us = ms * 1000;
+void JoyStick::WaitEvent(unsigned int us) {
     // Select stuff
     js_event event;
     fd_set rfds;
@@ -128,24 +129,24 @@ void JoyStick::WaitEvent(const float ms) {
         read(fd_, &event, sizeof(event));
         switch (event.type) {
         case JS_EVENT_BUTTON:
-            handler_.button_pressed(event.number, event.value);
+            handler_->button_pressed(event.number, event.value);
             break;
         case JS_EVENT_AXIS:
-            handler_.axis_moving(event.number, event.value);
+            handler_->axis_moving(event.number, event.value);
             break;
         }
     }
 }
 
-// For now just transmitter (we could add vibration if supported when a player lose)
+// For now just transmitter (we could add vibration if supported when a player lose or hits the ball)
 class PongClient : public JoyStick::EventListener {
 public:
     PongClient(const char *host, const char *port);
-    void Sim(const float dt);
+    bool UpdatePos(float dt);
     void Send();
     float GetPos();
-    virtual void button_pressed(const int button, const int status) {}
-    virtual void axis_moving(const int axis, const int value);
+    virtual void button_pressed(int button, int status) {}
+    virtual void axis_moving(int axis, int value);
 private:
     const int udp_fd_;
     int16_t pos_;
@@ -153,54 +154,57 @@ private:
 };
 
 PongClient::PongClient(const char *host, const char *port) :
-    udp_fd_(UDPClient(host, port)), pos_(0), speed_(0) {
+    udp_fd_(OpenClientSocket(host, port)), pos_(0), speed_(0) {
     if (udp_fd_ < 0) {
         std::cerr << "Error on opening udp socket" << std::endl;
-        exit(0);
+        exit(1);
     }
 }
 
 float PongClient::GetPos() {
-    return pos_ / (float)(1 << 15); // Return the position between -1 and 1, useful to debug
+    return pos_ / (float)SHRT_MAX; // Return the position between -1 and 1, useful to debug
 }
 
-void PongClient::axis_moving(const int axis, const int value){
-    if(axis == AXIS){
+void PongClient::axis_moving(int axis, int value) {
+    if (axis == AXIS) {
         speed_ = value * VFACTOR;
     }
 }
 
-void PongClient::Sim(const float dt) {
+bool PongClient::UpdatePos(float dt) {
+    if (speed_ == 0) return false;
     int32_t new_pos = pos_ + speed_ * dt;
-    if (new_pos > (1 << 15) - 1) {
-        new_pos = (1 << 15) - 1;
-    } else if (new_pos < - (1 << 15)) {
-        new_pos = - (1 << 15);
+    if (new_pos > SHRT_MAX - 1) {
+        new_pos = SHRT_MAX - 1;
+    } else if (new_pos < - SHRT_MAX) {
+        new_pos = - SHRT_MAX;
     }
     pos_ = new_pos;
+    return true;
 }
 
 void PongClient::Send() {
-    if (write(udp_fd_, &pos_, sizeof(pos_)) < 0) return;
+    uint16_t to_send = htons(pos_);
+    if (write(udp_fd_, &to_send, sizeof(to_send)) < 0) return;
 }
 
 int main(int argc, char *argv[]){
     const char *js_file = "/dev/input/js0";
-    if ( argc > 1 ) {
+    if (argc > 1) {
         js_file = argv[1];
     }
 
     PongClient pong_client = PongClient("localhost", "10000");
-    JoyStick js(js_file, pong_client);
+    JoyStick js(js_file, &pong_client);
     Timer t;
     float dt = 0;
+    t.Start();
     for (;;) {
-        t.Start();
         js.WaitEvent();
-        pong_client.Sim(dt);
-        pong_client.Send();
-        std::cout << pong_client.GetPos() << std::endl;
         dt = t.GetElapsedInMilliseconds();
+        t.Start();
+        if (pong_client.UpdatePos(dt)) pong_client.Send();
+        std::cout << pong_client.GetPos() << std::endl;
     }
 
     return 0;
