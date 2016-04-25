@@ -35,7 +35,6 @@
 #define VFACTOR -1e-3f // Speed factor, for now hardcoded, -1 to reverse axis dir,
                        // it UpdatePosply rescale the maximum speed.
 #define AXIS 1 // Joystick pong axis
-
 #define SHRT_MAX 32768
 
 class Timer {
