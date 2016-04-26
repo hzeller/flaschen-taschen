@@ -193,7 +193,7 @@ int main(int argc, char *argv[]){
         js_file = argv[1];
     }
 
-    PongClient pong_client = PongClient("localhost", "10000");
+    PongClient pong_client = PongClient("0.0.0.0", "4321");
     JoyStick js(js_file, &pong_client);
     Timer t;
     float dt = 0;
