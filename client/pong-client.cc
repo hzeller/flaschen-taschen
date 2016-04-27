@@ -204,7 +204,7 @@ int main(int argc, char *argv[]){
         dt = t.GetElapsedInMilliseconds();
         t.Start();
         if (pong_client.UpdatePos(dt)) pong_client.Send();
-        //std::cout << pong_client.GetPos() << std::endl;
+        std::cout << pong_client.GetPos() << std::endl;
     }
 
     return 0;
