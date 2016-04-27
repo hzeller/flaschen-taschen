@@ -20,11 +20,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/fcntl.h>
 #include <sys/select.h>
 #include <sys/time.h>
 #include <termios.h>
 #include <unistd.h>
 #include <vector>
+#include <arpa/inet.h>
 
 // Size of the display. 9 x 7 crates.
 #define DISPLAY_WIDTH  (9 * 5)
@@ -35,14 +37,19 @@
 
 #define BALL_ROWS 1
 #define BALL_COLUMN 1
-#define BALL_SPEED 15
+#define BALL_SPEED 20
 
 #define FRAME_RATE 60
 #define KEYBOARD_STEP 2
+#define MAXBOUNCEANGLE (M_PI * 2 / 12.0)
 
 #define INITIAL_GAME_WAIT (4 * FRAME_RATE)  // First start
 #define NEW_GAME_WAIT     (1 * FRAME_RATE)  // Time when a new game starts
 #define HELP_DISPLAY_TIME (2 * FRAME_RATE)
+
+#define MAX_BUFFER_LENGTH 1024
+#define SHRT_MAX 32768
+
 
 struct termios orig_termios;
 static void reset_terminal_mode() {
@@ -158,7 +165,7 @@ public:
              const ft::Font &font);
     ~PongGame();
 
-    void Start(const int fps);
+    void Start(int fps, int socket_fd = -1);
 
 private:
     // Evaluate t + 1 of the game, takes care of collisions with the players
@@ -245,9 +252,8 @@ void PongGame::reset_ball() {
     ball_.speed[1] = direction * BALL_SPEED * sin(theta);
 }
 
-void PongGame::Start(const int fps) {
+void PongGame::Start(int fps, int socket_fd) {
     assert(fps > 0);
-
     Timer t;
     float dt = 0;
     char command;
@@ -255,9 +261,41 @@ void PongGame::Start(const int fps) {
     // Select stuff
     fd_set rfds;
     struct timeval tv;
-    int retval;
+    int retval, bytes_read;
 
-    set_conio_terminal_mode();
+    int fd = socket_fd; // Default to stdout
+
+    // UDP Socket stuff
+    uint16_t recieve_data;
+    struct sockaddr_in6 client_address;
+    unsigned int address_length;
+    uint16_t p1port = 0, p2port = 0;
+    unsigned char p1addr[16], p2addr[16];
+    address_length = sizeof(struct sockaddr);
+
+    if (fd > 0) {
+        // Wait first player
+        fprintf(stderr, "Waiting for first player...(Move something)\n");
+        bytes_read = recvfrom(fd, &recieve_data, MAX_BUFFER_LENGTH, 0, (struct sockaddr *) &client_address, &address_length);
+        p1port = ntohs(client_address.sin6_port);
+        inet_ntop(AF_INET6,&client_address,(char *)&p1addr,INET6_ADDRSTRLEN);
+        fprintf(stderr,"Waiting for second player...(Move something)\n");
+        // Wait until second player send something
+        for (;;) {
+            bytes_read = recvfrom(fd, &recieve_data, MAX_BUFFER_LENGTH, 0, (struct sockaddr *) &client_address, &address_length);
+            p2port = ntohs(client_address.sin6_port);
+            if (p2port != p1port) {
+                inet_ntop(AF_INET6, &client_address, (char *) &p2addr, INET6_ADDRSTRLEN);
+                break;
+            }
+        }
+        // Also prints ipv4 into ipv6 format
+        fprintf(stderr, "Registered p1: %s:%u, p2: %s:%u\n", p1addr, p1port, p2addr, p2port);
+    } else {
+        // Keyboard mode
+        fd = 0;
+        set_conio_terminal_mode();
+    }
 
     for (;;) {
         t.Start();
@@ -270,14 +308,14 @@ void PongGame::Start(const int fps) {
         // TODO: make this a network event thing, so that people can play
         // over a network.
         FD_ZERO(&rfds);
-        FD_SET(0, &rfds);
+        FD_SET(fd, &rfds);
         tv.tv_sec = 0;
         tv.tv_usec = 1e6 / (float) fps;
-        retval = select(1, &rfds, NULL, NULL, &tv);
+        retval = select(fd + 1, &rfds, NULL, NULL, &tv);
 
-        if (retval == -1)
+        if (retval < 0)
             std::cerr << "Error on select" << std::endl;
-        else if (retval){
+        else if (retval && fd == 0){
             read(0, &command, sizeof(char));
             switch (command) {
             case 'd': case 'D':
@@ -298,12 +336,23 @@ void PongGame::Start(const int fps) {
             case 'q':
                 return;
             }
+        } else {
+            bytes_read = recvfrom(fd, &recieve_data, MAX_BUFFER_LENGTH, 0, (struct sockaddr *) &client_address, &address_length);
+            if (bytes_read == 2) {
+                if (ntohs(client_address.sin6_port) == p2port)
+                    p2_.pos[1] = (int)(((float)(short int)ntohs(recieve_data) / (SHRT_MAX) + 1) * (height_ - PLAYER_ROWS) / 2);
+                else {
+                    p1_.pos[1] = (int)(((float)(short int)ntohs(recieve_data) / (SHRT_MAX) + 1) * (height_ - PLAYER_ROWS) / 2);
+                }
+            }
         }
         dt = t.GetElapsedInMilliseconds();
     }
 }
 
 void PongGame::sim(const float dt) {
+    float angle;
+    float new_pos[2];
     if (help_countdown_ > 0)
         --help_countdown_;
 
@@ -312,19 +361,29 @@ void PongGame::sim(const float dt) {
         return;
     }
 
-    // Evaluate the new ball delta
-    ball_.pos[0] += dt * ball_.speed[0] / 1e3;
-    ball_.pos[1] += dt * ball_.speed[1] / 1e3;
+    new_pos[0] = ball_.pos[0] + dt * ball_.speed[0] / 1e3;
+    new_pos[1] = ball_.pos[1] + dt * ball_.speed[1] / 1e3;
 
     // Check if bouncin on a player cursor, (careful, for low fps
-    // QUANTUM TUNELING may arise)
-    if( p1_.IsOverMe(ball_.pos[0], ball_.pos[1]) || p2_.IsOverMe(ball_.pos[0], ball_.pos[1])) {
-        ball_.speed[0] *= -1;
-        ball_.pos[0] += 2 * dt * ball_.speed[0] / 1e3;
+    // QUANTUM TUNNELING may arise.
+    // TODO: we should check if we are going through a paddle from one frame to the other)
+    if(p1_.IsOverMe(new_pos[0], new_pos[1])) {
+        // Evaluate the reflection angle that will be larger as we bounce farther from the paddle center
+        angle = (p1_.pos[1] + PLAYER_ROWS/2 - new_pos[1]) * MAXBOUNCEANGLE / (PLAYER_ROWS / 2);
+        ball_.speed[0] = BALL_SPEED * cos(angle);
+        ball_.speed[1] = BALL_SPEED * -1 * sin(angle);
+    } else if (p2_.IsOverMe(new_pos[0], new_pos[1])) {
+        angle = (p2_.pos[1] + PLAYER_ROWS/2 - new_pos[1]) * MAXBOUNCEANGLE / (PLAYER_ROWS / 2);
+        ball_.speed[0] = BALL_SPEED * -1 * cos(angle);
+        ball_.speed[1] = BALL_SPEED * -1 * sin(angle);
     }
 
     // Wall
     if( ball_.pos[1] < 0 || ball_.pos[1] > height_ ) ball_.speed[1] *= -1;
+
+    // Evaluate the new ball delta
+    ball_.pos[0] += dt * ball_.speed[0] / 1e3;
+    ball_.pos[1] += dt * ball_.speed[1] / 1e3;
 
     // Score
     if (ball_.pos[0] < 0) {
@@ -395,6 +454,33 @@ void PongGame::next_frame() {
     frame_buffer_->Send();
 }
 
+int udp_server_init(int port) {
+    int server_socket;
+
+    if ((server_socket = socket(PF_INET6, SOCK_DGRAM, IPPROTO_UDP)) < 0) {
+        perror("IPv6 enabled ? While reating listen socket");
+        return false;
+    }
+    int opt = 0;   // Unset IPv6-only, in case it is set. Best effort.
+    setsockopt(server_socket, IPPROTO_IPV6, IPV6_V6ONLY, &opt, sizeof(opt));
+
+    // Set a non blocking socket
+    int flags = fcntl(server_socket, F_GETFL);
+    flags |= O_NONBLOCK;
+    fcntl(server_socket, F_SETFL, flags);
+
+    struct sockaddr_in6 addr = {0};
+    addr.sin6_family = AF_INET6;
+    addr.sin6_addr = in6addr_any;
+    addr.sin6_port = htons(port);
+    if (bind(server_socket, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
+        perror("Error on bind");
+        return -1;
+    }
+
+    fprintf(stderr, "UDP-server: ready to listen on %d\n", port);
+    return server_socket;
+}
 
 int main(int argc, char *argv[]) {
     const char *hostname = NULL;   // Will use default if not set otherwise.
@@ -416,8 +502,9 @@ int main(int argc, char *argv[]) {
             "Left paddel:  'w' up; 'd' down\n"
             "Right paddel: 'i' up; 'j' down\n\n"
             "Quit with 'q'. '?' for help.\n");
+
     // Start the game with x fps
-    pong.Start(FRAME_RATE);
+    pong.Start(FRAME_RATE, udp_server_init(4321));
 
     return 0;
 }
