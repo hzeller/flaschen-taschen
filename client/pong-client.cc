@@ -184,6 +184,7 @@ bool PongClient::UpdatePos(float dt) {
 
 void PongClient::Send() {
     uint16_t to_send = htons(pos_);
+    std::cout << to_send << std::endl;
     if (write(udp_fd_, &to_send, sizeof(to_send)) < 0) return;
 }
 
@@ -203,7 +204,7 @@ int main(int argc, char *argv[]){
         dt = t.GetElapsedInMilliseconds();
         t.Start();
         if (pong_client.UpdatePos(dt)) pong_client.Send();
-        std::cout << pong_client.GetPos() << std::endl;
+        //std::cout << pong_client.GetPos() << std::endl;
     }
 
     return 0;
