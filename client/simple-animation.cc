@@ -54,6 +54,7 @@ static const char* invader[][INVADER_ROWS] = {
         },
 };
 
+
 // Fill invader from pattern above.
 UDPFlaschenTaschen *CreateFromPattern(int socket, const char *invader[],
                                       const Color &color) {
