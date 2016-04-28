@@ -13,8 +13,9 @@
 #include "udp-flaschen-taschen.h"
 #include "bdf-font.h"
 
+#include <arpa/inet.h>
 #include <assert.h>
-#include <iostream>
+#include <limits.h>
 #include <math.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -25,8 +26,9 @@
 #include <sys/time.h>
 #include <termios.h>
 #include <unistd.h>
+
+#include <iostream>
 #include <vector>
-#include <arpa/inet.h>
 
 // Size of the display. 9 x 7 crates.
 #define DISPLAY_WIDTH  (9 * 5)
@@ -46,10 +48,6 @@
 #define INITIAL_GAME_WAIT (4 * FRAME_RATE)  // First start
 #define NEW_GAME_WAIT     (1 * FRAME_RATE)  // Time when a new game starts
 #define HELP_DISPLAY_TIME (2 * FRAME_RATE)
-
-#define MAX_BUFFER_LENGTH 1024
-#define SHRT_MAX 32768
-
 
 struct termios orig_termios;
 static void reset_terminal_mode() {
@@ -266,7 +264,7 @@ void PongGame::Start(int fps, int socket_fd) {
     int fd = socket_fd; // Default to stdout
 
     // UDP Socket stuff
-    uint16_t recieve_data;
+    uint16_t receive_data;
     struct sockaddr_in6 client_address;
     unsigned int address_length;
     uint16_t p1port = 0, p2port = 0;
@@ -276,13 +274,17 @@ void PongGame::Start(int fps, int socket_fd) {
     if (fd > 0) {
         // Wait first player
         fprintf(stderr, "Waiting for first player...(Move something)\n");
-        bytes_read = recvfrom(fd, &recieve_data, MAX_BUFFER_LENGTH, 0, (struct sockaddr *) &client_address, &address_length);
+        bytes_read = recvfrom(fd, &receive_data, sizeof(receive_data),
+                              0, (struct sockaddr *) &client_address,
+                              &address_length);
         p1port = ntohs(client_address.sin6_port);
         inet_ntop(AF_INET6,&client_address,(char *)&p1addr,INET6_ADDRSTRLEN);
         fprintf(stderr,"Waiting for second player...(Move something)\n");
         // Wait until second player send something
         for (;;) {
-            bytes_read = recvfrom(fd, &recieve_data, MAX_BUFFER_LENGTH, 0, (struct sockaddr *) &client_address, &address_length);
+            bytes_read = recvfrom(fd, &receive_data, sizeof(receive_data),
+                                  0, (struct sockaddr *) &client_address,
+                                  &address_length);
             p2port = ntohs(client_address.sin6_port);
             if (p2port != p1port) {
                 inet_ntop(AF_INET6, &client_address, (char *) &p2addr, INET6_ADDRSTRLEN);
@@ -315,8 +317,7 @@ void PongGame::Start(int fps, int socket_fd) {
 
         if (retval < 0)
             std::cerr << "Error on select" << std::endl;
-        else if (retval && fd == 0){
-            read(0, &command, sizeof(char));
+        else if (retval && fd == 0 && read(0, &command, sizeof(char)) == 1) {
             switch (command) {
             case 'd': case 'D':
                 p1_.pos[1] += KEYBOARD_STEP;
@@ -337,12 +338,15 @@ void PongGame::Start(int fps, int socket_fd) {
                 return;
             }
         } else {
-            bytes_read = recvfrom(fd, &recieve_data, MAX_BUFFER_LENGTH, 0, (struct sockaddr *) &client_address, &address_length);
+            bytes_read = recvfrom(fd, &receive_data, sizeof(receive_data),
+                                  0, (struct sockaddr *) &client_address,
+                                  &address_length);
             if (bytes_read == 2) {
+                const int16_t value = ntohs(receive_data);
                 if (ntohs(client_address.sin6_port) == p2port)
-                    p2_.pos[1] = (int)(((float)(short int)ntohs(recieve_data) / (SHRT_MAX) + 1) * (height_ - PLAYER_ROWS) / 2);
+                    p2_.pos[1] = (int)(((float)value / (SHRT_MAX) + 1) * (height_ - PLAYER_ROWS) / 2);
                 else {
-                    p1_.pos[1] = (int)(((float)(short int)ntohs(recieve_data) / (SHRT_MAX) + 1) * (height_ - PLAYER_ROWS) / 2);
+                    p1_.pos[1] = (int)(((float)value / (SHRT_MAX) + 1) * (height_ - PLAYER_ROWS) / 2);
                 }
             }
         }
