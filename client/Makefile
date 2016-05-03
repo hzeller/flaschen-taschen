@@ -15,6 +15,7 @@ simple-example: simple-example.cc
 send-text: send-text.cc
 pong-game: pong-game.cc
 pong-client: pong-client.cc
+burn-in: burn-in.cc
 
 send-image : send-image.cc
 	$(CXX) $(CXXFLAGS) $(MAGICK_CXXFLAGS) -o $@ $^ $(MAGICK_LDFLAGS) $(LDFLAGS)
