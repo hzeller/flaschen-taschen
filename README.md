@@ -19,7 +19,7 @@ make nice pixels.
 
 ![](./img/ft-work-in-progress.jpg)
 
-In [this video][2025-video], you see a test-setup with 5x4 creates (25x20 pixel).
+In [this video][7of9-video], you see the state close to completion.
 
 Final set-up will be 9 crates wide and 7 crates high for a total of 63 crates
 with 25 'pixels' each. 45x35 pixels or 1575 pixels total. All operated by
@@ -118,3 +118,4 @@ use 9 for our installation right now):
 [protocols]: ./doc/protocols.md
 [netpbm]: http://netpbm.sourceforge.net/
 [2025-video]: https://www.youtube.com/watch?v=hs8FoROzE4M
+[7of9-video]: https://www.youtube.com/watch?v=Uc2-8ntcEpY
