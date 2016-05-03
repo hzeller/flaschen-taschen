@@ -22,12 +22,12 @@
 #include <stdio.h>
 
 // Size of the display.
-#define DISPLAY_WIDTH 25
-#define DISPLAY_HEIGHT 20
+#define DISPLAY_WIDTH 45
+#define DISPLAY_HEIGHT 35
 
 // The 'layer' we're showing the space-invaders in. The background layer
 // in a FlaschenTaschen display is 0. With 1, we're hovering above that.
-#define Z_LAYER 1
+#define Z_LAYER 7
 
 #define INVADER_ROWS 8
 #define INVADER_WIDTH 11
@@ -88,8 +88,8 @@ int main(int argc, char *argv[]) {
     frames.push_back(CreateFromPattern(socket, invader[0], Color(255, 255, 0)));
     frames.push_back(CreateFromPattern(socket, invader[1], Color(255, 0, 255)));
 
-    const int max_animation_x = 20;
-    const int max_animation_y = 20;
+    const int max_animation_x = 45;
+    const int max_animation_y = 35;
     int animation_x = 0;
     int animation_y = 0;
     int animation_direction = +1;
