@@ -30,6 +30,13 @@ and crates. We are now starting to wire up the crates; if you want to help, chec
 [the documentation](./doc/wiring.md).
 <a href="doc/wiring.md"><img src="img/crate-descriptions.jpg" height="80px"></a>
 
+## Software
+
+There are various projects that create demos for F~T.
+Check out these repositories:
+
+  * https://github.com/cgorringe/ft-demos
+
 ## Tutorial: getting started
 
 To develop visuals for the FlaschenTaschen display once it is ready, here you
