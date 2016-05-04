@@ -37,9 +37,13 @@ The LED power inputs are long loose cables on both ends of the strip that we
 combine and solder to a barrel-jack receptacle pig-tail, see image below.
 Make sure to thread the wires from the LED _under_ the data wiring between the bottles.
 
-As a preparation for soldering, the pigtail needs to be shortened about 10cm (4 inches),
-the LED power cables roughly 6cm (2.5 inches) to not have too much slack. When removing outer
+As a preparation for soldering, the pigtail needs to be shortened by about 10cm (4 inches),
+the LED power cables roughly by 6cm (2.5 inches) to not have too much slack. When removing outer
 insulation from the pig-tail, make sure to not injure the insulation of the inner cables.
+
+You don't have to unfold the whole LED strip or put it in the box to solder on the
+power pigtail. Just do the whole process directly on the bundle of LEDs, it saves a lot of
+time. The below images have the crate in the background for illustration purposes.
 
 Uninsulate about 1 inch of the wires going to the LEDs and twist together the red
 and blue ones separately. Put a ~1 inch of heat-shrink tubing up each pair now, so that we don't
