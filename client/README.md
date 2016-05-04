@@ -71,7 +71,7 @@ specification.
 ### Compile
 ```bash
 # Need some devel libs
-sudo aptitude install libgraphicsmagick++-dev libwebp-dev
+sudo apt-get install libgraphicsmagick++-dev libwebp-dev
 make send-image
 ```
 
@@ -114,7 +114,7 @@ Let's try this with an example image:
 ### Compile
 ```bash
 # Need some devel libs
-sudo aptitude install libavcodec-dev libavformat-dev libswscale-dev
+sudo apt-get install libavcodec-dev libavformat-dev libswscale-dev
 make send-video
 ```
 
