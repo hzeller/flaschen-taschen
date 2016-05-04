@@ -205,7 +205,7 @@ int main(int argc, char *argv[]) {
     // The display we expose to the user provides composite layering which can
     // be used by the UDP server.
     CompositeFlaschenTaschen layered_display(&display, 16);
-    layered_display.StartLayerGarbageCollection(&mutex, 10);
+    layered_display.StartLayerGarbageCollection(&mutex, 45);
 
     // Optional services as thread.
     if (run_opc) opc_server_run_thread(&layered_display, &mutex);
