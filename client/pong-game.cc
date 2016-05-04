@@ -17,6 +17,7 @@
 #include <assert.h>
 #include <limits.h>
 #include <math.h>
+#include <signal.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -48,6 +49,11 @@
 #define INITIAL_GAME_WAIT (4 * FRAME_RATE)  // First start
 #define NEW_GAME_WAIT     (1 * FRAME_RATE)  // Time when a new game starts
 #define HELP_DISPLAY_TIME (2 * FRAME_RATE)
+
+volatile bool interrupt_received = false;
+static void InterruptHandler(int signo) {
+  interrupt_received = true;
+}
 
 struct termios orig_termios;
 static void reset_terminal_mode() {
@@ -305,7 +311,7 @@ void PongGame::Start(int fps, int socket_fd) {
         set_conio_terminal_mode();
     }
 
-    for (;;) {
+    while (!interrupt_received) {
         t.Start();
 
         // Assume the calculations to be instant for the sleep
@@ -340,6 +346,7 @@ void PongGame::Start(int fps, int socket_fd) {
             case '?': case '/':
                 help_countdown_ = HELP_DISPLAY_TIME;
                 break;
+            case 3:   // In raw mode, we receive Ctrl-C as raw byte.
             case 'q':
                 return;
             }
@@ -495,7 +502,7 @@ int udp_server_init(int port) {
 static int usage(const char *progname) {
     fprintf(stderr, "usage: %s [options]\n", progname);
     fprintf(stderr, "Options:\n"
-            "\t-g <width>x<height>[+<off_x>+<off_y>[+<layer>]] : Output geometry. Default 45x35"
+            "\t-g <width>x<height>[+<off_x>+<off_y>[+<layer>]] : Output geometry. Default 45x35\n"
             "\t-l <layer>      : Layer 0..15. Default 0 (note if also given in -g, then last counts)\n"
             "\t-h <host>       : Flaschen-Taschen display hostname.\n"
             "\t-r <port>       : remote operation: listen on port\n"
@@ -556,14 +563,18 @@ int main(int argc, char *argv[]) {
 
     srand(time(NULL));
 
-    // Open socket.
     const int display_socket = OpenFlaschenTaschenSocket(hostname);
     UDPFlaschenTaschen display(display_socket, width, height);
     display.SetOffset(off_x, off_y, off_z);
     PongGame pong(&display, width, height, font, bg);
 
+    signal(SIGTERM, InterruptHandler);
+    signal(SIGINT, InterruptHandler);
+
     // Start the game with x fps
     pong.Start(FRAME_RATE, remote_port > 0 ? udp_server_init(remote_port) : -1);
+    reset_terminal_mode();
 
+    fprintf(stderr, "Good bye.\n");
     return 0;
 }
