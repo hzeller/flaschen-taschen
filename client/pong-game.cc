@@ -31,8 +31,8 @@
 #include <vector>
 
 // Size of the display. 9 x 7 crates.
-#define DISPLAY_WIDTH  (9 * 5)
-#define DISPLAY_HEIGHT (7 * 5)
+#define DEFAULT_DISPLAY_WIDTH  (9 * 5)
+#define DEFAULT_DISPLAY_HEIGHT (7 * 5)
 
 #define PLAYER_ROWS 5
 #define PLAYER_COLUMN 1
@@ -159,8 +159,9 @@ private:
 
 class PongGame {
 public:
-    PongGame(const int socket, const int width, const int height,
-             const ft::Font &font);
+    PongGame(UDPFlaschenTaschen *display,
+             const int width, const int height,
+             const ft::Font &font, const Color &bg);
     ~PongGame();
 
     void Start(int fps, int socket_fd = -1);
@@ -180,6 +181,7 @@ private:
     const int width_;
     const int height_;
     const ft::Font &font_;
+    const Color background_;
 
     int start_countdown_;   // Just started a game.
     int help_countdown_;    // Time displaying help
@@ -212,11 +214,12 @@ bool Actor::IsOverMe(float x, float y) {
             (y - pos[1]) >= 0 && (y - pos[1]) < height_);
 }
 
-PongGame::PongGame(const int socket, const int width, const int height,
-                   const ft::Font &font)
-    : width_(width), height_(height), font_(font),
+PongGame::PongGame(UDPFlaschenTaschen *display,
+                   const int width, const int height,
+                   const ft::Font &font, const Color &bg)
+    : width_(width), height_(height), font_(font), background_(bg),
       start_countdown_(INITIAL_GAME_WAIT), help_countdown_(start_countdown_),
-      frame_buffer_(new UDPFlaschenTaschen(socket, width, height)),
+      frame_buffer_(display),
       edge_animation_(Color(255, 100, 0), 15, 5.0, frame_buffer_),
       new_ball_animation_(Color(0, 50, 0), 5, 3.0, frame_buffer_),
       ball_(ball, BALL_COLUMN, BALL_ROWS),
@@ -235,7 +238,6 @@ PongGame::PongGame(const int socket, const int width, const int height,
 }
 
 PongGame::~PongGame() {
-    delete frame_buffer_;
 }
 
 void PongGame::reset_ball() {
@@ -295,6 +297,10 @@ void PongGame::Start(int fps, int socket_fd) {
         fprintf(stderr, "Registered p1: %s:%u, p2: %s:%u\n", p1addr, p1port, p2addr, p2port);
     } else {
         // Keyboard mode
+        fprintf(stderr, "Game keys:\n"
+                "Left paddel:  'w' up; 'd' down\n"
+                "Right paddel: 'i' up; 'j' down\n\n"
+                "Quit with 'q'. '?' for help.\n");
         fd = 0;
         set_conio_terminal_mode();
     }
@@ -408,8 +414,8 @@ void PongGame::sim(const float dt) {
 }
 
 void PongGame::next_frame() {
-    // Clear the frame
-    frame_buffer_->Clear();
+    // Clear the frame.
+    frame_buffer_->Fill(background_);
 
     // Centerline
     const Color divider_color(50, 100, 50);
@@ -486,10 +492,63 @@ int udp_server_init(int port) {
     return server_socket;
 }
 
+static int usage(const char *progname) {
+    fprintf(stderr, "usage: %s [options]\n", progname);
+    fprintf(stderr, "Options:\n"
+            "\t-g <width>x<height>[+<off_x>+<off_y>[+<layer>]] : Output geometry. Default 45x35"
+            "\t-l <layer>      : Layer 0..15. Default 0 (note if also given in -g, then last counts)\n"
+            "\t-h <host>       : Flaschen-Taschen display hostname.\n"
+            "\t-r <port>       : remote operation: listen on port\n"
+            "\t-b<RRGGBB>      : Background color as hex (default: 000000)\n"
+            );
+
+    return 1;
+}
+
 int main(int argc, char *argv[]) {
     const char *hostname = NULL;   // Will use default if not set otherwise.
-    if ( argc > 1 ) {
-        hostname = argv[1];        // Hostname can be supplied as first arg
+    int width = DEFAULT_DISPLAY_WIDTH;
+    int height= DEFAULT_DISPLAY_HEIGHT;
+    int off_x = 0;
+    int off_y = 0;
+    int off_z = 0;
+    int remote_port = -1;
+    Color bg(0, 0, 0);
+
+    int opt;
+    while ((opt = getopt(argc, argv, "g:l:h:r:b:")) != -1) {
+        switch (opt) {
+        case 'g':
+            if (sscanf(optarg, "%dx%d%d%d%d", &width, &height, &off_x, &off_y, &off_z)
+                < 2) {
+                fprintf(stderr, "Invalid size spec '%s'", optarg);
+                return usage(argv[0]);
+            }
+            break;
+        case 'r':
+            remote_port = atoi(optarg);
+            break;
+        case 'h':
+            hostname = strdup(optarg); // leaking. Ignore.
+            break;
+        case 'l':
+            if (sscanf(optarg, "%d", &off_z) != 1 || off_z < 0 || off_z >= 16) {
+                fprintf(stderr, "Invalid layer '%s'\n", optarg);
+                return usage(argv[0]);
+            }
+            break;
+        case 'b': {
+            int r, g, b;
+            if (sscanf(optarg, "%02x%02x%02x", &r, &g, &b) != 3) {
+                fprintf(stderr, "Background color parse error\n");
+                return usage(argv[0]);
+            }
+            bg.r = r; bg.g = g; bg.b = b;
+            break;
+        }
+        default:
+            return usage(argv[0]);
+        }
     }
 
     ft::Font font;
@@ -498,17 +557,13 @@ int main(int argc, char *argv[]) {
     srand(time(NULL));
 
     // Open socket.
-    const int socket = OpenFlaschenTaschenSocket(hostname);
-    PongGame pong(socket, DISPLAY_WIDTH, DISPLAY_HEIGHT,
-                  font);
-
-    fprintf(stderr, "Game keys:\n"
-            "Left paddel:  'w' up; 'd' down\n"
-            "Right paddel: 'i' up; 'j' down\n\n"
-            "Quit with 'q'. '?' for help.\n");
+    const int display_socket = OpenFlaschenTaschenSocket(hostname);
+    UDPFlaschenTaschen display(display_socket, width, height);
+    display.SetOffset(off_x, off_y, off_z);
+    PongGame pong(&display, width, height, font, bg);
 
     // Start the game with x fps
-    pong.Start(FRAME_RATE, udp_server_init(4321));
+    pong.Start(FRAME_RATE, remote_port > 0 ? udp_server_init(remote_port) : -1);
 
     return 0;
 }
