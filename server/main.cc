@@ -37,30 +37,6 @@
 #define DROP_PRIV_USER "daemon"
 #define DROP_PRIV_GROUP "daemon"
 
-// Temporary code: we have two types of columns we want to stack.
-namespace {
-class StackedColumn : public FlaschenTaschen {
-public:
-    StackedColumn(FlaschenTaschen *lower, FlaschenTaschen *upper)
-        : lower_(lower), upper_(upper) {}
-
-    int width() const { return lower_->width(); } // both same width.
-    int height() const { return lower_->height() + upper_->height(); }
-    void SetPixel(int x, int y, const Color &col) {
-        if (y < lower_->height()) {
-            lower_->SetPixel(x, y, col);
-        } else {
-            upper_->SetPixel(x, y - lower_->height(), col);
-        }
-    }
-    void Send() {}
-
-private:
-    FlaschenTaschen *const lower_;
-    FlaschenTaschen *const upper_;
-};
-}  // namespace
-
 bool drop_privs(const char *priv_user, const char *priv_group) {
     uid_t ruid, euid, suid;
     if (getresuid(&ruid, &euid, &suid) >= 0) {
@@ -157,13 +133,19 @@ int main(int argc, char *argv[]) {
     MultiSPI spi;
     ColumnAssembly column_disp(&spi);
     // Looking from the back of the display: leftmost column first.
-    column_disp.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P19, 4));
-    column_disp.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P20, 4));
-    column_disp.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P15, 4));
-    column_disp.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P16, 4));
-    column_disp.AddColumn(new StackedColumn(
-           new LPD6803FlaschenTaschen(&spi, MultiSPI::SPI_P11, 2),
-           new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P12, 2)));
+    column_disp.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P18, 7));
+    column_disp.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P21, 7));
+    column_disp.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P14, 7));
+    column_disp.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P17, 7));
+
+    // Center column.
+    column_disp.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P16, 7));
+
+    column_disp.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P10, 7));
+    column_disp.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P13, 7));
+    column_disp.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P6, 7));
+    column_disp.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P9, 7));
+
     // Wrap in an implementation that executes Send() in high-priority thread
     // to prevent possible timing glitches.
     PriorityFlaschenTaschenSender display(&column_disp);
