@@ -575,6 +575,9 @@ int main(int argc, char *argv[]) {
     pong.Start(FRAME_RATE, remote_port > 0 ? udp_server_init(remote_port) : -1);
     reset_terminal_mode();
 
+    display.Clear();
+    display.Send();
+
     fprintf(stderr, "Good bye.\n");
     return 0;
 }
