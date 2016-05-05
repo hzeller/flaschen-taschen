@@ -17,10 +17,10 @@ pong-game: pong-game.cc
 pong-client: pong-client.cc
 burn-in: burn-in.cc
 
-send-image : send-image.cc
-	$(CXX) $(CXXFLAGS) $(MAGICK_CXXFLAGS) -o $@ $^ $(MAGICK_LDFLAGS) $(LDFLAGS)
+send-image : send-image.cc libftclient.a
+	$(CXX) $(CXXFLAGS) $(MAGICK_CXXFLAGS) -o $@ $< $(MAGICK_LDFLAGS) $(LDFLAGS)
 
-send-video: send-video.cc
+send-video: send-video.cc libftclient.a
 	$(CXX) $(CXXFLAGS) -o $@ $< $(FFMPEG_LDFLAGS) $(LDFLAGS)
 
 % : %.cc libftclient.a
