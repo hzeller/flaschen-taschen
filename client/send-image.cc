@@ -184,8 +184,8 @@ int main(int argc, char *argv[]) {
 
     bool do_scroll = false;
     bool do_clear_screen = false;
-    int width = 25;
-    int height = 20;
+    int width = 45;
+    int height = 35;
     int off_x = 0;
     int off_y = 0;
     int off_z = 0;
