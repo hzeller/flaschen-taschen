@@ -26,6 +26,10 @@
 
 #include <string>
 
+#define DEFAULT_WIDTH 45
+#define DEFAULT_HEIGHT 35
+#define WIDEST_GLYPH 'Z'
+
 volatile bool interrupt_received = false;
 static void InterruptHandler(int signo) {
   interrupt_received = true;
@@ -42,19 +46,21 @@ static int usage(const char *progname) {
             "\t-o              : Only run once, don't scroll forever.\n"
             "\t-c<RRGGBB>      : Text color as hex (default: FFFFFF)\n"
             "\t-b<RRGGBB>      : Background color as hex (default: 000000)\n"
+            "\t-v              : Scroll text vertically \n"
             );
 
     return 1;
 }
 
 int main(int argc, char *argv[]) {
-    int width = 45;
+    int width = -1;
     int height = -1;
     int off_x = 0;
     int off_y = 0;
     int off_z = 1;
     int scroll_delay_ms = 50;
     bool run_forever = true;
+    bool vertical = false;
     const char *host = NULL;
 
     Color fg(0xff, 0xff, 0xff);
@@ -63,7 +69,7 @@ int main(int argc, char *argv[]) {
 
     ft::Font font;
     int opt;
-    while ((opt = getopt(argc, argv, "f:g:h:s:oc:b:l:")) != -1) {
+    while ((opt = getopt(argc, argv, "f:g:h:s:voc:b:l:")) != -1) {
         switch (opt) {
         case 'g':
             if (sscanf(optarg, "%dx%d%d%d%d", &width, &height, &off_x, &off_y, &off_z)
@@ -110,19 +116,27 @@ int main(int argc, char *argv[]) {
             }
             bg.r = r; bg.g = g; bg.b = b;
             break;
+        case 'v':
+            vertical = true;
+            break;
 
         default:
             return usage(argv[0]);
         }
     }
-
+    // check for valid initial conditions
     if (font.height() < 0) {
         fprintf(stderr, "Need to provide a font.\n");
         return usage(argv[0]);
     }
-
+    // check height input and use default value if necessary
     if (height < 0) {
-        height = font.height();
+        height = vertical ? DEFAULT_HEIGHT : font.height();
+    }
+
+    // check width input and use default font width of WIDEST_GLYPH if necessary
+    if (width < 0) {
+        width = vertical ? font.CharacterWidth(WIDEST_GLYPH) : DEFAULT_WIDTH;
     }
 
     if (width < 1 || height < 1) {
@@ -158,28 +172,53 @@ int main(int argc, char *argv[]) {
 
     // Center in in the available display space.
     const int y_pos = (height - font.height()) / 2 + font.baseline();
+    const int x_pos = (width - font.CharacterWidth(WIDEST_GLYPH)) / 2 ;
 
     // dry-run to determine total number of pixels.
-    const int total_len = DrawText(&display, font, 0, y_pos, fg, NULL, text);
+       const int total_height = DrawText(&display, font, 0, y_pos, fg, NULL, text);
+       const int total_width = strlen(text) * font.height();
+
+    // if rotated, center in in the available display space.
+
 
     signal(SIGTERM, InterruptHandler);
     signal(SIGINT, InterruptHandler);
 
+   // scrolling horizontally l-r or vertically b-t
     if (scroll_delay_ms > 0) {
-        do {
-            display.Fill(bg);
-            for (int s = 0; s < total_len + width && !interrupt_received; ++s) {
-                DrawText(&display, font, width - s, y_pos, fg, &bg, text);
-                display.Send();
-                usleep(scroll_delay_ms * 1000);
-            }
-        } while (run_forever && !interrupt_received);
+        if (!vertical) {
+            do {
+              display.Fill(bg);
+              for (int s = 0; s < total_width + width && !interrupt_received; ++s) {
+                  DrawText(&display, font, width - s, y_pos, fg, &bg, text);
+                  display.Send();
+                  usleep(scroll_delay_ms * 1000);
+              }
+            } while (run_forever && !interrupt_received);
+        }
+        else {  // rotation for vertical banner text
+            do {
+              display.Fill(bg);
+              for (int s = 0; s < total_height + height && !interrupt_received; ++s) {
+                  VerticalDrawText(&display, font, x_pos, height - s, fg, &bg, text);
+                  display.Send();
+                  usleep(scroll_delay_ms * 1000);
+               }
+            } while (run_forever && !interrupt_received);
+        }
     }
-    else {
-        // No scrolling, just show directly and once.
-        display.Fill(bg);
-        DrawText(&display, font, 0, y_pos, fg, &bg, text);
-        display.Send();
+    // No scrolling, just show directly and once.
+    else if (scroll_delay_ms == 0) {
+        if (!vertical) {
+          display.Fill(bg);
+          DrawText(&display, font, 0, y_pos, fg, &bg, text);
+          display.Send();
+        }
+        else {
+          display.Fill(bg);
+          VerticalDrawText(&display, font, x_pos, height + font.height() ,fg, &bg, text);
+          display.Send();
+        }
     }
 
     // Don't let leftovers cover up content unless we set a no-scrolling

@@ -52,11 +52,15 @@ Options:
         -o              : Only run once, don't scroll forever.
         -c<RRGGBB>      : Text color as hex (default: FFFFFF)
         -b<RRGGBB>      : Background color as hex (default: 000000)
+        -v              : Scroll text vertically 
 ```
 
 Sample
 ```bash
 ./send-text -f fonts/6x10.bdf "We ♥ Flaschen Taschen"
+
+# Or coordinated horizontal and vertical messages
+./send-text -h localhost "♥Flaschen" -f fonts/5x5.bdf -s 60 -g 45x35+0+15+15 & ./send-text -h localhost "Taschen " -f fonts/5x5.bdf  -v  -s 60 -g 45x35+20+0+15 && fg
 
 # Or, how about showing the time
 while : ; do sleep 1 ; ./send-text -f fonts/9x18.bdf -s0 `date +%H:%M` ; done
