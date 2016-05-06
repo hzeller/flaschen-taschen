@@ -28,7 +28,6 @@
 #include <string>
 
 #include "composite-flaschen-taschen.h"
-#include "priority-flaschen-taschen-sender.h"
 #include "ft-thread.h"
 #include "led-flaschen-taschen.h"
 #include "multi-spi.h"
@@ -131,24 +130,20 @@ int main(int argc, char *argv[]) {
 
 #if FT_BACKEND == 0
     MultiSPI spi;
-    ColumnAssembly column_disp(&spi);
+    ColumnAssembly display(&spi);
     // Looking from the back of the display: leftmost column first.
-    column_disp.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P18, 7));
-    column_disp.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P21, 7));
-    column_disp.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P14, 7));
-    column_disp.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P17, 7));
+    display.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P18, 7));
+    display.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P21, 7));
+    display.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P14, 7));
+    display.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P17, 7));
 
     // Center column.
-    column_disp.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P16, 7));
+    display.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P16, 7));
 
-    column_disp.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P10, 7));
-    column_disp.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P13, 7));
-    column_disp.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P6, 7));
-    column_disp.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P9, 7));
-
-    // Wrap in an implementation that executes Send() in high-priority thread
-    // to prevent possible timing glitches.
-    PriorityFlaschenTaschenSender display(&column_disp);
+    display.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P10, 7));
+    display.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P13, 7));
+    display.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P6, 7));
+    display.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P9, 7));
 #elif FT_BACKEND == 1
     RGBMatrixFlaschenTaschen display(0, 0, width, height);
 #elif FT_BACKEND == 2
