@@ -18,6 +18,7 @@
 #include <assert.h>
 #include <strings.h>
 #include <stdlib.h>
+#include <string.h>
 
 // mmap-bcm-register
 #include <fcntl.h>
@@ -81,7 +82,7 @@ struct MultiSPI::GPIOData {
 };
 
 MultiSPI::MultiSPI(int clock_gpio)
-    : clock_gpio_(clock_gpio), size_(0), gpio_ops_(NULL) {
+    : clock_gpio_(clock_gpio), size_(0), gpio_dma_(NULL), gpio_shadow_(NULL) {
     alloced_.mem = NULL;
     bool success = gpio_.Init();
     assert(success);  // gpio couldn't be initialized
@@ -91,6 +92,7 @@ MultiSPI::MultiSPI(int clock_gpio)
 
 MultiSPI::~MultiSPI() {
     UncachedMemBlock_free(&alloced_);
+    free(gpio_shadow_);
 }
 
 bool MultiSPI::RegisterDataGPIO(int gpio, size_t serial_byte_size) {
@@ -106,16 +108,15 @@ void MultiSPI::FinishRegistration() {
     const int gpio_operations = size_ * 8 * 2 + 1;
     const int control_blocks
         = (gpio_operations + kMaxOpsPerBlock - 1) / kMaxOpsPerBlock;
-    const int alloc_size =
-        control_blocks * sizeof(struct dma_cb)
-        + gpio_operations * sizeof(GPIOData);
+    const int alloc_size = (control_blocks * sizeof(struct dma_cb)
+                            + gpio_operations * sizeof(GPIOData));
     alloced_ = UncachedMemBlock_alloc(alloc_size);
-    gpio_ops_ = (struct GPIOData*) ((uint8_t*)alloced_.mem 
+    gpio_dma_ = (struct GPIOData*) ((uint8_t*)alloced_.mem 
                                     + control_blocks * sizeof(struct dma_cb));
 
     struct dma_cb* previous = NULL;
     struct dma_cb* cb = NULL;
-    struct GPIOData *start_gpio = gpio_ops_;
+    struct GPIOData *start_gpio = gpio_dma_;
     int remaining = gpio_operations;
     for (int i = 0; i < control_blocks; ++i) {
         cb = (struct dma_cb*) ((uint8_t*)alloced_.mem + i * sizeof(dma_cb));
@@ -139,12 +140,18 @@ void MultiSPI::FinishRegistration() {
     // First block in our chain.
     start_block_ = (struct dma_cb*) alloced_.mem;
 
+    // --- All the memory operations we do in cached memory as direct operations
+    // on the uncached memory (which is used by the DMA operation) is pretty
+    // slow - and we need multiple read/write operations.
+    gpio_shadow_ = (struct GPIOData*)calloc(gpio_operations, sizeof(GPIOData));
+    gpio_copy_size_ = gpio_operations * sizeof(GPIOData);
+
     // Now, we can already prepare every other element to set the CLK pin
     for (int i = 0; i < gpio_operations; ++i) {
         if (i % 2 == 0)
-            gpio_ops_[i].clr = (1<<clock_gpio_);
+            gpio_shadow_[i].clr = (1<<clock_gpio_);
         else
-            gpio_ops_[i].set = (1<<clock_gpio_);
+            gpio_shadow_[i].set = (1<<clock_gpio_);
     }
 
     // 4.2.1.2
@@ -154,7 +161,7 @@ void MultiSPI::FinishRegistration() {
 
 void MultiSPI::SetBufferedByte(int data_gpio, size_t pos, uint8_t data) {
     assert(pos < size_);
-    GPIOData *buffer_pos = gpio_ops_ + 2 * 8 * pos;
+    GPIOData *buffer_pos = gpio_shadow_ + 2 * 8 * pos;
     for (uint8_t bit = 0x80; bit; bit >>= 1, buffer_pos += 2) {
         if (data & bit) {   // set
             buffer_pos->set |= (1 << data_gpio);
@@ -167,6 +174,8 @@ void MultiSPI::SetBufferedByte(int data_gpio, size_t pos, uint8_t data) {
 }
 
 void MultiSPI::SendBuffers() {
+    memcpy(gpio_dma_, gpio_shadow_, gpio_copy_size_);
+
     dma_channel_->cs |= DMA_CS_END;
     dma_channel_->cblock = UncachedMemBlock_to_physical(&alloced_, start_block_);
     dma_channel_->cs = DMA_CS_PRIORITY(7) | DMA_CS_PANIC_PRIORITY(7) | DMA_CS_DISDEBUG;

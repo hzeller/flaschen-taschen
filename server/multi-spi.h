@@ -87,8 +87,11 @@ private:
     size_t size_;
 
     struct UncachedMemBlock alloced_;
-    GPIOData *gpio_ops_;
+    GPIOData *gpio_dma_;
     struct dma_cb* start_block_;
     struct dma_channel_header* dma_channel_;
+
+    GPIOData *gpio_shadow_;
+    size_t gpio_copy_size_;
 };
 #endif  // RPI_MULTI_SPI_H
