@@ -157,11 +157,11 @@ void MultiSPI::SetBufferedByte(int data_gpio, size_t pos, uint8_t data) {
     GPIOData *buffer_pos = gpio_ops_ + 2 * 8 * pos;
     for (uint8_t bit = 0x80; bit; bit >>= 1, buffer_pos += 2) {
         if (data & bit) {   // set
-            buffer_pos->set = (1 << data_gpio);
-            buffer_pos->clr = (1 << clock_gpio_);
+            buffer_pos->set |= (1 << data_gpio);
+            buffer_pos->clr &= ~(1 << data_gpio);
         } else {            // reset
-            buffer_pos->set = 0;
-            buffer_pos->clr = (1 << data_gpio)|(1 << clock_gpio_);
+            buffer_pos->set &= ~(1 << data_gpio);
+            buffer_pos->clr |= (1 << data_gpio);
         }
     }
 }
