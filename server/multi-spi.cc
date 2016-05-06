@@ -90,7 +90,7 @@ MultiSPI::MultiSPI(int clock_gpio)
 }
 
 MultiSPI::~MultiSPI() {
-    // clear.
+    UncachedMemBlock_free(&alloced_);
 }
 
 bool MultiSPI::RegisterDataGPIO(int gpio, size_t serial_byte_size) {
@@ -117,7 +117,7 @@ void MultiSPI::FinishRegistration() {
     struct dma_cb* cb = NULL;
     struct GPIOData *start_gpio = gpio_ops_;
     int remaining = gpio_operations;
-    for (int i = 0; remaining > 0;++i) {
+    for (int i = 0; i < control_blocks; ++i) {
         cb = (struct dma_cb*) ((uint8_t*)alloced_.mem + i * sizeof(dma_cb));
         if (previous) {
             previous->next = UncachedMemBlock_to_physical(&alloced_, cb);
