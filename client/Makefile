@@ -1,5 +1,6 @@
 CXXFLAGS=-Wall -O3 -I../common -I.
 LIB_OBJECTS=udp-flaschen-taschen.o bdf-font.o
+LIB_CXXFLAGS=$(CXXFLAGS) -fPIC
 
 LDFLAGS=-L. -lftclient
 
@@ -25,6 +26,9 @@ send-video: send-video.cc libftclient.a
 
 % : %.cc libftclient.a
 	$(CXX) $(CXXFLAGS) -o $@ $< $(LDFLAGS)
+
+%.o : %.cc
+	$(CXX) $(LIB_CXXFLAGS) -c -o $@ $<
 
 libftclient.a: $(LIB_OBJECTS)
 	ar rcs $@ $^
