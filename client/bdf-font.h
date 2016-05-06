@@ -66,6 +66,9 @@ int DrawText(FlaschenTaschen *c, const Font &font, int x, int y,
              const Color &color, const Color *background_color,
              const char *utf8_text);
 
+int RotDrawText(FlaschenTaschen *c, const Font &font, int y, int x,
+             const Color &color, const Color *background_color,
+             const char *utf8_text);
 }  // namespace ft
 
 #endif  // RPI_GRAPHICS_H

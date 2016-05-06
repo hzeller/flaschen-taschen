@@ -42,6 +42,7 @@ static int usage(const char *progname) {
             "\t-o              : Only run once, don't scroll forever.\n"
             "\t-c<RRGGBB>      : Text color as hex (default: FFFFFF)\n"
             "\t-b<RRGGBB>      : Background color as hex (default: 000000)\n"
+            "\t-r              : scroll text vertically (rotate)\n"
             );
 
     return 1;
@@ -55,6 +56,7 @@ int main(int argc, char *argv[]) {
     int off_z = 1;
     int scroll_delay_ms = 50;
     bool run_forever = true;
+    bool rot_vertical = false;
     const char *host = NULL;
 
     Color fg(0xff, 0xff, 0xff);
@@ -63,7 +65,7 @@ int main(int argc, char *argv[]) {
 
     ft::Font font;
     int opt;
-    while ((opt = getopt(argc, argv, "f:g:h:s:oc:b:l:")) != -1) {
+    while ((opt = getopt(argc, argv, "f:g:h:s:roc:b:l:")) != -1) {
         switch (opt) {
         case 'g':
             if (sscanf(optarg, "%dx%d%d%d%d", &width, &height, &off_x, &off_y, &off_z)
@@ -109,6 +111,9 @@ int main(int argc, char *argv[]) {
                 return usage(argv[0]);
             }
             bg.r = r; bg.g = g; bg.b = b;
+            break;
+        case 'r':
+            rot_vertical = true;
             break;
 
         default:
@@ -160,16 +165,26 @@ int main(int argc, char *argv[]) {
     const int y_pos = (height - font.height()) / 2 + font.baseline();
 
     // dry-run to determine total number of pixels.
-    const int total_len = DrawText(&display, font, 0, y_pos, fg, NULL, text);
+    const int total_len = RotDrawText(&display, font, 0, y_pos, fg, NULL, text);
 
     signal(SIGTERM, InterruptHandler);
     signal(SIGINT, InterruptHandler);
 
-    if (scroll_delay_ms > 0) {
+    if (scroll_delay_ms > 0 && rot_vertical == false) {
         do {
             display.Fill(bg);
             for (int s = 0; s < total_len + width && !interrupt_received; ++s) {
                 DrawText(&display, font, width - s, y_pos, fg, &bg, text);
+                display.Send();
+                usleep(scroll_delay_ms * 1000);
+            }
+        } while (run_forever && !interrupt_received);
+    }
+    else if (scroll_delay_ms > 0 && rot_vertical == true) {
+        do {
+            display.Fill(bg);
+            for (int s = 0; s < total_len + width && !interrupt_received; ++s) {
+                RotDrawText(&display, font, width - s, y_pos, fg, &bg, text);
                 display.Send();
                 usleep(scroll_delay_ms * 1000);
             }
