@@ -150,4 +150,16 @@ int DrawText(FlaschenTaschen *c, const Font &font,
     return x - start_x;
 }
 
+int RotDrawText(FlaschenTaschen *c, const Font &font,
+             int y, int x, const Color &color, const Color *background_color,
+             const char *utf8_text) {
+    const int start_y = y;
+    while (*utf8_text) {
+        const uint32_t cp = utf8_next_codepoint(utf8_text);
+        font.DrawGlyph(c, x, y, color, background_color, cp);
+	y += font.height() ;
+    }
+    return y - start_y;
+}
+
 }  // namespace ft
