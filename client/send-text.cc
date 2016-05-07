@@ -42,7 +42,7 @@ static int usage(const char *progname) {
             "\t-o              : Only run once, don't scroll forever.\n"
             "\t-c<RRGGBB>      : Text color as hex (default: FFFFFF)\n"
             "\t-b<RRGGBB>      : Background color as hex (default: 000000)\n"
-            "\t-r              : scroll text vertically (rotate)\n"
+            "\t-r              : Scroll text vertically (rotate)\n"
             );
 
     return 1;
