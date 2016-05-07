@@ -165,7 +165,12 @@ int main(int argc, char *argv[]) {
     const int y_pos = (height - font.height()) / 2 + font.baseline();
 
     // dry-run to determine total number of pixels.
-    const int total_len = RotDrawText(&display, font, 0, y_pos, fg, NULL, text);
+    const int total_len = DrawText(&display, font, 0, y_pos, fg, NULL, text);
+
+    // if rotated, center in in the available display space.
+    const int x_pos = (width - total_len) / 2 ;
+
+
 
     signal(SIGTERM, InterruptHandler);
     signal(SIGINT, InterruptHandler);
@@ -180,15 +185,23 @@ int main(int argc, char *argv[]) {
             }
         } while (run_forever && !interrupt_received);
     }
-    else if (scroll_delay_ms > 0 && rot_vertical == true) {
-        do {
-            display.Fill(bg);
-            for (int s = 0; s < total_len + width && !interrupt_received; ++s) {
-                RotDrawText(&display, font, width - s, y_pos, fg, &bg, text);
-                display.Send();
-                usleep(scroll_delay_ms * 1000);
-            }
-        } while (run_forever && !interrupt_received);
+    else if ( rot_vertical == true) { 
+    // rotation for vertical banner text
+        if (scroll_delay_ms > 0) { 
+           do {
+              display.Fill(bg);
+              for (int s = 0; s < total_len + width && !interrupt_received; ++s) {
+                  RotDrawText(&display, font, width - s, x_pos, fg, &bg, text);
+                  display.Send();
+                  usleep(scroll_delay_ms * 1000);
+           }
+          } while (run_forever && !interrupt_received);
+        }
+	else if (scroll_delay_ms == 0) {
+	    display.Fill(bg);
+	    RotDrawText(&display, font, width,x_pos,fg, &bg, text);
+	    display.Send();
+	}
     }
     else {
         // No scrolling, just show directly and once.
