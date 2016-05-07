@@ -56,8 +56,8 @@ static int usage(const char *progname) {
 }
 
 int main(int argc, char *argv[]) {
-    int display_width = 20;
-    int display_height = 20;
+    int display_width = 45;
+    int display_height = 35;
     int off_x = 0;
     int off_y = 0;
     int off_z = 0;
