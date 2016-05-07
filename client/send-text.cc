@@ -50,7 +50,7 @@ static int usage(const char *progname) {
 
 int main(int argc, char *argv[]) {
     int width = 45;
-    int height = -1;
+    int height = 35;
     int off_x = 0;
     int off_y = 0;
     int off_z = 1;
@@ -190,8 +190,8 @@ int main(int argc, char *argv[]) {
         if (scroll_delay_ms > 0) { 
            do {
               display.Fill(bg);
-              for (int s = 0; s < total_len + width && !interrupt_received; ++s) {
-                  RotDrawText(&display, font, width - s, x_pos, fg, &bg, text);
+              for (int s = 0; s < total_len + height && !interrupt_received; ++s) {
+                  RotDrawText(&display, font, height - s, y_pos, fg, &bg, text);
                   display.Send();
                   usleep(scroll_delay_ms * 1000);
            }
