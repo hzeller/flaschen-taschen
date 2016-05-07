@@ -168,7 +168,7 @@ int main(int argc, char *argv[]) {
     const int total_len = DrawText(&display, font, 0, y_pos, fg, NULL, text);
 
     // if rotated, center in in the available display space.
-    const int x_pos = (width - total_len) / 2 ;
+    const int x_pos = (width ) / 2 ;
 
 
 
@@ -199,7 +199,7 @@ int main(int argc, char *argv[]) {
         }
 	else if (scroll_delay_ms == 0) {
 	    display.Fill(bg);
-	    RotDrawText(&display, font, width,x_pos,fg, &bg, text);
+	    RotDrawText(&display, font, height + font.height() ,x_pos,fg, &bg, text);
 	    display.Send();
 	}
     }
