@@ -66,7 +66,12 @@ int DrawText(FlaschenTaschen *c, const Font &font, int x, int y,
              const Color &color, const Color *background_color,
              const char *utf8_text);
 
-int RotDrawText(FlaschenTaschen *c, const Font &font, int y, int x,
+// Draw text as above, but vertically, encoded in UTF-8, with given "font" at
+// "x","y" with "color".
+// "background_color" can be NULL for transparency.
+// The "y" position is the baseline of the font.
+// Returns font height to advance up on the screen.
+int VerticalDrawText(FlaschenTaschen *c, const Font &font, int x, int y,
              const Color &color, const Color *background_color,
              const char *utf8_text);
 }  // namespace ft
