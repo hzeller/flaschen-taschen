@@ -17,25 +17,15 @@ So we use milk crates (which is a thing) and put common, clear 12oz (355ml)
 bottles in (Mate, Corona,..) inside. Wrapped in aluminum foil, they
 make nice pixels.
 
-![](./img/ft-work-in-progress.jpg)
+![](./img/ft-completed.jpg)
 
 In [this video][7of9-video], you see the state close to completion.
 
-Final set-up will be 9 crates wide and 7 crates high for a total of 63 crates
-with 25 'pixels' each. 45x35 pixels or 1575 pixels total. All operated by
-a Raspberry Pi that provides a [network API][protocols] to update the display.
-
-Current stage: we have received all the LEDs, but are still in the process of aquiring bottles
-and crates. We are now starting to wire up the crates; if you want to help, check out
-[the documentation](./doc/wiring.md).
-<a href="doc/wiring.md"><img src="img/crate-descriptions.jpg" height="80px"></a>
-
-## Software
-
-There are various projects that create demos for F~T.
-Check out these repositories:
-
-  * https://github.com/cgorringe/ft-demos
+The set-up is 9 crates wide and 7 crates high for a total of
+63 [crates](./doc/wiring.md) with 25 'pixels' each (this is what fits in our
+MakerFaire booth). 45x35 pixels or 1575 pixels total.
+All operated by a Raspberry Pi that provides a [network API][protocols] to
+update the display.
 
 ## Tutorial: getting started
 
@@ -60,7 +50,19 @@ $ git submodule update --init
 
 in the `flaschen-taschen/` directory.
 
-#### 2. Compile and run local server
+#### 2. Compile and run local server showing content in a Terminal
+
+If you are not around Noisebridge to directly send images to the FlaschenTaschen
+installation, then you can start your own FlaschenTaschen server that displays
+the pixels as colored spaces in a terminal. Note, you need a fairly recent
+terminal that can display 24 Bit color (Konsole can do that for a while, more
+recent Gnome terminals as well. Also, newer xterms can do that as well. If you
+are on a Mac, the default terminal app won't work, you have to get an external
+app for that).
+
+<a href="server/#terminal"><img src="img/terminal-screenshot.png" width="200px"></a>
+
+
 In one terminal, go to the [server/](./server) directory, compile the
 terminal-based display and run it. Make sure to have it large enough to show
 all pixels:
@@ -107,7 +109,12 @@ dependencies), then run
 `./send-image -h localhost some-image.png` which reads images and
 sends them to the FlaschenTaschen display.
 
-<a href="server/#terminal"><img src="img/terminal-screenshot.png" width="200px"></a>
+## Related Software
+
+There are various projects that create demos for F~T. Collecting links here.
+Check out these repositories:
+
+  * https://github.com/cgorringe/ft-demos
 
 ## Connecting LED strips to the Pi
 
