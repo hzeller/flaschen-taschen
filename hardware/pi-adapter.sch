@@ -576,7 +576,7 @@ F 1 "CONN_01X03" H 3077 3046 50  0000 L CNN
 F 2 "Pin_Headers:Pin_Header_Straight_1x03" H 3000 3100 50  0001 C CNN
 F 3 "" H 3000 3100 50  0000 C CNN
 	1    3000 3100
-	1    0    0    -1  
+	1    0    0    1   
 $EndComp
 $Comp
 L GND #PWR020
