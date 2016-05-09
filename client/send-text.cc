@@ -28,7 +28,7 @@
 
 #define DEFAULT_WIDTH 45
 #define DEFAULT_HEIGHT 35
-#define WIDEST_GLYPH 'Z'
+#define WIDEST_GLYPH 'W'
 
 volatile bool interrupt_received = false;
 static void InterruptHandler(int signo) {
