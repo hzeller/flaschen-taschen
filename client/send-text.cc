@@ -26,6 +26,10 @@
 
 #include <string>
 
+#define DEFAULT_WIDTH 45
+#define DEFAULT_HEIGHT 35
+#define WIDEST_GLYPH 'Z'
+
 volatile bool interrupt_received = false;
 static void InterruptHandler(int signo) {
   interrupt_received = true;
@@ -127,12 +131,12 @@ int main(int argc, char *argv[]) {
     }
     // check height input and use default value if necessary
     if (height < 0) {
-        height = font.height();
+        height = vertical ? DEFAULT_HEIGHT : font.height();
     }
 
-    // check width input and use default font width of 'W' if necessary
+    // check width input and use default font width of WIDEST_GLYPH if necessary
     if (width < 0) {
-        width = font.CharacterWidth('W');
+        width = vertical ? font.CharacterWidth(WIDEST_GLYPH) : DEFAULT_WIDTH;
     }
 
     if (width < 1 || height < 1) {
@@ -168,7 +172,7 @@ int main(int argc, char *argv[]) {
 
     // Center in in the available display space.
     const int y_pos = (height - font.height()) / 2 + font.baseline();
-    const int x_pos = (width - font.CharacterWidth('W')) / 2 ;
+    const int x_pos = (width - font.CharacterWidth(WIDEST_GLYPH)) / 2 ;
 
     // dry-run to determine total number of pixels.
        const int total_height = DrawText(&display, font, 0, y_pos, fg, NULL, text);
