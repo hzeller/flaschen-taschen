@@ -157,7 +157,7 @@ int VerticalDrawText(FlaschenTaschen *c, const Font &font,
     while (*utf8_text) {
         const uint32_t cp = utf8_next_codepoint(utf8_text);
         font.DrawGlyph(c, x, y, color, background_color, cp);
-	y += font.height() ;
+        y += font.height() ;
     }
     return y - start_y;
 }
