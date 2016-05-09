@@ -216,7 +216,7 @@ int main(int argc, char *argv[]) {
         }
         else {
           display.Fill(bg);
-          VerticalDrawText(&display, font, x_pos, height + font.height() ,fg, &bg, text);
+          VerticalDrawText(&display, font, x_pos, -1 + font.height() ,fg, &bg, text);
           display.Send();
         }
     }
