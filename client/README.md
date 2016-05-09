@@ -64,9 +64,7 @@ Sample
 
 # Or, how about showing the time
 while : ; do sleep 1 ; ./send-text -f fonts/9x18.bdf -s0 `date +%H:%M` ; done
-
 ```
-
 
 Text has a default layer of 1, so it is hovering above the background image.
 If you don't want that, you can explicitly set it as last value in the geometry
