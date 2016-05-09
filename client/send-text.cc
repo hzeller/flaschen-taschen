@@ -120,17 +120,17 @@ int main(int argc, char *argv[]) {
             return usage(argv[0]);
         }
     }
-// check for valid initial conditions
+    // check for valid initial conditions
     if (font.height() < 0) {
         fprintf(stderr, "Need to provide a font.\n");
         return usage(argv[0]);
     }
-// check height input and use default value if necessary
+    // check height input and use default value if necessary
     if (height < 0) {
         height = font.height();
     }
 
-    // use dummy display with max known capabilitys of a flaschen taschen
+    // check width input and use default font width of 'W' if necessary
     if (width < 0) {
         width = font.CharacterWidth('W');
     }
