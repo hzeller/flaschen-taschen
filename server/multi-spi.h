@@ -16,6 +16,8 @@
 #define RPI_MULTI_SPI_H
 
 #include "ft-gpio.h"
+#include "rpi-dma.h"
+
 #include <stddef.h>
 
 // MultiSPI outputs multiple SPI streams in parallel on different GPIOs.
@@ -67,20 +69,29 @@ public:
     // Overlength transmission bytes are all zero.
     bool RegisterDataGPIO(int gpio, size_t serial_byte_size);
 
+    // This needs to be called after all RegisterDataGPIO have been called.
+    void FinishRegistration();
+
     // Set data byte for given gpio channel at given position in the
     // stream. "pos" needs to be in range [0 .. serial_bytes_per_stream)
     // Data is sent with next Send().
     void SetBufferedByte(int data_gpio, size_t pos, uint8_t data);
 
-    // Send data for all streams.
+    // Send data for all streams. Wait for completion.
     void SendBuffers();
     
 private:
-    void UpdateBufferSize(size_t new_size);
-
+    struct GPIOData;
     ft::GPIO gpio_;
     const int clock_gpio_;
     size_t size_;
-    uint32_t *gpio_data_;
+
+    struct UncachedMemBlock alloced_;
+    GPIOData *gpio_dma_;
+    struct dma_cb* start_block_;
+    struct dma_channel_header* dma_channel_;
+
+    GPIOData *gpio_shadow_;
+    size_t gpio_copy_size_;
 };
 #endif  // RPI_MULTI_SPI_H

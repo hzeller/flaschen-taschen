@@ -38,6 +38,7 @@ public:
     // Columns have been added right to left, or, if standing
     // behind the display: leftmost column first.
     void AddColumn(FlaschenTaschen *taschen);
+    void PostDaemonInit();
 
     int width() const { return width_; }
     int height() const { return height_; }

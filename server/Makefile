@@ -27,12 +27,12 @@ RGB_LIBRARY=$(RGB_LIBDIR)/lib$(RGB_LIBRARY_NAME).a
 RGB_LDFLAGS=-lrt -lm -lpthread
 
 INCLUDES=-I../common
-OBJECTS=ft-thread.o opc-server.o udp-server.o pixel-push-server.o composite-flaschen-taschen.o priority-flaschen-taschen-sender.o cie1931.o ppm-reader.o
+OBJECTS=ft-thread.o opc-server.o udp-server.o pixel-push-server.o composite-flaschen-taschen.o cie1931.o ppm-reader.o
 
 # Nested if/else are very awkward, so we just compare each possible outcome
 ifeq ($(FT_BACKEND), ft)
    DEFINES=-DFT_BACKEND=0
-   OBJECTS+=ws2801-flaschen-taschen.o lpd6803-flaschen-taschen.o ft-gpio.o multi-spi.o crate-mapping.o column-assembly.o
+   OBJECTS+=ws2801-flaschen-taschen.o lpd6803-flaschen-taschen.o ft-gpio.o multi-spi.o mailbox.o rpi-dma.o crate-mapping.o column-assembly.o
 endif
 
 ifeq ($(FT_BACKEND), rgb-matrix)
