@@ -175,8 +175,8 @@ int main(int argc, char *argv[]) {
     const int x_pos = (width - font.CharacterWidth(WIDEST_GLYPH)) / 2 ;
 
     // dry-run to determine total number of pixels.
-       const int total_height = DrawText(&display, font, 0, y_pos, fg, NULL, text);
-       const int total_width = strlen(text) * font.height();
+    const int total_height = DrawText(&display, font, 0, y_pos, fg, NULL, text);
+    const int total_width = strlen(text) * font.height();
 
     // if rotated, center in in the available display space.
 
