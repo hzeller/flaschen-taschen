@@ -19,6 +19,7 @@
 #include <grp.h>
 #include <pwd.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
@@ -73,6 +74,7 @@ static int usage(const char *progname) {
             "\t                      to be ready (e.g eth0. Empty string '' for no "
             "waiting).\n"
             "\t                      Default ''\n"
+            "\t--layer-timeout <sec>: Layer timeout: clearing after non-activity (Default: 15)\n"
             "\t-d                  : Become daemon\n"
             "\t--pixel-pusher      : Run PixelPusher protocol (default: false)\n"
             "\t--opc               : Run OpenPixelControl protocol (default: false)\n"
@@ -85,6 +87,7 @@ int main(int argc, char *argv[]) {
     std::string interface = "";
     int width = 45;
     int height = 35;
+    int layer_timeout = 15;
     bool as_daemon = false;
     bool run_opc = false;
     bool run_pixel_pusher = false;
@@ -92,12 +95,14 @@ int main(int argc, char *argv[]) {
     enum LongOptionsOnly {
         OPT_OPC_SERVER = 1000,
         OPT_PIXEL_PUSHER = 1001,
+        OPT_LAYER_TIMEOUT = 1002,
     };
 
     static struct option long_options[] = {
         { "interface",          required_argument, NULL, 'I'},
         { "dimension",          required_argument, NULL, 'D'},
         { "daemon",             no_argument,       NULL, 'd'},
+        { "layer-timeout",      required_argument, NULL,  OPT_LAYER_TIMEOUT },
         { "opc",                no_argument,       NULL,  OPT_OPC_SERVER },
         { "pixel-pusher",       no_argument,       NULL,  OPT_PIXEL_PUSHER },
         { 0,                    0,                 0,    0  },
@@ -118,6 +123,9 @@ int main(int argc, char *argv[]) {
         case 'I':
             interface = optarg;
             break;
+        case OPT_LAYER_TIMEOUT:
+            layer_timeout = atoi(optarg);
+            break;
         case OPT_OPC_SERVER:
             run_opc = true;
             break;
@@ -127,6 +135,10 @@ int main(int argc, char *argv[]) {
         default:
             return usage(argv[0]);
         }
+    }
+
+    if (layer_timeout < 1) {
+        layer_timeout = 1;
     }
 
 #if FT_BACKEND == 0
@@ -187,7 +199,7 @@ int main(int argc, char *argv[]) {
     // The display we expose to the user provides composite layering which can
     // be used by the UDP server.
     CompositeFlaschenTaschen layered_display(&display, 16);
-    layered_display.StartLayerGarbageCollection(&mutex, 45);
+    layered_display.StartLayerGarbageCollection(&mutex, layer_timeout);
 
     // Optional services as thread.
     if (run_opc) opc_server_run_thread(&layered_display, &mutex);
