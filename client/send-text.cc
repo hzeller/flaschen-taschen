@@ -175,7 +175,7 @@ int main(int argc, char *argv[]) {
     const int x_pos = (width - font.CharacterWidth(WIDEST_GLYPH)) / 2 ;
 
     // dry-run to determine total number of pixels.
-    const int total_height = DrawText(&display, font, 0, y_pos, fg, NULL, text);
+    const int total_height = VerticalDrawText(&display, font, 0, y_pos, fg, NULL, text);
     const int total_width = strlen(text) * font.height();
 
     // if rotated, center in in the available display space.
@@ -200,7 +200,7 @@ int main(int argc, char *argv[]) {
             do {
               display.Fill(bg);
               for (int s = 0; s < total_height + height && !interrupt_received; ++s) {
-                  VerticalDrawText(&display, font, x_pos, height - s, fg, &bg, text);
+                  VerticalDrawText(&display, font, x_pos, height + font.height() - s, fg, &bg, text);
                   display.Send();
                   usleep(scroll_delay_ms * 1000);
                }
