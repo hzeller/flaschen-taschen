@@ -114,7 +114,8 @@ sends them to the FlaschenTaschen display.
 There are various projects that create demos for F~T. Collecting links here.
 Check out these repositories:
 
-  * https://github.com/cgorringe/ft-demos
+  * https://github.com/cgorringe/ft-demos Demos such as [plasma](./img/ft-completed.jpg), lines, quilt, ...
+  * https://github.com/scottyallen/flaschenvnc VNC implementation: cast your screen to FlaschenTaschen ([like so](https://www.youtube.com/watch?v=s3pGp_Vf4Pk))
 
 ## Connecting LED strips to the Pi
 
