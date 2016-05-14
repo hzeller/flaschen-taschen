@@ -5,19 +5,26 @@
 // Henner Zeller <h.zeller@acm.org>
 //
 
-#include <stdio.h>
-#include <sys/time.h>
-#include <signal.h>
 #include <arpa/inet.h>
 #include <assert.h>
 #include <limits.h>
+#include <signal.h>
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/fcntl.h>
+#include <sys/time.h>
 #include <unistd.h>
 
 #include "udp-flaschen-taschen.h"
 #include "game-engine.h"
-#include "timer.h"
+#include "bdf-font.h"
+
+// Size of the display. 9 x 7 crates.
+#define DEFAULT_DISPLAY_WIDTH  (9 * 5)
+#define DEFAULT_DISPLAY_HEIGHT (7 * 5)
+
+#define FRAME_RATE 60
 
 // Share it with a .h?
 struct ClientOutput {
@@ -28,8 +35,19 @@ struct ClientOutput {
 
 volatile bool interrupt_received = false;
 static void InterruptHandler(int signo) {
-  interrupt_received = true;
+    interrupt_received = true;
 }
+
+// An InputController receives inputs somehow and updats the input
+// list.
+// should be able to update the InputList (tbd, for now we accept a vector
+// of 2 players each of them with an x,y (-1,1) "output")
+class InputController {
+public:
+    ~InputController() {}
+    virtual void UpdateInputList(Game::InputList *inputs_list,
+                                 uint64_t timeout_us) = 0;
+};
 
 // Limited to 2 players (easily extendible)
 class UDPInputServer : public InputController {
@@ -38,18 +56,20 @@ public:
     UDPInputServer(uint16_t port);
     ~UDPInputServer() { if (fd_ > 0) close(fd_); }
 
-    void UpdateInputList(InputList *inputs_list, uint64_t timeout_us);
-    void RegisterPlayers();
+    void UpdateInputList(Game::InputList *inputs_list, uint64_t timeout_us);
+    void RegisterPlayers(UDPFlaschenTaschen *display);
+
 private:
     UDPInputServer() {}
     uint16_t p1port_, p2port_; // Maybe struct and typedef?
-    unsigned char p1addr_[INET6_ADDRSTRLEN], p2addr_[INET6_ADDRSTRLEN];
+    char p1addr_[INET6_ADDRSTRLEN];
+    char p2addr_[INET6_ADDRSTRLEN];
     int fd_;
 };
 
 UDPInputServer::UDPInputServer(uint16_t port) {
     if ((fd_ = socket(PF_INET6, SOCK_DGRAM, IPPROTO_UDP)) < 0) {
-        perror("IPv6 enabled ? While reating listen socket");
+        perror("IPv6 in kernel enabled ? While creating listen socket.");
         exit(1);
     }
     int opt = 0;   // Unset IPv6-only, in case it is set. Best effort.
@@ -71,24 +91,35 @@ UDPInputServer::UDPInputServer(uint16_t port) {
     fprintf(stdout, "UDPInputServer started on port: %u\n", port);
 }
 
-void UDPInputServer::RegisterPlayers() {
+void UDPInputServer::RegisterPlayers(UDPFlaschenTaschen *display) {
+    ft::Font font;
+    font.LoadFont("fonts/5x5.bdf");  // TODO: don't hardcode.
+
     struct sockaddr_in6 client_address;
     unsigned int address_length;
     address_length = sizeof(struct sockaddr);
 
-    fprintf(stdout, "Waiting for first player...(Move something)\n");
+    const Color text_bg(0, 0, 50);
+    ft::DrawText(display, font, 0, 4, Color(255, 0, 0), &text_bg,
+                 "1. Player");
+    display->Send();
+
     recvfrom(fd_, NULL, 0,
-                0, (struct sockaddr *) &client_address,
-                &address_length);
+             0, (struct sockaddr *) &client_address,
+             &address_length);
     p1port_ = ntohs(client_address.sin6_port);
     inet_ntop(AF_INET6, &client_address, (char *)&p1addr_, INET6_ADDRSTRLEN);
     fprintf(stdout, "Registered p1: %s:%u\n", p1addr_, p1port_);
 
-    fprintf(stdout, "Waiting for second player...(Move something)\n");
+    ft::DrawText(display, font, 0, 4, Color(0, 255, 0), &text_bg,
+                 "1. OK    ");
+    ft::DrawText(display, font, 0, 14, Color(255, 0, 0), &text_bg,
+                 "2. Player");
+    display->Send();
     for (;;) {
         recvfrom(fd_, NULL, 0,
-                                0, (struct sockaddr *) &client_address,
-                                &address_length);
+                 0, (struct sockaddr *) &client_address,
+                 &address_length);
         p2port_ = ntohs(client_address.sin6_port);
         inet_ntop(AF_INET6, &client_address, (char *) &p2addr_, INET6_ADDRSTRLEN);
         if (p2port_ != p1port_) {
@@ -96,9 +127,12 @@ void UDPInputServer::RegisterPlayers() {
             break;
         }
     }
+    ft::DrawText(display, font, 0, 14, Color(0, 255, 0), &text_bg,
+                 "2. OK    ");
 }
 
-void UDPInputServer::UpdateInputList(InputList *inputs_list, uint64_t timeout_us) {
+void UDPInputServer::UpdateInputList(Game::InputList *inputs_list,
+                                     uint64_t timeout_us) {
     ClientOutput data_received;
     struct sockaddr_in6 client_address;
     unsigned int address_length;
@@ -131,14 +165,75 @@ void UDPInputServer::UpdateInputList(InputList *inputs_list, uint64_t timeout_us
     }
 }
 
-void RunGame(Game *game, int frame_rate, int remote_port) {
+static int usage(const char *progname) {
+    fprintf(stderr, "usage: %s [options]\n", progname);
+    fprintf(stderr, "Options:\n"
+            "\t-g <width>x<height>[+<off_x>+<off_y>[+<layer>]] : Output geometry. Default 45x35\n"
+            "\t-l <layer>      : Layer 0..15. Default 0 (note if also given in -g, then last counts)\n"
+            "\t-h <host>       : Flaschen-Taschen display hostname.\n"
+            "\t-r <port>       : remote operation: listen on port\n"
+            //"\t-b<RRGGBB>      : Background color as hex (default: 000000)\n"
+            );
+
+    return 1;
+}
+
+int RunGame(const int argc, char *argv[], Game *game) {
+    const char *hostname = NULL;   // Will use default if not set otherwise.
+    int width = DEFAULT_DISPLAY_WIDTH;
+    int height= DEFAULT_DISPLAY_HEIGHT;
+    int off_x = 0;
+    int off_y = 0;
+    int off_z = 0;
+    int remote_port = 4321;
+
+    if (argc < 2) {
+        fprintf(stderr, "Mandatory argument(s) missing\n");
+        return usage(argv[0]);
+    }
+
+    int opt;
+    while ((opt = getopt(argc, argv, "g:l:h:p:b:")) != -1) {
+        switch (opt) {
+        case 'g':
+            if (sscanf(optarg, "%dx%d%d%d%d", &width, &height, &off_x, &off_y, &off_z)
+                < 2) {
+                fprintf(stderr, "Invalid size spec '%s'", optarg);
+                return usage(argv[0]);
+            }
+            break;
+        case 'p':
+            remote_port = atoi(optarg);
+            if (remote_port < 1023 || remote_port > 65535) {
+                fprintf(stderr, "Invalid port '%s'\n", optarg);
+                return usage(argv[0]);
+            }
+            break;
+        case 'h':
+            hostname = strdup(optarg); // leaking. Ignore.
+            break;
+        case 'l':
+            if (sscanf(optarg, "%d", &off_z) != 1 || off_z < 0 || off_z >= 16) {
+                fprintf(stderr, "Invalid layer '%s'\n", optarg);
+                return usage(argv[0]);
+            }
+            break;
+        default:
+            return usage(argv[0]);
+        }
+    }
+
+    const int display_socket = OpenFlaschenTaschenSocket(hostname);
+    UDPFlaschenTaschen display(display_socket, width, height);
+    display.SetOffset(off_x, off_y, off_z);
+
     if (remote_port < 1023 || remote_port > 65535) {
         fprintf(stderr, "Invalid port specified\n");
         exit(1);
     }
 
     UDPInputServer inputs(remote_port);
-    inputs.RegisterPlayers();
+    inputs.RegisterPlayers(&display);
 
     signal(SIGTERM, InterruptHandler);
     signal(SIGINT, InterruptHandler);
@@ -148,14 +243,28 @@ void RunGame(Game *game, int frame_rate, int remote_port) {
     inputs_list.push_back(GameInput());
     inputs_list.push_back(GameInput());
 
-    fprintf(stdout, "Starting the game...\n");
-    Timer t;
-    // Start time
-    t.Start();
+    fprintf(stdout, "Start game.\n");
+
+    display.Clear();
+    display.Send();
+
+    game->SetCanvas(&display);
+
+    const uint64_t frame_interval = 1000000 / FRAME_RATE;
+    struct timeval tp;
+    gettimeofday(&tp, NULL);
+    const int64_t start_time = tp.tv_sec * 1000000 + tp.tv_usec;
+
     while (!interrupt_received) {
-        inputs.UpdateInputList(&inputs_list, 1e6 / (float) frame_rate);
-        game->UpdateFrame(t.GetElapsedInMicroseconds(), inputs_list);
-        // Start time, we need the time between already sent frames.
-        t.Start();
+        inputs.UpdateInputList(&inputs_list, frame_interval);
+        gettimeofday(&tp, NULL);
+        const int64_t now = tp.tv_sec * 1000000 + tp.tv_usec;
+        game->UpdateFrame(now - start_time, inputs_list);
     }
+
+    display.Clear();
+    display.Send();
+
+    fprintf(stderr, "Good bye.\n");
+    return 0;
 }

@@ -36,4 +36,4 @@ libftclient.a: $(LIB_OBJECTS)
 	ar rcs $@ $^
 
 clean:
-	rm -f send-text send-image send-video simple-example simple-animation pong-game pong-client $(LIB_OBJECTS) libftclient.a
+	rm -f send-text send-image send-video simple-example simple-animation pong-game game-client $(LIB_OBJECTS) libftclient.a

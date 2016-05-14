@@ -44,25 +44,3 @@ private:
     Actor p2_;
     int score[2];
 };
-
-//Handles start/stop and returns the number of milliseconds passed if no c++11 :(
-class Timer {
-public:
-    Timer() {}
-    ~Timer() {}
-    inline void start() {
-        gettimeofday(&tp_, NULL);
-        start_ = tp_.tv_sec * 1e6 + tp_.tv_usec;
-    }
-
-    inline float stop() {
-        gettimeofday(&tp_, NULL);
-        return (tp_.tv_sec * 1e6 + tp_.tv_usec - start_) / 1e3;
-    }
-
-    inline void clear() { start_ = 0; }
-
-private:
-    struct timeval tp_;
-    unsigned long int start_;
-};

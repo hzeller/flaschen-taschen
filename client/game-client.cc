@@ -1,5 +1,7 @@
 // -*- mode: c++; c-basic-offset: 4; indent-tabs-mode: nil; -*-
 //
+// Leonardo Romor <leonardo.romor@gmail.com>
+//
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation version 2.
@@ -22,16 +24,12 @@
 #include <string.h>
 #include <termios.h>
 
-#include "timer.h"
-
 #define JS_EVENT_BUTTON 0x01
 #define JS_EVENT_AXIS 0x02
 #define JS_EVENT_INIT 0x80
 
-#define VFACTOR -1e-3f // Speed factor, for now hardcoded, -1 to reverse axis dir,
-                       // it UpdatePosply rescale the maximum speed.
-#define YAXIS 1 // Joystick left Y axis
-#define XAXIS 0 // Joystick left X axis
+#define JS_YAXIS 1 // Joystick left Y axis
+#define JS_XAXIS 0 // Joystick left X axis
 
 #define KEYBOARD_STEP (SHRT_MAX - 1) / 8 // Range from -32767 .. +32767
 
@@ -108,18 +106,17 @@ void JoyStick::WaitEvent(ClientOutput *output, unsigned int us) {
     retval = select(fd_ + 1, &rfds, NULL, NULL, &tv);
     if (retval == -1)
         fprintf(stderr, "Error on select");
-    else if (retval) {
-        read(fd_, &event, sizeof(event));
+    else if (retval && read(fd_, &event, sizeof(event)) == sizeof(event)) {
         switch (event.type) {
         case JS_EVENT_BUTTON:
             break;
         case JS_EVENT_AXIS:
             // Horrible (split?)
             switch (event.number) {
-            case XAXIS:
+            case JS_XAXIS:
                 output->x_pos = event.value;
                 break;
-            case YAXIS:
+            case JS_YAXIS:
                 output->y_pos = event.value;
                 break;
             }
@@ -156,9 +153,11 @@ private:
 
 Keyboard::Keyboard() : ypos_(0) {
     // Keyboard mode
-    fprintf(stdout, "Game keys:\n"
-           "Left paddel:  'w' up; 'd' down\n"
-           "Quit with 'q'.\n");
+    fprintf(stdout, "Game keys: standard vi-keys on keyboard:\n"
+            "'H'=Left | 'J'=Down | 'K'=Up  | 'L'=Right\n"
+            "K     ^     K\n"
+            "H <-    ->  L\n"
+            "J     V     J\n");
     set_conio_terminal_mode();
 }
 
@@ -180,12 +179,14 @@ void Keyboard::WaitEvent(ClientOutput *output, unsigned int us) {
         fprintf(stderr, "Error on select\n");
     else if (retval && read(0, &command, sizeof(char)) == 1) {
         switch (command) {
-        case 'd': case 'D':
+        case 'd': case 'D': // Legacy
+        case 'j': case 'J': // vim binding.
             limit += KEYBOARD_STEP;
             if (limit > SHRT_MAX - 1) ypos_ = SHRT_MAX - 1;
             else ypos_ += KEYBOARD_STEP;
             break;
-        case 'w': case 'W':
+        case 'w': case 'W':  // Legacy
+        case 'k': case 'K':  // vim binding.
             limit -= KEYBOARD_STEP;
             if (limit < -SHRT_MAX + 1) ypos_ = -SHRT_MAX + 1;
             else ypos_ -= KEYBOARD_STEP;
