@@ -9,14 +9,16 @@ MAGICK_LDFLAGS=`GraphicsMagick++-config --ldflags --libs`
 
 FFMPEG_LDFLAGS=`pkg-config --cflags --libs  libavcodec libavformat libswscale libavutil`
 
-all : simple-example simple-animation send-text pong-game pong-client
+all : simple-example simple-animation send-text pong-game game-client
 
 simple-animation: simple-animation.cc
 simple-example: simple-example.cc
 send-text: send-text.cc
-pong-game: pong-game.cc
-pong-client: pong-client.cc
+game-client: game-client.cc
 burn-in: burn-in.cc
+
+pong-game: pong-game.cc game-engine.cc libftclient.a
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
 send-image : send-image.cc libftclient.a
 	$(CXX) $(CXXFLAGS) $(MAGICK_CXXFLAGS) -o $@ $< $(MAGICK_LDFLAGS) $(LDFLAGS)
@@ -34,4 +36,4 @@ libftclient.a: $(LIB_OBJECTS)
 	ar rcs $@ $^
 
 clean:
-	rm -f send-text send-image send-video simple-example simple-animation pong-game $(LIB_OBJECTS) libftclient.a
+	rm -f send-text send-image send-video simple-example simple-animation pong-game pong-client $(LIB_OBJECTS) libftclient.a
