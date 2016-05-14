@@ -19,13 +19,19 @@ make nice pixels.
 
 ![](./img/ft-completed.jpg)
 
-In [this video][7of9-video], you see the state close to completion.
+In [this video][7of9-video], you see the state close to completion. Or how about
+[Star Wars](https://www.youtube.com/watch?v=s3pGp_Vf4Pk) on the completed
+display ?
 
 The set-up is 9 crates wide and 7 crates high for a total of
-63 [crates](./doc/wiring.md) with 25 'pixels' each (this is what fits in our
-MakerFaire booth). 45x35 pixels or 1575 pixels total.
+63 [crates (see wiring here)](./doc/wiring.md) with 25 'pixels' each
+(this is what fits in our MakerFaire booth). 45x35 pixels or 1575 pixels total.
 All operated by a Raspberry Pi that provides a [network API][protocols] to
 update the display.
+
+This is how it looks from the back:
+
+<a href="img/crate-arrange.jpg"><img src="img/crate-arrange.jpg" width="300px"></a>
 
 ## Tutorial: getting started
 
