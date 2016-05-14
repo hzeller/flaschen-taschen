@@ -112,11 +112,13 @@ private:
 
 class Pong : public Game {
 public:
-    Pong(const ft::Font &font, const Color &bg);
+    Pong(const ft::Font &font);
     ~Pong() {}
 
-    virtual void SetCanvas(UDPFlaschenTaschen *canvas) {
+    virtual void SetCanvas(UDPFlaschenTaschen *canvas,
+                           const Color &background) {
         frame_buffer_ = canvas;
+        background_ = background;
         width_ = frame_buffer_->width();
         height_ = frame_buffer_->height();
 
@@ -148,7 +150,7 @@ private:
     int width_;
     int height_;
     const ft::Font &font_;
-    const Color background_;
+    Color background_;
 
     int64_t last_game_time_;
     int start_countdown_;   // Just started a game.
@@ -190,8 +192,8 @@ bool Actor::IsOverMe(float x, float y) {
             (y - pos[1]) >= 0 && (y - pos[1]) < height_);
 }
 
-Pong::Pong(const ft::Font &font, const Color &bg)
-    : width_(-1), height_(-1), font_(font), background_(bg),
+Pong::Pong(const ft::Font &font)
+    : width_(-1), height_(-1), font_(font),
       last_game_time_(0),
       start_countdown_(INITIAL_GAME_WAIT),
       edge_animation_(Color(255, 100, 0), 15, 5.0),
@@ -309,7 +311,6 @@ int main(int argc, char *argv[]) {
 
     srand(time(NULL));
 
-    Color bg(0, 0, 0);  // todo: get from flags.
-    Pong pong(font, bg);
+    Pong pong(font);
     return RunGame(argc, argv, &pong);
 }

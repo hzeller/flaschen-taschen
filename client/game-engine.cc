@@ -57,7 +57,8 @@ public:
     ~UDPInputServer() { if (fd_ > 0) close(fd_); }
 
     void UpdateInputList(Game::InputList *inputs_list, uint64_t timeout_us);
-    void RegisterPlayers(UDPFlaschenTaschen *display);
+    void RegisterPlayers(UDPFlaschenTaschen *display,
+                         const ft::Font &font);
 
 private:
     UDPInputServer() {}
@@ -91,15 +92,13 @@ UDPInputServer::UDPInputServer(uint16_t port) {
     fprintf(stdout, "UDPInputServer started on port: %u\n", port);
 }
 
-void UDPInputServer::RegisterPlayers(UDPFlaschenTaschen *display) {
-    ft::Font font;
-    font.LoadFont("fonts/5x5.bdf");  // TODO: don't hardcode.
-
+void UDPInputServer::RegisterPlayers(UDPFlaschenTaschen *display,
+                                     const ft::Font &font) {
     struct sockaddr_in6 client_address;
     unsigned int address_length;
     address_length = sizeof(struct sockaddr);
 
-    const Color text_bg(0, 0, 50);
+    const Color text_bg(0, 0, 1);
     ft::DrawText(display, font, 0, 4, Color(255, 0, 0), &text_bg,
                  "1. Player");
     display->Send();
@@ -171,8 +170,8 @@ static int usage(const char *progname) {
             "\t-g <width>x<height>[+<off_x>+<off_y>[+<layer>]] : Output geometry. Default 45x35\n"
             "\t-l <layer>      : Layer 0..15. Default 0 (note if also given in -g, then last counts)\n"
             "\t-h <host>       : Flaschen-Taschen display hostname.\n"
-            "\t-r <port>       : remote operation: listen on port\n"
-            //"\t-b<RRGGBB>      : Background color as hex (default: 000000)\n"
+            "\t-p <port>       : Game input port.\n"
+            "\t-b <RRGGBB>     : Background color as hex (default: 000000)\n"
             );
 
     return 1;
@@ -186,6 +185,7 @@ int RunGame(const int argc, char *argv[], Game *game) {
     int off_y = 0;
     int off_z = 0;
     int remote_port = 4321;
+    Color background(0, 0, 0);
 
     if (argc < 2) {
         fprintf(stderr, "Mandatory argument(s) missing\n");
@@ -218,22 +218,29 @@ int RunGame(const int argc, char *argv[], Game *game) {
                 return usage(argv[0]);
             }
             break;
+        case 'b': {
+            int r, g, b;
+            if (sscanf(optarg, "%02x%02x%02x", &r, &g, &b) != 3) {
+                fprintf(stderr, "Background color parse error\n");
+                return usage(argv[0]);
+            }
+            background.r = r; background.g = g; background.b = b;
+            break;
+        }
         default:
             return usage(argv[0]);
         }
     }
 
+    ft::Font font;
+    font.LoadFont("fonts/5x5.bdf");  // TODO: don't hardcode.
+
     const int display_socket = OpenFlaschenTaschenSocket(hostname);
     UDPFlaschenTaschen display(display_socket, width, height);
     display.SetOffset(off_x, off_y, off_z);
 
-    if (remote_port < 1023 || remote_port > 65535) {
-        fprintf(stderr, "Invalid port specified\n");
-        exit(1);
-    }
-
     UDPInputServer inputs(remote_port);
-    inputs.RegisterPlayers(&display);
+    inputs.RegisterPlayers(&display, font);
 
     signal(SIGTERM, InterruptHandler);
     signal(SIGINT, InterruptHandler);
@@ -243,12 +250,21 @@ int RunGame(const int argc, char *argv[], Game *game) {
     inputs_list.push_back(GameInput());
     inputs_list.push_back(GameInput());
 
+    Color black;
+    for (int countdown = 3; countdown > 0; countdown--) {
+        char buffer[10];
+        snprintf(buffer, sizeof(buffer), "%d%*s", countdown, 4-countdown, ">");
+        ft::DrawText(&display, font, 0, 24, Color(255, 255, 0), &black, buffer);
+        display.Send();
+        sleep(1);
+    }
+
     fprintf(stdout, "Start game.\n");
 
     display.Clear();
     display.Send();
 
-    game->SetCanvas(&display);
+    game->SetCanvas(&display, background);
 
     const uint64_t frame_interval = 1000000 / FRAME_RATE;
     struct timeval tp;

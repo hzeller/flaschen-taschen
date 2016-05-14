@@ -234,8 +234,8 @@ static int usage(const char *progname) {
     fprintf(stderr, "usage: %s [options]\n", progname);
     fprintf(stderr, "Options:\n"
             "\t-j <dev>        : Joypad device file\n"
-            "\t-h <host>       : Flaschen-Taschen display hostname.\n"
-            "\t-p <port>       : remote operation: listen on port\n"
+            "\t-h <host>       : Game hostname.\n"
+            "\t-p <port>       : Remote game port (default: 4321)\n"
             );
 
     return 1;

@@ -24,8 +24,12 @@ public:
 
     virtual ~Game() {}
 
-    // The canvas this game draws on.
-    virtual void SetCanvas(UDPFlaschenTaschen *canvas) = 0;
+    // The canvas this game draws on. This is set by RunGame() with a valid
+    // canvas (this is where you get your widht and height).
+    // The background color can be changed via a commandline option so the
+    // might be interested in using it.
+    virtual void SetCanvas(UDPFlaschenTaschen *canvas,
+                           const Color &background) = 0;
 
     // Call UpdateFrame() with game time (micro-seconds since beginning)
     // and current state of input. The UpdateFrame() method is called whenever
