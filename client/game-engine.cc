@@ -18,6 +18,7 @@
 
 #include "udp-flaschen-taschen.h"
 #include "game-engine.h"
+#include "game-engine-private.h"
 #include "bdf-font.h"
 
 // Size of the display. 9 x 7 crates.
@@ -25,13 +26,6 @@
 #define DEFAULT_DISPLAY_HEIGHT (7 * 5)
 
 #define FRAME_RATE 60
-
-// Share it with a .h?
-struct ClientOutput {
-    int16_t x_pos;  // Range -32767 .. +32767
-    int16_t y_pos;  // Range -32767 .. +32767
-    // buttons...
-};
 
 volatile bool interrupt_received = false;
 static void InterruptHandler(int signo) {
@@ -152,13 +146,18 @@ void UDPInputServer::UpdateInputList(Game::InputList *inputs_list,
         bytes_read = recvfrom(fd_, &data_received, sizeof(ClientOutput),
                               0, (struct sockaddr *) &client_address,
                               &address_length);
+        data_received.x_pos = ntohs(data_received.x_pos);
+        data_received.y_pos = ntohs(data_received.y_pos);
         if (bytes_read == sizeof(ClientOutput)) {
+            GameInput *target = NULL;
             if (ntohs(client_address.sin6_port) == p2port_) {
-                (*inputs_list)[1].x_pos = (int16_t) ntohs(data_received.x_pos) / (float) SHRT_MAX;
-                (*inputs_list)[1].y_pos = (int16_t) ntohs(data_received.y_pos) / (float) SHRT_MAX;
+                target = &(*inputs_list)[1];
             } else if (ntohs(client_address.sin6_port) == p1port_) {
-                (*inputs_list)[0].x_pos = (int16_t) ntohs(data_received.x_pos) / (float) SHRT_MAX;
-                (*inputs_list)[0].y_pos = (int16_t) ntohs(data_received.y_pos) / (float) SHRT_MAX;
+                target = &(*inputs_list)[0];
+            }
+            if (target) {
+                target->x_pos = data_received.x_pos / (float) SHRT_MAX;
+                target->y_pos = data_received.y_pos / (float) SHRT_MAX;
             }
         }
     }

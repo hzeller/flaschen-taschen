@@ -24,6 +24,8 @@
 #include <string.h>
 #include <termios.h>
 
+#include "game-engine-private.h"
+
 #define JS_EVENT_BUTTON 0x01
 #define JS_EVENT_AXIS 0x02
 #define JS_EVENT_INIT 0x80
@@ -32,12 +34,6 @@
 #define JS_XAXIS 0 // Joystick left X axis
 
 #define KEYBOARD_STEP (SHRT_MAX - 1) / 8 // Range from -32767 .. +32767
-
-struct ClientOutput {
-    int16_t x_pos;  // Range -32767 .. +32767
-    int16_t y_pos;  // Range -32767 .. +32767
-    // buttons...
-};
 
 int OpenClientSocket(const char *host, const char *port) {
     if (host == NULL || port == NULL) {
@@ -169,10 +165,11 @@ public:
     virtual EventResult WaitEvent(ClientOutput *output, int usec);
 
 private:
-    int16_t ypos_;
+    int xpos_;
+    int ypos_;
 };
 
-Keyboard::Keyboard() : ypos_(0) {
+Keyboard::Keyboard() : xpos_(0), ypos_(0) {
     // Keyboard mode
     fprintf(stdout, "Game keys: standard vi-keys on keyboard:\n"
             "'H'=Left | 'J'=Down | 'K'=Up  | 'L'=Right\n"
@@ -186,7 +183,6 @@ Keyboard::Keyboard() : ypos_(0) {
 Controller::EventResult Keyboard::WaitEvent(ClientOutput *output, int usec) {
     int fd = STDIN_FILENO;
     char command;
-    int32_t limit = ypos_;
     // Select stuff
     fd_set rfds;
     struct timeval tv;
@@ -207,18 +203,28 @@ Controller::EventResult Keyboard::WaitEvent(ClientOutput *output, int usec) {
             switch (command) {
             case 'd': case 'D': // Legacy
             case 'j': case 'J': // vim binding.
-                limit += KEYBOARD_STEP;
-                if (limit > SHRT_MAX - 1) ypos_ = SHRT_MAX - 1;
-                else ypos_ += KEYBOARD_STEP;
+                ypos_ += KEYBOARD_STEP;
+                if (ypos_ > SHRT_MAX - 1) ypos_ = SHRT_MAX - 1;
                 output->y_pos = ypos_;
                 return EV_UPDATED_POS;
 
             case 'w': case 'W':  // Legacy
             case 'k': case 'K':  // vim binding.
-                limit -= KEYBOARD_STEP;
-                if (limit < -SHRT_MAX + 1) ypos_ = -SHRT_MAX + 1;
-                else ypos_ -= KEYBOARD_STEP;
+                ypos_ -= KEYBOARD_STEP;
+                if (ypos_ < -SHRT_MAX + 1) ypos_ = -SHRT_MAX + 1;
                 output->y_pos = ypos_;
+                return EV_UPDATED_POS;
+
+            case 'l': case 'L':
+                xpos_ += KEYBOARD_STEP;
+                if (xpos_ > SHRT_MAX - 1) xpos_ = SHRT_MAX - 1;
+                output->x_pos = xpos_;
+                return EV_UPDATED_POS;
+
+            case 'h': case 'H':
+                xpos_ -= KEYBOARD_STEP;
+                if (xpos_ < -SHRT_MAX + 1) xpos_ = -SHRT_MAX + 1;
+                output->x_pos = xpos_;
                 return EV_UPDATED_POS;
 
             case 3:   // In raw mode, we receive Ctrl-C as raw byte.

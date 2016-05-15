@@ -13,7 +13,6 @@
 struct GameInput {
     float x_pos;  // Range -1 .. +1
     float y_pos;  // Range -1 .. +1
-    // buttons...
 };
 
 // A game needs to implement this interface. It is called regularly with
