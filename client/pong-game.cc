@@ -57,8 +57,8 @@ static const char * ball[PLAYER_ROWS] = {
 class Actor {
 public:
     Actor(const char *representation[],
-          const int width, const int height)
-        : repr_(representation), width_(width), height_(height) {}
+          const int width, const int height, const Color& color)
+        : repr_(representation), width_(width), height_(height), col_(color) {}
 
     float pos[2];
     float speed[2];
@@ -70,6 +70,7 @@ private:
     const char **repr_;
     const int width_;
     const int height_;
+    const Color col_;
 
     Actor(); // no default constructor.
 };
@@ -186,7 +187,7 @@ void Actor::print_on_buffer(FlaschenTaschen *frame_buffer) {
         const char *line = repr_[row];
         for (int x = 0; line[x]; ++x) {
             if (line[x] != ' ') {
-                frame_buffer->SetPixel(x + pos[0], row + pos[1],  Color(255,255,255));
+                frame_buffer->SetPixel(x + pos[0], row + pos[1],  col_);
             }
         }
     }
@@ -203,9 +204,9 @@ Pong::Pong(const ft::Font &font)
       start_countdown_(INITIAL_GAME_WAIT),
       edge_animation_(Color(255, 100, 0), 15, 5.0),
       new_ball_animation_(Color(0, 50, 0), 5, 3.0),
-      ball_(ball, BALL_COLUMN, BALL_ROWS),
-      p1_(player, PLAYER_COLUMN, PLAYER_ROWS),
-      p2_(player, PLAYER_COLUMN, PLAYER_ROWS) {
+      ball_(ball, BALL_COLUMN, BALL_ROWS, Color(255, 255, 0)),
+      p1_(player, PLAYER_COLUMN, PLAYER_ROWS, Color(255, 255, 255)),
+      p2_(player, PLAYER_COLUMN, PLAYER_ROWS, Color(255, 255, 255)) {
     bzero(score_, sizeof(score_));
 }
 
