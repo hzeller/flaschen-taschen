@@ -23,6 +23,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <termios.h>
+#include <signal.h>
 
 #include "game-engine-private.h"
 
@@ -34,6 +35,11 @@
 #define JS_XAXIS 0 // Joystick left X axis
 
 #define KEYBOARD_STEP (SHRT_MAX - 1) / 8 // Range from -32767 .. +32767
+
+volatile bool interrupt_received = false;
+static void InterruptHandler(int signo) {
+    interrupt_received = true;
+}
 
 int OpenClientSocket(const char *host, const char *port) {
     if (host == NULL || port == NULL) {
@@ -312,11 +318,15 @@ int main(int argc, char *argv[]) {
         }
     }
 
+    signal(SIGTERM, InterruptHandler);
+    signal(SIGINT, InterruptHandler);
+
     UDPGameClient client = UDPGameClient(hostname, remote_port);
     if (!control) control = new Keyboard();
     ClientOutput output;
     const int kTimeout = 1000000 / 2;  // Ping at least twice a second.
-    while (control->WaitEvent(&output, kTimeout) != Controller::EV_FINISHED) {
+    while (!interrupt_received
+           && control->WaitEvent(&output, kTimeout) != Controller::EV_FINISHED) {
         client.Send(output);
     }
 
