@@ -66,3 +66,11 @@ class Flaschen(object):
   def send(self):
     '''Send the updated pixels to the display.'''
     self._sock.send(self._data)
+
+  def fill(self, color):
+    for x in xrange(self.width):
+      for y in xrange(self.height):
+        self.set(x, y, color)
+
+  def clear(self):
+    self.fill((0, 0, 0))
