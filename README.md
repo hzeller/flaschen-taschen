@@ -43,18 +43,9 @@ Linux specifics removed).
 #### 1. Check out the project
 
 ```bash
-$ git clone --recursive https://github.com/hzeller/flaschen-taschen.git
+$ git clone https://github.com/hzeller/flaschen-taschen.git
 $ cd flaschen-taschen
 ```
-
-Make sure to use the `--recursive` flag, as there are sub-modules to check
-out. If you forgot that, type
-
-```
-$ git submodule update --init
-```
-
-in the `flaschen-taschen/` directory.
 
 #### 2. Compile and run local server showing content in a Terminal
 
