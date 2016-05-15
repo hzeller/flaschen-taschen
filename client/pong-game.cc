@@ -34,6 +34,7 @@
 #define BALL_SPEED 20
 
 #define MAXBOUNCEANGLE (M_PI * 2 / 12.0)
+#define MOMENTUM_RATIO 0.9
 
 #define FRAME_RATE 60
 #define INITIAL_GAME_WAIT (4 * FRAME_RATE)  // First start
@@ -143,7 +144,7 @@ public:
 private:
     // Evaluate t + 1 of the game, takes care of collisions with the players
     // and set the score in case of the ball goes in the border limit of the game.
-    void sim(const uint64_t dt);
+    void sim(const uint64_t dt, const InputList &inputs_list);
 
     // Simply project to pixels the pong world.
     void next_frame();
@@ -173,10 +174,7 @@ private:
 };
 
 void Pong::UpdateFrame(int64_t game_time_us, const InputList &inputs_list) {
-    p1_.pos[1] = (inputs_list[0].y_pos + 1) * (height_ - PLAYER_ROWS) / 2;
-    p2_.pos[1] = (inputs_list[1].y_pos + 1) * (height_ - PLAYER_ROWS) / 2;
-
-    sim(game_time_us - last_game_time_);
+    sim(game_time_us - last_game_time_, inputs_list);
     next_frame();
     last_game_time_ = game_time_us;
 }
@@ -221,7 +219,7 @@ void Pong::reset_ball() {
     ball_.speed[1] = direction * BALL_SPEED * sin(theta);
 }
 
-void Pong::sim(const uint64_t dt) {
+void Pong::sim(const uint64_t dt, const InputList &inputs_list) {
     float angle;
     float new_pos[2];
 
@@ -230,6 +228,18 @@ void Pong::sim(const uint64_t dt) {
         return;
     }
 
+    // New speed and position evaluation (PLAYERS)
+    p1_.speed[1] = -p1_.pos[1];
+    p1_.pos[1] = (inputs_list[0].y_pos + 1) * (height_ - PLAYER_ROWS) / 2;
+    p1_.speed[1] += p1_.pos[1];
+    p1_.speed[1] /= dt / 1e6;
+
+    p2_.speed[1] = -p2_.pos[1];
+    p2_.pos[1] = (inputs_list[1].y_pos + 1) * (height_ - PLAYER_ROWS) / 2;
+    p2_.speed[1] += p2_.pos[1];
+    p2_.speed[1] /= dt / 1e6;
+
+    // Let's check if we are in a collision event
     new_pos[0] = ball_.pos[0] + dt * ball_.speed[0] / 1e6;
     new_pos[1] = ball_.pos[1] + dt * ball_.speed[1] / 1e6;
 
@@ -240,11 +250,11 @@ void Pong::sim(const uint64_t dt) {
         // Evaluate the reflection angle that will be larger as we bounce farther from the paddle center
         angle = (p1_.pos[1] + PLAYER_ROWS/2 - new_pos[1]) * MAXBOUNCEANGLE / (PLAYER_ROWS / 2);
         ball_.speed[0] = BALL_SPEED * cos(angle);
-        ball_.speed[1] = BALL_SPEED * -1 * sin(angle);
+        ball_.speed[1] = BALL_SPEED * -1 * sin(angle) + MOMENTUM_RATIO * p1_.speed[1];
     } else if (p2_.IsOverMe(new_pos[0], new_pos[1])) {
         angle = (p2_.pos[1] + PLAYER_ROWS/2 - new_pos[1]) * MAXBOUNCEANGLE / (PLAYER_ROWS / 2);
         ball_.speed[0] = BALL_SPEED * -1 * cos(angle);
-        ball_.speed[1] = BALL_SPEED * -1 * sin(angle);
+        ball_.speed[1] = BALL_SPEED * -1 * sin(angle)  + MOMENTUM_RATIO * p1_.speed[1];
     }
 
     // Wall
