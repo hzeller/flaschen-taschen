@@ -41,6 +41,12 @@ static void InterruptHandler(int signo) {
     interrupt_received = true;
 }
 
+static uint64_t NowUsec() {
+    struct timeval tp;
+    gettimeofday(&tp, NULL);
+    return tp.tv_sec * 1000000LL + tp.tv_usec;
+}
+
 int OpenClientSocket(const char *host, const char *port) {
     if (host == NULL || port == NULL) {
         fprintf(stderr, "Error, no host or port specified\n");
@@ -102,6 +108,7 @@ JoyStick::JoyStick(const char *js) : fd_(open(js, O_RDONLY)) {
 }
 
 Controller::EventResult JoyStick::WaitEvent(ClientOutput *output, int usec) {
+    const int64_t kMaxEventSpeed = 1000000 / 80; // max 80Hz
     // Select stuff
     js_event event;
     fd_set rfds;
@@ -109,6 +116,8 @@ Controller::EventResult JoyStick::WaitEvent(ClientOutput *output, int usec) {
     int retval;
     tv.tv_sec = usec / 1000000;
     tv.tv_usec = usec % 1000000;
+    EventResult result = EV_TIMEOUT;
+    const int64_t start_time = NowUsec();
     while (tv.tv_sec > 0 || tv.tv_usec > 0) {
         // TODO: currently relying on Linux feature to update tv.
         FD_ZERO(&rfds);
@@ -120,6 +129,8 @@ Controller::EventResult JoyStick::WaitEvent(ClientOutput *output, int usec) {
             perror("Error on select");
             return EV_FINISHED;
         } else if (read(fd_, &event, sizeof(event)) == sizeof(event)) {
+            const int64_t event_time = NowUsec() - start_time;
+            const bool too_fast = event_time < kMaxEventSpeed;
             switch (event.type) {
             case JS_EVENT_BUTTON:
                 break;
@@ -129,13 +140,21 @@ Controller::EventResult JoyStick::WaitEvent(ClientOutput *output, int usec) {
                 case JS_XAXIS:
                     if (output->x_pos != event.value) {
                         output->x_pos = event.value;
-                        return EV_UPDATED_POS;
+                        result = EV_UPDATED_POS;
+                        if (!too_fast) return result;
+                        // So we got an event, but don't want to send these
+                        // too fast. If we got a result, but too quickly, we
+                        // wait until the time is up. There might be some other
+                        // event coming in that time.
+                        tv.tv_sec = 0; tv.tv_usec = kMaxEventSpeed - event_time;
                     }
                     break;
                 case JS_YAXIS:
                     if (output->y_pos != event.value) {
                         output->y_pos = event.value;
-                        return EV_UPDATED_POS;
+                        result = EV_UPDATED_POS;
+                        if (!too_fast) return result;
+                        tv.tv_sec = 0; tv.tv_usec = kMaxEventSpeed - event_time;
                     }
                     break;
                 }
@@ -144,7 +163,7 @@ Controller::EventResult JoyStick::WaitEvent(ClientOutput *output, int usec) {
             return EV_FINISHED;
         }
     }
-    return EV_TIMEOUT;
+    return result;
 }
 
 struct termios orig_termios;
