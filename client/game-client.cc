@@ -72,15 +72,21 @@ int OpenClientSocket(const char *host, const char *port) {
 
 class Controller {
 public:
+    enum EventResult {
+        EV_UPDATED_POS = 1, // updated position.
+        EV_TIMEOUT = 2,     // timeout
+        EV_FINISHED = 3,    // exit.
+    };
     virtual ~Controller() {}
-    virtual void WaitEvent(ClientOutput *output, unsigned int us = 1e6) = 0;
+    virtual EventResult WaitEvent(ClientOutput *output, int usec) = 0;
 };
 
 class JoyStick : public Controller {
 public:
     JoyStick(const char *js);
     ~JoyStick() { close(fd_); }
-    void WaitEvent(ClientOutput *output, unsigned int us = 1e6);
+    virtual EventResult WaitEvent(ClientOutput *output, int usec);
+
 private:
     const int fd_;
     JoyStick();
@@ -88,41 +94,55 @@ private:
 
 JoyStick::JoyStick(const char *js) : fd_(open(js, O_RDONLY)) {
     if (fd_ < 0) {
-        fprintf(stderr, "Error opening joystick");
+        perror("Error opening joystick");
         exit(1);
     }
 }
 
-void JoyStick::WaitEvent(ClientOutput *output, unsigned int us) {
+Controller::EventResult JoyStick::WaitEvent(ClientOutput *output, int usec) {
     // Select stuff
     js_event event;
     fd_set rfds;
     struct timeval tv;
     int retval;
-    FD_ZERO(&rfds);
-    FD_SET(this->fd_, &rfds);
-    tv.tv_sec = 0;
-    tv.tv_usec = us;
-    retval = select(fd_ + 1, &rfds, NULL, NULL, &tv);
-    if (retval == -1)
-        fprintf(stderr, "Error on select");
-    else if (retval && read(fd_, &event, sizeof(event)) == sizeof(event)) {
-        switch (event.type) {
-        case JS_EVENT_BUTTON:
-            break;
-        case JS_EVENT_AXIS:
-            // Horrible (split?)
-            switch (event.number) {
-            case JS_XAXIS:
-                output->x_pos = event.value;
+    tv.tv_sec = usec / 1000000;
+    tv.tv_usec = usec % 1000000;
+    while (tv.tv_sec > 0 || tv.tv_usec > 0) {
+        // TODO: currently relying on Linux feature to update tv.
+        FD_ZERO(&rfds);
+        FD_SET(this->fd_, &rfds);
+        retval = select(fd_ + 1, &rfds, NULL, NULL, &tv);
+        if (retval == 0) {
+            return EV_TIMEOUT;
+        } else if (retval == -1) {
+            perror("Error on select");
+            return EV_FINISHED;
+        } else if (read(fd_, &event, sizeof(event)) == sizeof(event)) {
+            switch (event.type) {
+            case JS_EVENT_BUTTON:
                 break;
-            case JS_YAXIS:
-                output->y_pos = event.value;
-                break;
+            case JS_EVENT_AXIS:
+                // Horrible (split?)
+                switch (event.number) {
+                case JS_XAXIS:
+                    if (output->x_pos != event.value) {
+                        output->x_pos = event.value;
+                        return EV_UPDATED_POS;
+                    }
+                    break;
+                case JS_YAXIS:
+                    if (output->y_pos != event.value) {
+                        output->y_pos = event.value;
+                        return EV_UPDATED_POS;
+                    }
+                    break;
+                }
             }
-            break;
+        } else {
+            return EV_FINISHED;
         }
     }
+    return EV_TIMEOUT;
 }
 
 struct termios orig_termios;
@@ -146,7 +166,8 @@ static void set_conio_terminal_mode() {
 class Keyboard : public Controller {
 public:
     Keyboard();
-    void WaitEvent(ClientOutput *output, unsigned int us = 1e6);
+    virtual EventResult WaitEvent(ClientOutput *output, int usec);
+
 private:
     int16_t ypos_;
 };
@@ -157,47 +178,57 @@ Keyboard::Keyboard() : ypos_(0) {
             "'H'=Left | 'J'=Down | 'K'=Up  | 'L'=Right\n"
             "K     ^     K\n"
             "H <-    ->  L\n"
-            "J     V     J\n");
+            "J     V     J\n"
+            "(q)uit\n");
     set_conio_terminal_mode();
 }
 
-void Keyboard::WaitEvent(ClientOutput *output, unsigned int us) {
-    int fd = 0;
+Controller::EventResult Keyboard::WaitEvent(ClientOutput *output, int usec) {
+    int fd = STDIN_FILENO;
     char command;
     int32_t limit = ypos_;
     // Select stuff
     fd_set rfds;
     struct timeval tv;
     int retval;
-    FD_ZERO(&rfds);
-    FD_SET(fd, &rfds);
-    tv.tv_sec = 0;
-    tv.tv_usec = us;
-    retval = select(fd + 1, &rfds, NULL, NULL, &tv);
+    tv.tv_sec = usec / 1000000;
+    tv.tv_usec = usec % 1000000;
 
-    if (retval < 0)
-        fprintf(stderr, "Error on select\n");
-    else if (retval && read(0, &command, sizeof(char)) == 1) {
-        switch (command) {
-        case 'd': case 'D': // Legacy
-        case 'j': case 'J': // vim binding.
-            limit += KEYBOARD_STEP;
-            if (limit > SHRT_MAX - 1) ypos_ = SHRT_MAX - 1;
-            else ypos_ += KEYBOARD_STEP;
-            break;
-        case 'w': case 'W':  // Legacy
-        case 'k': case 'K':  // vim binding.
-            limit -= KEYBOARD_STEP;
-            if (limit < -SHRT_MAX + 1) ypos_ = -SHRT_MAX + 1;
-            else ypos_ -= KEYBOARD_STEP;
-            break;
-        case 3:   // In raw mode, we receive Ctrl-C as raw byte.
-        case 'q':
-            reset_terminal_mode();
-            exit(0);
+    while (tv.tv_sec > 0 || tv.tv_usec > 0) {
+        FD_ZERO(&rfds);
+        FD_SET(fd, &rfds);
+        retval = select(fd + 1, &rfds, NULL, NULL, &tv);
+        if (retval == 0) {
+            return EV_TIMEOUT;
+        } else if (retval < 0) {
+            perror("Error on select\n");
+            return EV_FINISHED;
+        } else if (read(0, &command, sizeof(char)) == sizeof(char)) {
+            switch (command) {
+            case 'd': case 'D': // Legacy
+            case 'j': case 'J': // vim binding.
+                limit += KEYBOARD_STEP;
+                if (limit > SHRT_MAX - 1) ypos_ = SHRT_MAX - 1;
+                else ypos_ += KEYBOARD_STEP;
+                output->y_pos = ypos_;
+                return EV_UPDATED_POS;
+
+            case 'w': case 'W':  // Legacy
+            case 'k': case 'K':  // vim binding.
+                limit -= KEYBOARD_STEP;
+                if (limit < -SHRT_MAX + 1) ypos_ = -SHRT_MAX + 1;
+                else ypos_ -= KEYBOARD_STEP;
+                output->y_pos = ypos_;
+                return EV_UPDATED_POS;
+
+            case 3:   // In raw mode, we receive Ctrl-C as raw byte.
+            case 'q':
+                reset_terminal_mode();
+                return EV_FINISHED;
+            }
         }
     }
-    output->y_pos = ypos_;
+    return EV_TIMEOUT;
 }
 
 // For now just transmitter (we could add vibration if supported when a player lose or hits the ball)
@@ -268,7 +299,7 @@ int main(int argc, char *argv[]) {
             hostname = strdup(optarg);
             break;
         case 'j':
-            control = new JoyStick(strdup(optarg));
+            control = new JoyStick(optarg);
             break;
         default:
             return usage(argv[0]);
@@ -278,11 +309,11 @@ int main(int argc, char *argv[]) {
     UDPGameClient client = UDPGameClient(hostname, remote_port);
     if (!control) control = new Keyboard();
     ClientOutput output;
-    for (;;) {
-        control->WaitEvent(&output);
+    while (control->WaitEvent(&output, 1000000) != Controller::EV_FINISHED) {
         client.Send(output);
     }
 
     delete control;
+    fprintf(stderr, "Exiting.\n");
     return 0;
 }
