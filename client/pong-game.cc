@@ -269,29 +269,29 @@ void Pong::sim(const uint64_t dt, const InputList &inputs_list) {
     if (ball_.pos[0] < 0) {
         edge_animation_.StartNew(0, ball_.pos[1]);
         score_[0] += 1;
+        ball_.pos[0] = width_ / 2;
+        ball_.pos[1] = height_ / 2;
+        reset_ball();
+        start_countdown_ = NEW_GAME_WAIT;
         if(score_[0] == POINTS_TO_WIN) {
             score_[0] = 0;
             //start_countdown_ = NEW_MATCH_WAIT;
             // Fireworks?
-            return;
+            // return;
         }
+    } else if (ball_.pos[0] > width_ - 1) {
+        edge_animation_.StartNew(width_ - 1, ball_.pos[1]);
+        score_[1] += 1;
         ball_.pos[0] = width_ / 2;
         ball_.pos[1] = height_ / 2;
         reset_ball();
         start_countdown_ = NEW_GAME_WAIT;
-    } else if (ball_.pos[0] > width_ - 1) {
-        edge_animation_.StartNew(width_ - 1, ball_.pos[1]);
-        score_[1] += 1;
         if(score_[1] == POINTS_TO_WIN) {
             score_[1] = 0;
             //start_countdown_ = NEW_MATCH_WAIT;
             // Fireworks?
-            return;
+            // return;
         }
-        ball_.pos[0] = width_ / 2;
-        ball_.pos[1] = height_ / 2;
-        reset_ball();
-        start_countdown_ = NEW_GAME_WAIT;
     }
 }
 
