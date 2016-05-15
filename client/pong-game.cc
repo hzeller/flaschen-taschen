@@ -77,6 +77,7 @@ private:
 
 class PuffAnimation {
 public:
+    // Negative radius: reverse animation.
     PuffAnimation(const Color &color, int steps, float radius)
         : steps_(steps), radius_(radius),
           color_(color), countdown_(0) {}
@@ -93,7 +94,12 @@ public:
 
     void Animate() {
         if (countdown_ <= 0) return;
-        const float r = (countdown_ - steps_) * radius_ / steps_;
+        float r;
+        if (radius_ < 0) {
+            r = radius_ - (countdown_ - steps_) * -radius_ / steps_;
+        } else {
+            r = (countdown_ - steps_) * radius_ / steps_;
+        }
         // Simplified circle. Could be more efficient.
         for (float a = 0; a < M_PI / 2; a += M_PI / 7) {
             display_->SetPixel(x_ + cos(a) * r, y_ + sin(a) * r, color_);
@@ -203,7 +209,7 @@ Pong::Pong(const ft::Font &font)
       last_game_time_(0),
       start_countdown_(INITIAL_GAME_WAIT),
       edge_animation_(Color(255, 100, 0), 15, 5.0),
-      new_ball_animation_(Color(0, 50, 0), 5, 3.0),
+      new_ball_animation_(Color(100, 100, 0), 10, -5.0),
       ball_(ball, BALL_COLUMN, BALL_ROWS, Color(255, 255, 0)),
       p1_(player, PLAYER_COLUMN, PLAYER_ROWS, Color(255, 255, 255)),
       p2_(player, PLAYER_COLUMN, PLAYER_ROWS, Color(255, 255, 255)) {
