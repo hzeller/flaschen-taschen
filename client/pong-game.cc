@@ -223,10 +223,7 @@ void Pong::sim(const uint64_t dt, const InputList &inputs_list) {
     float angle;
     float new_pos[2];
 
-    if (start_countdown_ > 0) {
-        --start_countdown_;
-        return;
-    }
+    if (start_countdown_ > 0) --start_countdown_;
 
     // New speed and position evaluation (PLAYERS)
     p1_.speed[1] = -p1_.pos[1];
