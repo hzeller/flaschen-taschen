@@ -249,6 +249,9 @@ int RunGame(const int argc, char *argv[], Game *game) {
     const int kPlayers = 2;  // TODO: ask game how many players it wants.
 
     while (!interrupt_received) {
+        display.Clear();
+        display.Send();
+
         std::vector<GameInput> inputs_list;
         for (int i = 0; i < kPlayers; ++i) {
             inputs_list.push_back(GameInput());
@@ -295,10 +298,10 @@ int RunGame(const int argc, char *argv[], Game *game) {
             const int64_t now = tp.tv_sec * 1000000 + tp.tv_usec;
             game->UpdateFrame(now - start_time, inputs_list);
         }
-
-        display.Clear();
-        display.Send();
     }
+
+    display.Clear();
+    display.Send();
 
     fprintf(stderr, "Good bye.\n");
     return 0;
