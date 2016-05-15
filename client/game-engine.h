@@ -27,8 +27,13 @@ public:
     // canvas (this is where you get your widht and height).
     // The background color can be changed via a commandline option so the
     // might be interested in using it.
+    // This is called once in the beginning.
     virtual void SetCanvas(UDPFlaschenTaschen *canvas,
                            const Color &background) = 0;
+
+    // Start a new game. This is always called for a new game, possibly
+    // multiple times in the lifetime of this object.
+    virtual void Start() = 0;
 
     // Call UpdateFrame() with game time (micro-seconds since beginning)
     // and current state of input. The UpdateFrame() method is called whenever

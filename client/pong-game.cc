@@ -122,18 +122,23 @@ public:
         width_ = frame_buffer_->width();
         height_ = frame_buffer_->height();
 
+        edge_animation_.SetCanvas(canvas);
+        new_ball_animation_.SetCanvas(canvas);
+    }
+
+    virtual void Start() {
+        start_countdown_ = INITIAL_GAME_WAIT;
+        bzero(score_, sizeof(score_));
+        last_game_time_ = 0;
         reset_ball();  // center ball.
         p1_.pos[0] = 2;
         p1_.pos[1] = (height_ - PLAYER_ROWS) / 2;
 
         p2_.pos[0] = width_ - 3;
         p2_.pos[1] = (height_ - PLAYER_ROWS) / 2;
-
-        edge_animation_.SetCanvas(canvas);
-        new_ball_animation_.SetCanvas(canvas);
     }
 
-    void UpdateFrame(int64_t game_time_us, const InputList &inputs_list);
+    virtual void UpdateFrame(int64_t game_time_us, const InputList &inputs_list);
 
 private:
     // Evaluate t + 1 of the game, takes care of collisions with the players

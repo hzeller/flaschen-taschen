@@ -12,6 +12,8 @@
 
 // The message, serialized over the wire.
 struct ClientOutput {
+    ClientOutput() : x_pos(0), y_pos(0), button_bits(0) {}
+
     int16_t x_pos;  // Range -32767 .. +32767
     int16_t y_pos;  // Range -32767 .. +32767
 

@@ -270,7 +270,7 @@ void UDPGameClient::Send(ClientOutput output) {
 static int usage(const char *progname) {
     fprintf(stderr, "usage: %s [options]\n", progname);
     fprintf(stderr, "Options:\n"
-            "\t-j <dev>        : Joypad device file\n"
+            "\t-j <dev>        : Joypad device file (e.g. /dev/input/js0)\n"
             "\t-h <host>       : Game hostname.\n"
             "\t-p <port>       : Remote game port (default: 4321)\n"
             );
@@ -315,11 +315,17 @@ int main(int argc, char *argv[]) {
     UDPGameClient client = UDPGameClient(hostname, remote_port);
     if (!control) control = new Keyboard();
     ClientOutput output;
-    while (control->WaitEvent(&output, 1000000) != Controller::EV_FINISHED) {
+    const int kTimeout = 1000000 / 2;  // Ping at least twice a second.
+    while (control->WaitEvent(&output, kTimeout) != Controller::EV_FINISHED) {
         client.Send(output);
     }
 
     delete control;
     fprintf(stderr, "Exiting.\n");
+
+    // Make sure the exit message is not lost.
+    output.b.but_exit = 1;
+    for (int i = 0; i < 3; ++i) { client.Send(output); }
+
     return 0;
 }
