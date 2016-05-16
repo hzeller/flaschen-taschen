@@ -44,7 +44,7 @@ public:
 
     // Set pixel to the currently configured layer (see SetLayer()).
     virtual void SetPixel(int x, int y, const Color &col);
-    virtual void Send() { delegatee_->Send(); }
+    virtual void Send();
 
     // -- Layering features
 
@@ -71,7 +71,7 @@ private:
     const int width_;
     const int height_;
     int current_layer_;
-
+    bool any_visible_pixel_drawn_;
     Ticks current_time_;
 
     std::vector<ScreenBuffer*> screens_;

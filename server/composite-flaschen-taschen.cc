@@ -95,7 +95,7 @@ CompositeFlaschenTaschen::CompositeFlaschenTaschen(FlaschenTaschen *delegatee,
                                                    int layers)
     : delegatee_(delegatee),
       width_(delegatee->width()), height_(delegatee->height()),
-      current_layer_(0),
+      current_layer_(0), any_visible_pixel_drawn_(false),
       z_buffer_(new ZBuffer(width_, height_)),
       garbage_collect_(NULL) {
     assert(layers < 32);  // otherwise could getting slow.
@@ -120,10 +120,18 @@ void CompositeFlaschenTaschen::SetPixel(int x, int y, const Color &col) {
     SetPixelAtLayer(x, y, current_layer_, col);
 }
 
+void CompositeFlaschenTaschen::Send() {
+    // Don't send anything if we only had pixels in hidden layers.
+    if (any_visible_pixel_drawn_)
+        delegatee_->Send();
+    any_visible_pixel_drawn_ = false;
+}
+
 void CompositeFlaschenTaschen::SetPixelAtLayer(int x, int y, int layer,
                                                const Color &col) {
     screens_[layer]->At(x, y) = col;
     if (layer >= z_buffer_->At(x, y)) {
+        any_visible_pixel_drawn_ = true;
         if (col.is_black()) {
             // Transparent pixel. Find closest stacked below us that is not.
             for (/**/; layer > 0; --layer) {
