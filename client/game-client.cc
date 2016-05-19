@@ -15,6 +15,7 @@
 // along with this program.  If not, see <http://gnu.org/licenses/gpl-2.0.txt>
 
 #include <linux/joystick.h>
+
 #include <netdb.h>
 #include <stdio.h>
 #include <limits.h>

@@ -36,11 +36,14 @@
 #define MAXBOUNCEANGLE (M_PI * 2 / 12.0)
 #define MOMENTUM_RATIO 0.9
 
+#define POINTS_TO_WIN 10
+
 #define FRAME_RATE 60
 #define INITIAL_GAME_WAIT (4 * FRAME_RATE)  // First start
+#define LONGEST_GAME_PLAY (900 * FRAME_RATE)
 #define NEW_GAME_WAIT     (1 * FRAME_RATE)  // Time when a new game starts
 #define NEW_MATCH_WAIT    (3 * FRAME_RATE)  // Fireworks time
-#define POINTS_TO_WIN 21
+#define WIN_BLINK_TIME    (3 * FRAME_RATE)
 
 static const char * player[PLAYER_ROWS] = {
     "#",
@@ -138,6 +141,8 @@ public:
 
     virtual void Start() {
         start_countdown_ = INITIAL_GAME_WAIT;
+        finish_countdown_ = LONGEST_GAME_PLAY;
+        game_finished_ = false;
         bzero(score_, sizeof(score_));
         last_game_time_ = 0;
         reset_ball();  // center ball.
@@ -148,7 +153,7 @@ public:
         p2_.pos[1] = (height_ - PLAYER_ROWS) / 2;
     }
 
-    virtual void UpdateFrame(int64_t game_time_us, const InputList &inputs_list);
+    virtual bool UpdateFrame(int64_t game_time_us, const InputList &inputs_list);
 
 private:
     // Evaluate t + 1 of the game, takes care of collisions with the players
@@ -169,6 +174,8 @@ private:
 
     int64_t last_game_time_;
     int start_countdown_;   // Just started a game.
+    int finish_countdown_;
+    bool game_finished_;
 
     UDPFlaschenTaschen * frame_buffer_;
     PuffAnimation edge_animation_;
@@ -182,10 +189,12 @@ private:
     Pong(); // no default constructor.
 };
 
-void Pong::UpdateFrame(int64_t game_time_us, const InputList &inputs_list) {
+bool Pong::UpdateFrame(int64_t game_time_us, const InputList &inputs_list) {
     sim(game_time_us - last_game_time_, inputs_list);
     next_frame();
     last_game_time_ = game_time_us;
+
+    return finish_countdown_ != 0;
 }
 
 void Actor::print_on_buffer(FlaschenTaschen *frame_buffer) {
@@ -233,6 +242,7 @@ void Pong::sim(const uint64_t dt, const InputList &inputs_list) {
     float new_pos[2];
 
     if (start_countdown_ > 0) --start_countdown_;
+    if (finish_countdown_ > 0) --finish_countdown_;
 
     // New speed and position evaluation (PLAYERS)
     p1_.speed[1] = -p1_.pos[1];
@@ -267,7 +277,7 @@ void Pong::sim(const uint64_t dt, const InputList &inputs_list) {
     if ( new_pos[1] < 0 || new_pos[1] > height_ ) ball_.speed[1] *= -1;
 
     // Evaluate the new ball delta
-    if (!start_countdown_) {
+    if (!start_countdown_ && !game_finished_) {
         ball_.pos[0] += dt * ball_.speed[0] / 1e6;
         ball_.pos[1] += dt * ball_.speed[1] / 1e6;
     }
@@ -290,11 +300,11 @@ void Pong::sim(const uint64_t dt, const InputList &inputs_list) {
     }
 
     if (score_[0] == POINTS_TO_WIN || score_[1] == POINTS_TO_WIN) {
-        //start_countdown_ = NEW_MATCH_WAIT;
-        // Fireworks?
-        // ???
-        // profit.
-        // return;
+        if (!game_finished_) {
+            finish_countdown_ = WIN_BLINK_TIME;  // remaining time.
+            // TODO: fireworks.
+            game_finished_ = true;
+        }
     }
 }
 
@@ -332,6 +342,14 @@ void Pong::next_frame() {
     p1_.print_on_buffer(frame_buffer_);
     p2_.print_on_buffer(frame_buffer_);
 
+    if (game_finished_) {
+        const uint8_t col_val = finish_countdown_ % 16 * 16;
+        const Color wincol(col_val, col_val, 0);
+        ft::DrawText(frame_buffer_, font_,
+                     score_[0] == POINTS_TO_WIN ? 0 : 25, 14,
+                     wincol, NULL, "WIN!");
+    }
+
     // Push the frame
     frame_buffer_->Send();
 }
@@ -339,6 +357,8 @@ void Pong::next_frame() {
 int main(int argc, char *argv[]) {
     ft::Font font;
     font.LoadFont("fonts/5x5.bdf");  // TODO: don't hardcode.
+    ft::Font large_font;
+    large_font.LoadFont("fonts/9x18.bdf");  // TODO: don't hardcode.
 
     srand(time(NULL));
 

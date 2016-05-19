@@ -11,8 +11,10 @@
 #include <vector>
 
 struct GameInput {
+    GameInput() : x_pos(0), y_pos(0), some_button(false) {}
     float x_pos;  // Range -1 .. +1
     float y_pos;  // Range -1 .. +1
+    bool some_button;
 };
 
 // A game needs to implement this interface. It is called regularly with
@@ -39,7 +41,8 @@ public:
     // and current state of input. The UpdateFrame() method is called whenever
     // the input changes, or at least with the refresh rate (like 60/second).
     // Only when within this method, the canvas should be updated.
-    virtual void UpdateFrame(int64_t game_time_us,
+    // Returns 'true' while game is running ('false' = finish game)
+    virtual bool UpdateFrame(int64_t game_time_us,
                              const InputList &inputs_list) = 0;
 
 };

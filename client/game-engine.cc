@@ -5,6 +5,7 @@
 // Henner Zeller <h.zeller@acm.org>
 //
 
+#include <linux/joystick.h>
 #include <arpa/inet.h>
 #include <assert.h>
 #include <limits.h>
@@ -27,16 +28,171 @@
 
 #define FRAME_RATE 60
 
+#define JS_EVENT_BUTTON 0x01
+#define JS_EVENT_AXIS 0x02
+#define JS_EVENT_INIT 0x80
+
+#define JS_YAXIS 1 // Joystick left Y axis
+#define JS_XAXIS 0 // Joystick left X axis
+
 volatile bool interrupt_received = false;
 static void InterruptHandler(int signo) {
     interrupt_received = true;
 }
 
+static uint64_t NowUsec() {
+    struct timeval tp;
+    gettimeofday(&tp, NULL);
+    return tp.tv_sec * 1000000LL + tp.tv_usec;
+}
+
+class InputController {
+public:
+    // Init the UDP server and the Joystick logic
+    virtual ~InputController() {}
+
+    // Update input list. Returns true if all controllers are still connected.
+    virtual bool UpdateInputList(Game::InputList *inputs_list,
+                                 uint64_t timeout_us) = 0;
+    virtual int RegisterPlayers(UDPFlaschenTaschen *display,
+                                const ft::Font &font) = 0;
+};
+
+class JSInputController : public InputController {
+public:
+    JSInputController() {
+        // Hacky hardcoded.
+        fds_.push_back(open("/dev/input/js0", O_RDONLY));
+        fds_.push_back(open("/dev/input/js1", O_RDONLY));
+    }
+    ~JSInputController() {
+        close(fds_[0]);
+        close(fds_[1]);
+    }
+
+    virtual int RegisterPlayers(UDPFlaschenTaschen *display,
+                                const ft::Font &font) {
+        if (fds_[0] < 0 || fds_[1] < 0) {
+            // Ugh, somehting unplugged. Wait a little and signal
+            // the game engine that
+            fprintf(stderr, "Broken input file-descriptors (%d, %d)",
+                    fds_[0], fds_[1]);
+            sleep(1);
+            return 0;
+        }
+        bool both_expired = true;
+        const int kAgreeTime = 3 * 1000000;
+        std::vector<GameInput> inputs_list(2);
+        int64_t expires[2] = {0};
+        for (;;) {
+            if (!UpdateInputList(&inputs_list, kAgreeTime))
+                return 0;  // Uh problem.
+            const int64_t now = NowUsec();
+            for (size_t i = 0; i < inputs_list.size(); ++i) {
+                if (inputs_list[i].some_button) {
+                    expires[i] = now + kAgreeTime;
+                    inputs_list[i].some_button = false;
+                }
+            }
+            const Color tcolor(255, 255, 0);
+            const Color text_bg(0, 0, 1);
+            const bool one_ready = expires[0] > now || expires[1] > now;
+            if (one_ready) {
+                ft::DrawText(display, font, 0, 4, tcolor, &text_bg,
+                             expires[0] > now ? "< Ready  " : "< Press ");
+                ft::DrawText(display, font, 0, 14, tcolor, &text_bg,
+                             expires[1] > now ? "  Ready >" : " Press >");
+            } else {
+                display->Clear();
+            }
+            if (!both_expired)
+                display->Send();
+            both_expired = !one_ready;
+            // Both are within time frame.
+            if (expires[0] > now && expires[1] > now)
+                return 2;
+        }
+    }
+
+    virtual bool UpdateInputList(Game::InputList *inputs_list,
+                                 uint64_t timeout_us) {
+        const int64_t kMaxEventSpeed = 1000000 / 40; // max Hz
+        // Select stuff
+        js_event event;
+        fd_set rfds;
+        struct timeval tv;
+        int retval;
+        tv.tv_sec = timeout_us / 1000000;
+        tv.tv_usec = timeout_us % 1000000;
+        const int64_t start_time = NowUsec();
+
+        while (tv.tv_sec > 0 || tv.tv_usec > 0) {
+            FD_ZERO(&rfds);
+            int max_fd = -1;
+            for (size_t i = 0; i < fds_.size(); ++i) {
+                FD_SET(fds_[i], &rfds);
+                if (fds_[i] > max_fd) max_fd = fds_[i];
+            }
+            // TODO: currently relying on Linux feature to update tv.
+            retval = select(max_fd + 1, &rfds, NULL, NULL, &tv);
+            if (retval == 0) {
+                return true;
+            } else if (retval == -1) {
+                perror("Error on select");
+                return false;
+            }
+
+            for (size_t i = 0; i < fds_.size(); ++i) {
+                if (!FD_ISSET(fds_[i], &rfds))
+                    continue;
+                if (read(fds_[i], &event, sizeof(event)) == sizeof(event)) {
+                    const int64_t event_time = NowUsec() - start_time;
+                    const bool too_fast = event_time < kMaxEventSpeed;
+                    switch (event.type) {
+                    case JS_EVENT_BUTTON:
+                        (*inputs_list)[i].some_button = true;
+                        if (!too_fast) return true;
+                        tv.tv_sec = 0;
+                        tv.tv_usec = kMaxEventSpeed - event_time;
+                        break;
+                    case JS_EVENT_AXIS: {
+                        const float value = event.value / (float) SHRT_MAX;
+                        switch (event.number) {
+                        case JS_XAXIS:
+                            if ((*inputs_list)[i].x_pos != value) {
+                                (*inputs_list)[i].x_pos = value;
+                                if (!too_fast) return true;
+                                tv.tv_sec = 0;
+                                tv.tv_usec = kMaxEventSpeed - event_time;
+                            }
+                            break;
+                        case JS_YAXIS:
+                            if ((*inputs_list)[i].y_pos != value) {
+                                (*inputs_list)[i].y_pos = value;
+                                if (!too_fast) return true;
+                                tv.tv_sec = 0;
+                                tv.tv_usec = kMaxEventSpeed - event_time;
+                            }
+                            break;
+                        }                   
+                        break;
+                    }
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+private:
+    std::vector<int> fds_;
+};
+
 // An InputController receives inputs somehow and updats the input
 // list.
 // should be able to update the InputList (tbd, for now we accept a vector
 // of 2 players each of them with an x,y (-1,1) "output")
-class UDPInputController {
+class UDPInputController : public InputController {
 public:
     // Init the UDP server and the Joystick logic
     UDPInputController(uint16_t port);
@@ -259,21 +415,10 @@ int RunGame(const int argc, char *argv[], Game *game) {
 
         // TODO: the UDPInputController needs to maintain the input list.
         // TODO: it needs to get a number how many inputs it expects.
-        UDPInputController inputs(remote_port);
+        JSInputController inputs;
         if (inputs.RegisterPlayers(&display, font) != kPlayers) {
-            fprintf(stderr, "Couldn't get enough players.\n");
-            break;
-        }
-
-        Color black(0,0,0);
-        for (int countdown = 3; countdown > 0; countdown--) {
-            char buffer[10];
-            snprintf(buffer, sizeof(buffer), "%d%*s", countdown,
-                     4-countdown, ">");
-            ft::DrawText(&display, font, 0, 24, Color(255, 255, 0), &black,
-                         buffer);
-            display.Send();
-            sleep(1);
+            fprintf(stderr, "Couldn't get enough players\n");
+            continue;
         }
 
         fprintf(stdout, "Start game.\n");
@@ -284,9 +429,7 @@ int RunGame(const int argc, char *argv[], Game *game) {
         game->SetCanvas(&display, background);
 
         const uint64_t frame_interval = 1000000 / FRAME_RATE;
-        struct timeval tp;
-        gettimeofday(&tp, NULL);
-        const int64_t start_time = tp.tv_sec * 1000000 + tp.tv_usec;
+        const int64_t start_time = NowUsec();
 
         game->Start();
         while (!interrupt_received) {
@@ -294,9 +437,11 @@ int RunGame(const int argc, char *argv[], Game *game) {
                 fprintf(stdout, "Game finished.\n");
                 break;
             }
-            gettimeofday(&tp, NULL);
-            const int64_t now = tp.tv_sec * 1000000 + tp.tv_usec;
-            game->UpdateFrame(now - start_time, inputs_list);
+            const int64_t now = NowUsec();
+            if (!game->UpdateFrame(now - start_time, inputs_list)) {
+                fprintf(stderr, "Game done.\n");
+                break;  // game done.
+            }
         }
     }
 
