@@ -260,7 +260,7 @@ void Pong::sim(const uint64_t dt, const InputList &inputs_list) {
     } else if (p2_.IsOverMe(new_pos[0], new_pos[1])) {
         angle = (p2_.pos[1] + PLAYER_ROWS/2 - new_pos[1]) * MAXBOUNCEANGLE / (PLAYER_ROWS / 2);
         ball_.speed[0] = BALL_SPEED * -1 * cos(angle);
-        ball_.speed[1] = BALL_SPEED * -1 * sin(angle)  + MOMENTUM_RATIO * p1_.speed[1];
+        ball_.speed[1] = BALL_SPEED * -1 * sin(angle)  + MOMENTUM_RATIO * p2_.speed[1];
     }
 
     // Wall
