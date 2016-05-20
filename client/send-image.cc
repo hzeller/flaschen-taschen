@@ -123,7 +123,7 @@ static bool LoadImageAndScale(const char *filename,
 }
 
 void DisplayAnimation(const std::vector<Magick::Image> &image_sequence,
-                      float bright,
+                      float bright, time_t end_time,
                       const UDPFlaschenTaschen &display) {
     std::vector<PreprocessedFrame*> frames;
     // Convert to preprocessed frames.
@@ -133,6 +133,8 @@ void DisplayAnimation(const std::vector<Magick::Image> &image_sequence,
     }
 
     for (unsigned int i = 0; !interrupt_received; ++i) {
+        if (time(NULL) > end_time)
+            break;
         if (i == frames.size()) i = 0;
         PreprocessedFrame *frame = frames[i];
         frame->Send();  // Simple. just send it.
@@ -146,13 +148,13 @@ void DisplayAnimation(const std::vector<Magick::Image> &image_sequence,
 }
 
 void DisplayScrolling(const Magick::Image &img, int scroll_delay_ms,
-                      float brightness_factor,
+                      float brightness_factor, time_t end_time,
                       UDPFlaschenTaschen *display) {
     // Create a copy from which it is faster to extract relevant content.
     UDPFlaschenTaschen copy(-1, img.columns(), img.rows());
     CopyImage(img, brightness_factor, &copy);
 
-    while (!interrupt_received) {
+    while (!interrupt_received && time(NULL) <= end_time) {
         for (int start = 0; start < copy.width(); ++start) {
             if (interrupt_received) break;
             for (int y = 0; y < display->height(); ++y) {
@@ -175,6 +177,7 @@ static int usage(const char *progname) {
             "\t-h <host>       : Flaschen-Taschen display hostname.\n"
             "\t-s[<ms>]        : Scroll horizontally (optionally: delay ms; default 60).\n"
             "\t-b<brighness%%>  : Brightness percent (default 100)\n"
+            "\t-t<timeout>     : Only display for this long\n"
             "\t-C              : Just clear given area and exit.\n");
     return 1;
 }
@@ -192,9 +195,10 @@ int main(int argc, char *argv[]) {
     int scroll_delay_ms = 50;
     int brighness_percent = 100;
     const char *host = NULL;
-
+    int timeout = 1000000;
+    
     int opt;
-    while ((opt = getopt(argc, argv, "g:h:s::Cl:b:")) != -1) {
+    while ((opt = getopt(argc, argv, "g:h:s::Cl:b:t:")) != -1) {
         switch (opt) {
         case 'g':
             if (sscanf(optarg, "%dx%d%d%d%d", &width, &height, &off_x, &off_y, &off_z)
@@ -205,6 +209,9 @@ int main(int argc, char *argv[]) {
             break;
         case 'h':
             host = strdup(optarg); // leaking. Ignore.
+            break;
+        case 't':
+            timeout = atoi(optarg);
             break;
         case 'l':
             if (sscanf(optarg, "%d", &off_z) != 1 || off_z < 0 || off_z >= 16) {
@@ -282,14 +289,15 @@ int main(int argc, char *argv[]) {
     signal(SIGINT, InterruptHandler);
 
     const float bright = brighness_percent / 100.0f;
+    const time_t end_time = time(NULL) + timeout;
     if (do_scroll) {
-        DisplayScrolling(frames[0], scroll_delay_ms, bright, &display);
+        DisplayScrolling(frames[0], scroll_delay_ms, bright, end_time, &display);
     } else {
-        DisplayAnimation(frames, bright, display);
+        DisplayAnimation(frames, bright, end_time, display);
     }
 
     // Don't let leftovers cover up content.
-    if (interrupt_received && off_z > 0) {
+    if ((interrupt_received && off_z > 0) || time(NULL) >= timeout) {
         display.Clear();
         display.Send();
     }
