@@ -36,6 +36,7 @@
 
 #define MAXBOUNCEANGLE (M_PI * 2 / 12.0)
 #define MOMENTUM_RATIO 0.9
+#define MAX_EXTRA_SPEED 90
 
 #define POINTS_TO_WIN 10
 
@@ -73,7 +74,7 @@ public:
     float speed[2];
 
     void print_on_buffer(FlaschenTaschen * frame_buffer);
-    bool IsOverMe(float x, float y);
+    bool WithinHeightRange(float y) const;
 
     void SetMotionBlurColor(const Color &col) {
         motion_blur_color_ = col;
@@ -121,10 +122,12 @@ public:
         }
         // Simplified circle. Could be more efficient.
         for (float a = 0; a < M_PI / 2; a += M_PI / 7) {
-            display_->SetPixel(x_ + cos(a) * r, y_ + sin(a) * r, color_);
-            display_->SetPixel(x_ - cos(a) * r, y_ + sin(a) * r, color_);
-            display_->SetPixel(x_ - cos(a) * r, y_ - sin(a) * r, color_);
-            display_->SetPixel(x_ + cos(a) * r, y_ - sin(a) * r, color_);
+            const float c = cosf(a) * r;
+            const float s = sinf(a) * r;
+            display_->SetPixel(roundf(x_ + c), roundf(y_ + s), color_);
+            display_->SetPixel(roundf(x_ - c), roundf(y_ + s), color_);
+            display_->SetPixel(roundf(x_ - c), roundf(y_ - s), color_);
+            display_->SetPixel(roundf(x_ + c), roundf(y_ - s), color_);
         }
         --countdown_;
     }
@@ -230,9 +233,9 @@ void Actor::print_on_buffer(FlaschenTaschen *frame_buffer) {
     skip_blur_ = false;  // reset
 }
 
-bool Actor::IsOverMe(float x, float y) {
-    return ((x - pos[0]) >= 0 && (x - pos[0]) < width_ &&
-            (y - pos[1]) >= 0 && (y - pos[1]) < height_);
+bool Actor::WithinHeightRange(float y) const {
+    const float delta = roundf(y - pos[1]);
+    return (delta >= 0 && delta < height_);
 }
 
 Pong::Pong(const ft::Font &font)
@@ -261,8 +264,14 @@ void Pong::reset_ball() {
     ball_.speed[1] = direction * BALL_SPEED * sin(theta);
 }
 
+// Given x on a line between old_pos and new_pos, where was y crossing ?
+static float YCross(float old_pos[], float new_pos[], float at_x) {
+    if (new_pos[0] == old_pos[0]) return old_pos[1];
+    const float move_fraction = (at_x - old_pos[0]) / (new_pos[0] - old_pos[0]);
+    return (new_pos[1] - old_pos[1]) * move_fraction + old_pos[1];
+}
+
 void Pong::sim(const uint64_t dt, const InputList &inputs_list) {
-    float angle;
     float new_pos[2];
 
     if (start_countdown_ > 0) --start_countdown_;
@@ -283,22 +292,29 @@ void Pong::sim(const uint64_t dt, const InputList &inputs_list) {
     new_pos[0] = ball_.pos[0] + dt * ball_.speed[0] / 1e6;
     new_pos[1] = ball_.pos[1] + dt * ball_.speed[1] / 1e6;
 
-    // Check if bouncin on a player cursor, (careful, for low fps
-    // QUANTUM TUNNELING may arise.
-    // TODO: we should check if we are going through a paddle from one frame to the other)
-    if (p1_.IsOverMe(new_pos[0], new_pos[1])) {
-        // Evaluate the reflection angle that will be larger as we bounce farther from the paddle center
-        angle = (p1_.pos[1] + PLAYER_ROWS/2 - new_pos[1]) * MAXBOUNCEANGLE / (PLAYER_ROWS / 2);
-        ball_.speed[0] = BALL_SPEED * cos(angle);
-        ball_.speed[1] = BALL_SPEED * -1 * sin(angle) + MOMENTUM_RATIO * p1_.speed[1];
-    } else if (p2_.IsOverMe(new_pos[0], new_pos[1])) {
-        angle = (p2_.pos[1] + PLAYER_ROWS/2 - new_pos[1]) * MAXBOUNCEANGLE / (PLAYER_ROWS / 2);
-        ball_.speed[0] = BALL_SPEED * -1 * cos(angle);
-        ball_.speed[1] = BALL_SPEED * -1 * sin(angle)  + MOMENTUM_RATIO * p2_.speed[1];
-    }
+    // Skipping some unexpected angle
+    // Evaluate the reflection angle that will be larger as we bounce farther from the paddle center
+    //angle = (p1_.pos[1] + PLAYER_ROWS/2 - new_pos[1]) * MAXBOUNCEANGLE / (PLAYER_ROWS / 2);
 
-    // Wall
-    if ( new_pos[1] < 0 || new_pos[1] > height_ ) ball_.speed[1] *= -1;
+    // See if we hit a paddel.
+    if (new_pos[0] <= p1_.pos[0] &&
+        p1_.WithinHeightRange(YCross(ball_.pos, new_pos, p1_.pos[0]))) {
+        float extra_speed = MOMENTUM_RATIO * p1_.speed[1];
+        if (fabs(extra_speed) > MAX_EXTRA_SPEED)
+            extra_speed = p1_.speed[1] < 0 ? -MAX_EXTRA_SPEED : MAX_EXTRA_SPEED;
+        ball_.speed[0] = -ball_.speed[0];
+        ball_.speed[1] += extra_speed;
+    } else if (new_pos[0] >= p2_.pos[0] &&
+               p2_.WithinHeightRange(YCross(ball_.pos, new_pos, p2_.pos[0]))) {
+        float extra_speed = MOMENTUM_RATIO * p2_.speed[1];
+        if (fabs(extra_speed) > MAX_EXTRA_SPEED)
+            extra_speed = p2_.speed[1] < 0 ? -MAX_EXTRA_SPEED : MAX_EXTRA_SPEED;
+        ball_.speed[0] = -ball_.speed[0];
+        ball_.speed[1] += extra_speed;
+    } else if ( new_pos[1] < 0 || new_pos[1] > height_ ) {
+        // Wall
+        ball_.speed[1] *= -1;
+    }
 
     // Evaluate the new ball delta
     if (!start_countdown_ && !game_finished_) {
@@ -310,15 +326,11 @@ void Pong::sim(const uint64_t dt, const InputList &inputs_list) {
     if (ball_.pos[0] < 0) {
         edge_animation_.StartNew(0, ball_.pos[1]);
         score_[1] += 1;  // Opposing party gets the point.
-        ball_.pos[0] = width_ / 2;
-        ball_.pos[1] = height_ / 2;
         reset_ball();
         start_countdown_ = NEW_GAME_WAIT;
     } else if (ball_.pos[0] > width_ - 1) {
         edge_animation_.StartNew(width_ - 1, ball_.pos[1]);
         score_[0] += 1;  // Opposing party gets the point.
-        ball_.pos[0] = width_ / 2;
-        ball_.pos[1] = height_ / 2;
         reset_ball();
         start_countdown_ = NEW_GAME_WAIT;
     }
