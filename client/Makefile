@@ -1,5 +1,5 @@
 CXXFLAGS=-Wall -O3 -I../common -I.
-LIB_OBJECTS=udp-flaschen-taschen.o bdf-font.o
+LIB_OBJECTS=udp-flaschen-taschen.o bdf-font.o graphics.o
 LIB_CXXFLAGS=$(CXXFLAGS) -fPIC
 
 LDFLAGS=-L. -lftclient
