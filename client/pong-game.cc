@@ -24,6 +24,7 @@
 
 #include "udp-flaschen-taschen.h"
 #include "bdf-font.h"
+#include "graphics.h"
 #include "game-engine.h"
 
 #define PLAYER_ROWS 5
@@ -61,7 +62,12 @@ class Actor {
 public:
     Actor(const char *representation[],
           const int width, const int height, const Color& color)
-        : repr_(representation), width_(width), height_(height), col_(color) {}
+        : repr_(representation), width_(width), height_(height), col_(color),
+          skip_blur_(true) {
+        bzero(pos, sizeof(pos));
+        bzero(speed, sizeof(pos));
+        bzero(last_pos, sizeof(last_pos));
+    }
 
     float pos[2];
     float speed[2];
@@ -69,11 +75,21 @@ public:
     void print_on_buffer(FlaschenTaschen * frame_buffer);
     bool IsOverMe(float x, float y);
 
+    void SetMotionBlurColor(const Color &col) {
+        motion_blur_color_ = col;
+    }
+
+    void SetSkipNextMotionBlur() { skip_blur_ = true; }
+
 private:
     const char **repr_;
     const int width_;
     const int height_;
     const Color col_;
+    Color motion_blur_color_;
+    bool skip_blur_;
+
+    float last_pos[2];
 
     Actor(); // no default constructor.
 };
@@ -198,6 +214,10 @@ bool Pong::UpdateFrame(int64_t game_time_us, const InputList &inputs_list) {
 }
 
 void Actor::print_on_buffer(FlaschenTaschen *frame_buffer) {
+    if (!motion_blur_color_.is_black() && !skip_blur_) {
+        ft::DrawLine(frame_buffer, last_pos[0], last_pos[1],
+                     pos[0], pos[1], motion_blur_color_);
+    }
     for (int row = 0; row < height_; ++row) {
         const char *line = repr_[row];
         for (int x = 0; line[x]; ++x) {
@@ -206,6 +226,8 @@ void Actor::print_on_buffer(FlaschenTaschen *frame_buffer) {
             }
         }
     }
+    memcpy(last_pos, pos, sizeof(last_pos));
+    skip_blur_ = false;  // reset
 }
 
 bool Actor::IsOverMe(float x, float y) {
@@ -223,12 +245,14 @@ Pong::Pong(const ft::Font &font)
       p1_(player, PLAYER_COLUMN, PLAYER_ROWS, Color(255, 255, 255)),
       p2_(player, PLAYER_COLUMN, PLAYER_ROWS, Color(255, 255, 255)) {
     bzero(score_, sizeof(score_));
+    ball_.SetMotionBlurColor(Color(120, 120, 0));
 }
 
 void Pong::reset_ball() {
     ball_.pos[0] = width_/2;
     ball_.pos[1] = height_/2-1;
     new_ball_animation_.StartNew(ball_.pos[0], ball_.pos[1]);
+    ball_.SetSkipNextMotionBlur();
 
     // Generate random angle in the range of 1/4 tau
     const float theta = 2 * M_PI / 4 * (rand() % 100 - 50) / 100.0;
@@ -270,7 +294,7 @@ void Pong::sim(const uint64_t dt, const InputList &inputs_list) {
     } else if (p2_.IsOverMe(new_pos[0], new_pos[1])) {
         angle = (p2_.pos[1] + PLAYER_ROWS/2 - new_pos[1]) * MAXBOUNCEANGLE / (PLAYER_ROWS / 2);
         ball_.speed[0] = BALL_SPEED * -1 * cos(angle);
-        ball_.speed[1] = BALL_SPEED * -1 * sin(angle)  + MOMENTUM_RATIO * p1_.speed[1];
+        ball_.speed[1] = BALL_SPEED * -1 * sin(angle)  + MOMENTUM_RATIO * p2_.speed[1];
     }
 
     // Wall

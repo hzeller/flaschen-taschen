@@ -245,7 +245,8 @@ int UDPInputController::RegisterPlayers(UDPFlaschenTaschen *display,
                  "1. Player");
     display->Send();
 
-    if (recvfrom(fd_, NULL, 0,
+    char c;
+    if (recvfrom(fd_, &c, 1,
                  0, (struct sockaddr *) &client_address,
                  &address_length) < 0) {
         return 0;
@@ -263,7 +264,7 @@ int UDPInputController::RegisterPlayers(UDPFlaschenTaschen *display,
         if (interrupt_received) {
             return 0;
         }
-        if (recvfrom(fd_, NULL, 0,
+        if (recvfrom(fd_, &c, 1,
                      0, (struct sockaddr *) &client_address,
                      &address_length) < 0) {
             return 1;
