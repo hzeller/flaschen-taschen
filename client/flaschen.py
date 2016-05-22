@@ -43,7 +43,7 @@ class Flaschen(object):
       color: A 3 tuple of (r, g, b) color values, 0-255
       transparent: If true, black(0, 0, 0) will be transparent and show the layer below.
     '''
-    if x >= self.width or y >= self.height:
+    if x >= self.width or y >= self.height or x < 0 or y < 0:
       return
     if color == (0, 0, 0) and transparent:
       color = (1, 1, 1)
