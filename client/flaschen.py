@@ -56,5 +56,5 @@ class Flaschen(object):
       for x in xrange(0, self.width):
         data.append(''.join([chr(c) for c in self.pixels[x][y]]))
 
-    data = self._header() + ''.join(data) + "\n" + self._footer()
+    data = self._header + ''.join(data) + "\n" + self._footer
     self.sock.sendto(data, (self.host, self.port))
