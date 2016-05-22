@@ -45,7 +45,7 @@ class Flaschen(object):
     '''
     if x >= self.width or y >= self.height or x < 0 or y < 0:
       return
-    if color == (0, 0, 0) and transparent:
+    if color == (0, 0, 0) and not transparent:
       color = (1, 1, 1)
     self.pixels[x][y] = color
   
