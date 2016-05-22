@@ -18,13 +18,12 @@ class Flaschen(object):
   '''A Framebuffer display interface that sends a frame via UDP.'''
 
   def __init__(self, host, port, width, height, layer=0):
-    self.host = host
-    self.port = port
     self.width = width
     self.height = height
     self.layer = layer
     self.pixels = bytearray(width * height * 3)
     self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    self.sock.connect((host, port))
     self._header = ''.join(["P6\n",
                             "%d %d\n" % (self.width, self.height),
                             "255\n"])
@@ -54,4 +53,4 @@ class Flaschen(object):
   def send(self):
     '''Send the updated pixels to the display.'''
     data = self._header + self.pixels + "\n" + self._footer
-    self.sock.sendto(data, (self.host, self.port))
+    self.sock.send(data)
