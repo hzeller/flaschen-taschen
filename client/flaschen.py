@@ -27,16 +27,12 @@ class Flaschen(object):
     for x in xrange(width):
       self.pixels.append([(0, 0, 0) for y in xrange(height)])
     self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-
-  def _header(self):
-    return ''.join(["P6\n",
-                    "45 35\n",
-                    "255\n"])
-
-  def _footer(self):
-    return ''.join(["0\n",
-                    "0\n",
-                    "%d\n" % self.layer])
+    self._header = ''.join(["P6\n",
+                            "%d %d\n" % (self.width, self.height),
+                            "255\n"])
+    self._footer = ''.join(["0\n",
+                            "0\n",
+                            "%d\n" % self.layer])
 
   def set(self, x, y, color, transparent=False):
     '''Set the pixel at the given coordinates to the specified color.
