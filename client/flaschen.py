@@ -23,9 +23,7 @@ class Flaschen(object):
     self.width = width
     self.height = height
     self.layer = layer
-    self.pixels = []
-    for x in xrange(width):
-      self.pixels.append([(0, 0, 0) for y in xrange(height)])
+    self.pixels = bytearray(width * height * 3)
     self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     self._header = ''.join(["P6\n",
                             "%d %d\n" % (self.width, self.height),
@@ -47,14 +45,13 @@ class Flaschen(object):
       return
     if color == (0, 0, 0) and not transparent:
       color = (1, 1, 1)
-    self.pixels[x][y] = color
+
+    offset = (x + y * self.width) * 3
+    self.pixels[offset] = color[0]
+    self.pixels[offset + 1] = color[1]
+    self.pixels[offset + 2] = color[2]
   
   def send(self):
     '''Send the updated pixels to the display.'''
-    data = []
-    for y in xrange(0, self.height):
-      for x in xrange(0, self.width):
-        data.append(''.join([chr(c) for c in self.pixels[x][y]]))
-
-    data = self._header + ''.join(data) + "\n" + self._footer
+    data = self._header + self.pixels + "\n" + self._footer
     self.sock.sendto(data, (self.host, self.port))
