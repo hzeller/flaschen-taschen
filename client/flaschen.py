@@ -17,10 +17,21 @@ import socket
 class Flaschen(object):
   '''A Framebuffer display interface that sends a frame via UDP.'''
 
-  def __init__(self, host, port, width, height, layer=0):
+  def __init__(self, host, port, width, height, layer=0, transparent=False):
+    '''
+
+    Args:
+      host: The flaschen taschen server hostname or ip address.
+      port: The flaschen taschen server port number.
+      width: The width of the flaschen taschen display in pixels.
+      height: The height of the flaschen taschen display in pixels.
+      layer: The layer of the flaschen taschen display to write to.
+      transparent: If true, black(0, 0, 0) will be transparent and show the layer below.
+    '''
     self.width = width
     self.height = height
     self.layer = layer
+    self.transparent = transparent
     self.pixels = bytearray(width * height * 3)
     self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     self.sock.connect((host, port))
@@ -31,18 +42,17 @@ class Flaschen(object):
                             "0\n",
                             "%d\n" % self.layer])
 
-  def set(self, x, y, color, transparent=False):
+  def set(self, x, y, color):
     '''Set the pixel at the given coordinates to the specified color.
 
     Args:
       x: x offset of the pixel to set
       y: y offset of the piyel to set
       color: A 3 tuple of (r, g, b) color values, 0-255
-      transparent: If true, black(0, 0, 0) will be transparent and show the layer below.
     '''
     if x >= self.width or y >= self.height or x < 0 or y < 0:
       return
-    if color == (0, 0, 0) and not transparent:
+    if color == (0, 0, 0) and not self.transparent:
       color = (1, 1, 1)
 
     offset = (x + y * self.width) * 3
