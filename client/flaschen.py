@@ -52,8 +52,8 @@ class Flaschen(object):
   def send(self):
     '''Send the updated pixels to the display.'''
     data = []
-    for y in xrange(0, 35):
-      for x in xrange(0, 45):
+    for y in xrange(0, self.width):
+      for x in xrange(0, self.height):
         data.append(''.join([chr(c) for c in self.pixels[x][y]]))
 
     data = self._header() + ''.join(data) + "\n" + self._footer()
