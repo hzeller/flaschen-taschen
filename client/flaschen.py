@@ -32,17 +32,17 @@ class Flaschen(object):
     self.height = height
     self.layer = layer
     self.transparent = transparent
-    self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    self.sock.connect((host, port))
+    self._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    self._sock.connect((host, port))
     header = ''.join(["P6\n",
                       "%d %d\n" % (self.width, self.height),
                       "255\n"])
     footer = ''.join(["0\n",
                       "0\n",
                       "%d\n" % self.layer])
-    self.pixels = bytearray(width * height * 3 + len(header) + len(footer))
-    self.pixels[0:len(header)] = header
-    self.pixels[-1 * len(footer):] = footer
+    self._pixels = bytearray(width * height * 3 + len(header) + len(footer))
+    self._pixels[0:len(header)] = header
+    self._pixels[-1 * len(footer):] = footer
     self._header_len = len(header)
 
   def set(self, x, y, color):
@@ -59,10 +59,10 @@ class Flaschen(object):
       color = (1, 1, 1)
 
     offset = (x + y * self.width) * 3 + self._header_len
-    self.pixels[offset] = color[0]
-    self.pixels[offset + 1] = color[1]
-    self.pixels[offset + 2] = color[2]
+    self._pixels[offset] = color[0]
+    self._pixels[offset + 1] = color[1]
+    self._pixels[offset + 2] = color[2]
   
   def send(self):
     '''Send the updated pixels to the display.'''
-    self.sock.send(self.pixels)
+    self._sock.send(self._pixels)
