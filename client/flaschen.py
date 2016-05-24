@@ -32,15 +32,18 @@ class Flaschen(object):
     self.height = height
     self.layer = layer
     self.transparent = transparent
-    self.pixels = bytearray(width * height * 3)
     self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     self.sock.connect((host, port))
-    self._header = ''.join(["P6\n",
-                            "%d %d\n" % (self.width, self.height),
-                            "255\n"])
-    self._footer = ''.join(["0\n",
-                            "0\n",
-                            "%d\n" % self.layer])
+    header = ''.join(["P6\n",
+                      "%d %d\n" % (self.width, self.height),
+                      "255\n"])
+    footer = ''.join(["0\n",
+                      "0\n",
+                      "%d\n" % self.layer])
+    self.pixels = bytearray(width * height * 3 + len(header) + len(footer))
+    self.pixels[0:len(header)] = header
+    self.pixels[-1 * len(footer):] = footer
+    self._header_len = len(header)
 
   def set(self, x, y, color):
     '''Set the pixel at the given coordinates to the specified color.
@@ -55,12 +58,11 @@ class Flaschen(object):
     if color == (0, 0, 0) and not self.transparent:
       color = (1, 1, 1)
 
-    offset = (x + y * self.width) * 3
+    offset = (x + y * self.width) * 3 + self._header_len
     self.pixels[offset] = color[0]
     self.pixels[offset + 1] = color[1]
     self.pixels[offset + 2] = color[2]
   
   def send(self):
     '''Send the updated pixels to the display.'''
-    data = self._header + self.pixels + "\n" + self._footer
-    self.sock.send(data)
+    self.sock.send(self.pixels)
