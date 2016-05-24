@@ -40,9 +40,9 @@ class Flaschen(object):
     footer = ''.join(["0\n",
                       "0\n",
                       "%d\n" % self.layer])
-    self._pixels = bytearray(width * height * 3 + len(header) + len(footer))
-    self._pixels[0:len(header)] = header
-    self._pixels[-1 * len(footer):] = footer
+    self._data = bytearray(width * height * 3 + len(header) + len(footer))
+    self._data[0:len(header)] = header
+    self._data[-1 * len(footer):] = footer
     self._header_len = len(header)
 
   def set(self, x, y, color):
@@ -59,10 +59,10 @@ class Flaschen(object):
       color = (1, 1, 1)
 
     offset = (x + y * self.width) * 3 + self._header_len
-    self._pixels[offset] = color[0]
-    self._pixels[offset + 1] = color[1]
-    self._pixels[offset + 2] = color[2]
+    self._data[offset] = color[0]
+    self._data[offset + 1] = color[1]
+    self._data[offset + 2] = color[2]
   
   def send(self):
     '''Send the updated pixels to the display.'''
-    self._sock.send(self._pixels)
+    self._sock.send(self._data)
