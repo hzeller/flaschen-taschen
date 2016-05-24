@@ -8,3 +8,4 @@ send-image
 send-video
 simple-animation
 simple-example
+*.pyc
