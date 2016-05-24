@@ -143,8 +143,10 @@ private:
     const int height_;
     size_t initial_offset_;
     size_t pixel_offset_;
+    size_t fps_offset_;
     bool is_first_;
     std::string buffer_;
+    int64_t last_time_;
 };
 
 #endif // LED_FLASCHEN_TASCHEN_H_

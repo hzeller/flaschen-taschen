@@ -8,4 +8,6 @@ send-image
 send-video
 simple-animation
 simple-example
+pong-game
+game-client
 *.pyc

@@ -19,13 +19,19 @@ make nice pixels.
 
 ![](./img/ft-completed.jpg)
 
-In [this video][7of9-video], you see the state close to completion.
+In [this video][7of9-video], you see the state close to completion. Or how about
+[Star Wars](https://www.youtube.com/watch?v=s3pGp_Vf4Pk) on the completed
+display ?
 
 The set-up is 9 crates wide and 7 crates high for a total of
-63 [crates](./doc/wiring.md) with 25 'pixels' each (this is what fits in our
-MakerFaire booth). 45x35 pixels or 1575 pixels total.
+63 [crates (see wiring here)](./doc/wiring.md) with 25 'pixels' each
+(this is what fits in our MakerFaire booth). 45x35 pixels or 1575 pixels total.
 All operated by a Raspberry Pi that provides a [network API][protocols] to
 update the display.
+
+This is how it looks from the back:
+
+<a href="img/crate-arrange.jpg"><img src="img/crate-arrange.jpg" width="300px"></a>
 
 ## Tutorial: getting started
 
@@ -37,18 +43,9 @@ Linux specifics removed).
 #### 1. Check out the project
 
 ```bash
-$ git clone --recursive https://github.com/hzeller/flaschen-taschen.git
+$ git clone https://github.com/hzeller/flaschen-taschen.git
 $ cd flaschen-taschen
 ```
-
-Make sure to use the `--recursive` flag, as there are sub-modules to check
-out. If you forgot that, type
-
-```
-$ git submodule update --init
-```
-
-in the `flaschen-taschen/` directory.
 
 #### 2. Compile and run local server showing content in a Terminal
 
@@ -114,7 +111,8 @@ sends them to the FlaschenTaschen display.
 There are various projects that create demos for F~T. Collecting links here.
 Check out these repositories:
 
-  * https://github.com/cgorringe/ft-demos
+  * https://github.com/cgorringe/ft-demos Demos such as [plasma](./img/ft-completed.jpg), lines, quilt, ...
+  * https://github.com/scottyallen/flaschenvnc VNC implementation: cast your screen to FlaschenTaschen ([like so](https://www.youtube.com/watch?v=s3pGp_Vf4Pk))
 
 ## Connecting LED strips to the Pi
 

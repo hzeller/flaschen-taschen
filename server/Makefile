@@ -3,6 +3,10 @@
 # display without having it available. We support all the same network API
 # interface, so things can be tested independently.
 #
+# TL;DR: If you want the output to the terminal for local experiments, try
+#
+# make FT_TERMINAL=terminal
+#
 # FT_BACKEND can be one of the following
 # ft
 #    The implementation that talks to the real FlaschenTaschen LED strip
@@ -16,6 +20,8 @@
 # rgb-matrix
 #    Output things to a LED matrix
 #    (see https://github.com/hzeller/rpi-rgb-led-matrix )
+#    This requires the project to be checked out with submodules
+#    (git clone --recursive)
 #
 FT_BACKEND=ft
 
