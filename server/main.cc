@@ -31,8 +31,12 @@
 #include "composite-flaschen-taschen.h"
 #include "ft-thread.h"
 #include "led-flaschen-taschen.h"
-#include "multi-spi.h"
 #include "servers.h"
+
+#if FT_BACKEND == 0
+#  include "multi-spi.h"
+#  include "led-strip.h"
+#endif
 
 #define DROP_PRIV_USER "daemon"
 #define DROP_PRIV_GROUP "daemon"
@@ -141,21 +145,29 @@ int main(int argc, char *argv[]) {
     }
 
 #if FT_BACKEND == 0
-    MultiSPI spi;
-    ColumnAssembly display(&spi);
+    using spixels::MultiSPI;
+    using spixels::CreateWS2801Strip;
+    static const int kLedsPerCol = 7 * 25;
+    MultiSPI *const spi = spixels::CreateDMAMultiSPI();
+    ColumnAssembly display(spi);
+
+#define MAKE_COLUMN(port) new CrateColumnFlaschenTaschen(CreateWS2801Strip(spi, port, kLedsPerCol))
+
     // Looking from the back of the display: leftmost column first.
-    display.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P18, 7));
-    display.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P21, 7));
-    display.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P14, 7));
-    display.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P17, 7));
+    display.AddColumn(MAKE_COLUMN(MultiSPI::SPI_P8));
+    display.AddColumn(MAKE_COLUMN(MultiSPI::SPI_P7));
+    display.AddColumn(MAKE_COLUMN(MultiSPI::SPI_P6));
+    display.AddColumn(MAKE_COLUMN(MultiSPI::SPI_P5));
 
-    // Center column.
-    display.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P16, 7));
+    // Center column. Connected to front part
+    display.AddColumn(MAKE_COLUMN(MultiSPI::SPI_P13));
 
-    display.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P10, 7));
-    display.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P13, 7));
-    display.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P6, 7));
-    display.AddColumn(new WS2801FlaschenTaschen(&spi, MultiSPI::SPI_P9, 7));
+    // Rest: continue on the back part
+    display.AddColumn(MAKE_COLUMN(MultiSPI::SPI_P4));
+    display.AddColumn(MAKE_COLUMN(MultiSPI::SPI_P3));
+    display.AddColumn(MAKE_COLUMN(MultiSPI::SPI_P2));
+    display.AddColumn(MAKE_COLUMN(MultiSPI::SPI_P1));
+#undef MAKE_COLUMN
 #elif FT_BACKEND == 1
     RGBMatrixFlaschenTaschen display(0, 0, width, height);
 #elif FT_BACKEND == 2

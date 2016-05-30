@@ -25,6 +25,11 @@
 #
 FT_BACKEND=ft
 
+# Spixel related. It is checked out as as submodule in spixels/
+SPIXELS_INCDIR=spixels/include
+SPIXELS_LIBDIR=spixels/lib
+SPIXELS_LIBRARY=spixels/lib/libspixels.a
+
 # RGB matrix related. It is checked out as a submodule in rgb-matrix/
 RGB_INCDIR=rgb-matrix/include
 RGB_LIBDIR=rgb-matrix/lib
@@ -33,12 +38,14 @@ RGB_LIBRARY=$(RGB_LIBDIR)/lib$(RGB_LIBRARY_NAME).a
 RGB_LDFLAGS=-lrt -lm -lpthread
 
 INCLUDES=-I../common
-OBJECTS=ft-thread.o opc-server.o udp-server.o pixel-push-server.o composite-flaschen-taschen.o cie1931.o ppm-reader.o
+OBJECTS=ft-thread.o opc-server.o udp-server.o pixel-push-server.o composite-flaschen-taschen.o ppm-reader.o
 
 # Nested if/else are very awkward, so we just compare each possible outcome
 ifeq ($(FT_BACKEND), ft)
    DEFINES=-DFT_BACKEND=0
-   OBJECTS+=ws2801-flaschen-taschen.o lpd6803-flaschen-taschen.o ft-gpio.o multi-spi.o mailbox.o rpi-dma.o crate-mapping.o column-assembly.o
+   OBJECTS+=crate-column-flaschen-taschen.o crate-mapping.o column-assembly.o
+   INCLUDES+=-I$(SPIXELS_INCDIR)
+   STATIC_LIBS+=$(SPIXELS_LIBRARY)
 endif
 
 ifeq ($(FT_BACKEND), rgb-matrix)
@@ -63,17 +70,20 @@ all : ft-server
 ft-server: main.o $(OBJECTS) $(STATIC_LIBS)
 	$(CXX) -o $@ $^ $(LDFLAGS)
 
-%.o : %.cc compiler-flags
+%.o : %.cc .compiler-flags
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-%.o : %.c compiler-flags
+%.o : %.c .compiler-flags
 	$(CC) $(CXXFLAGS) -c -o $@ $<
 
 $(RGB_LIBRARY):
 	$(MAKE) -C $(RGB_LIBDIR)
 
+$(SPIXELS_LIBRARY):
+	$(MAKE) -C $(SPIXELS_LIBDIR)
+
 # Make sure to re-compile when the compiler flags change.
-compiler-flags: FORCE
+.compiler-flags: FORCE
 	@echo '$(CXXFLAGS)$(OBJECTS)' | cmp -s - $@ || echo '$(CXXFLAGS)$(OBJECTS)' > $@
 
 .PHONY: FORCE

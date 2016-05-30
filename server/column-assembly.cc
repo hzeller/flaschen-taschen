@@ -17,7 +17,7 @@
 #include <unistd.h>
 #include "multi-spi.h"
 
-ColumnAssembly::ColumnAssembly(MultiSPI *spi)
+ColumnAssembly::ColumnAssembly(spixels::MultiSPI *spi)
     : spi_(spi), width_(0), height_(0)  {}
 
 ColumnAssembly::~ColumnAssembly() {
@@ -42,14 +42,9 @@ void ColumnAssembly::SetPixel(int x, int y, const Color &col) {
     column->SetPixel(4 - x % 5, height() - y - 1, col);
 }
 
-void ColumnAssembly::PostDaemonInit() {
-    spi_->FinishRegistration();
-}
+void ColumnAssembly::PostDaemonInit() {}
 
 void ColumnAssembly::Send() {
-    for (size_t i = 0; i < columns_.size(); ++i) {
-        columns_[i]->Send();
-    }
     spi_->SendBuffers();
-    usleep(200);  // WS2801 triggers on 50usec no data.
+    usleep(50);  // WS2801 triggers on 50usec no data.
 }

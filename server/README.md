@@ -12,6 +12,9 @@ For the actual Flaschen Taschen display, simply build with
   make
 ```
 
+(Note, this needs the http://spixels.org library, which is included as git
+sub-module. So you have to `git clone --recursive` the flaschen-taschen repo).
+
 These are the options
 
 ```

@@ -1,7 +1,7 @@
 *.o
 *.a
 *~
-compiler-flags
+.compiler-flags
 ft-server
 send-text
 send-image

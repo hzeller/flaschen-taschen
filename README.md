@@ -7,8 +7,8 @@ Noisebridge Flaschen Taschen Project
 Software and Raspberry Pi interface hardware for [FlaschenTaschen].
 
 FlaschenTaschen is inspired by projects such as the [Muro de botellas]
-or [MateLight]. A bunch of us have seen Mate Light in action at [32c3] and got
-excited :)
+or [MateLight]. A bunch of Noisebridgers have seen Mate Light in action
+at [32c3] and got excited :)
 So our Noisebridge interpretation of it has a German influenced name.
 
 Unfortunately, in the US, bottle reuse is not at all a thing, so there
@@ -43,7 +43,7 @@ Linux specifics removed).
 #### 1. Check out the project
 
 ```bash
-$ git clone https://github.com/hzeller/flaschen-taschen.git
+$ git clone --recursive https://github.com/hzeller/flaschen-taschen.git
 $ cd flaschen-taschen
 ```
 
@@ -117,10 +117,11 @@ Check out these repositories:
 ## Connecting LED strips to the Pi
 
 LED strips are controlled by a Raspberry Pi, connected via
-a [custom level shifter](./hardware) for up to 16 strips (of which we only
-use 9 for our installation right now):
+a [custom level shifter](./server/spixels/hardware) (provided in the separate
+[spixels] library) for up to 16 strips (of which we only use 9 for our
+installation right now):
 
-<a href="hardware/"><img src="img/pi-adapter-pcb.png" width="200px"></a>
+<a href="server/spixels/hardware/"><img src="img/pi-adapter-pcb.png" width="200px"></a>
 
 [FlaschenTaschen]: https://noisebridge.net/wiki/Flaschen_Taschen
 [Muro de botellas]: http://www.zuloark.com/muro-de-botellas/
@@ -131,3 +132,4 @@ use 9 for our installation right now):
 [netpbm]: http://netpbm.sourceforge.net/
 [2025-video]: https://www.youtube.com/watch?v=hs8FoROzE4M
 [7of9-video]: https://www.youtube.com/watch?v=Uc2-8ntcEpY
+[spixels]: http://spixels.org/

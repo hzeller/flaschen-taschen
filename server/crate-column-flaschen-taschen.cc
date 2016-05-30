@@ -20,24 +20,23 @@
 #include <stdio.h>
 #include <strings.h>
 
-#include "multi-spi.h"
+#include "led-strip.h"
 
-WS2801FlaschenTaschen::WS2801FlaschenTaschen(MultiSPI *multi_spi,
-                                             int gpio, int crates)
-    : spi_(multi_spi), gpio_pin_(gpio), height_(crates * 5) {
-    multi_spi->RegisterDataGPIO(gpio, height_ * 5 * 3);
+CrateColumnFlaschenTaschen::CrateColumnFlaschenTaschen(spixels::LEDStrip *strip)
+    : strip_(strip), height_(strip->count() / 25) {
 }
 
-void WS2801FlaschenTaschen::SetPixel(int x, int y, const Color &col) {
+CrateColumnFlaschenTaschen::~CrateColumnFlaschenTaschen() {
+    delete strip_;
+}
+
+void CrateColumnFlaschenTaschen::SetPixel(int x, int y, const Color &col) {
     if (x < 0 || x >= width() || y < 0 || y >= height())
         return;
 
     const int crate = y / 5;
     y %= 5;
     const int pos = 25 * crate + kCrateMapping[4-y][x];
-
-    spi_->SetBufferedByte(gpio_pin_, 3 * pos + 0, luminance_cie1931(8, col.r));
-    spi_->SetBufferedByte(gpio_pin_, 3 * pos + 1, luminance_cie1931(8, col.g));
-    spi_->SetBufferedByte(gpio_pin_, 3 * pos + 2, luminance_cie1931(8, col.b));
+    strip_->SetPixel(pos, col.r, col.g, col.b);
 }
 
