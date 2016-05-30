@@ -117,11 +117,11 @@ Check out these repositories:
 ## Connecting LED strips to the Pi
 
 LED strips are controlled by a Raspberry Pi, connected via
-a [custom level shifter](./server/spixels/hardware) (provided in the separate
+a [custom level shifter][spixels-hardware] (provided in the separate
 [spixels] library) for up to 16 strips (of which we only use 9 for our
 installation right now):
 
-<a href="server/spixels/hardware/"><img src="img/pi-adapter-pcb.png" width="200px"></a>
+<a href="https://github.com/hzeller/spixels/tree/master/hardware"><img src="img/pi-adapter-pcb.png" width="200px"></a>
 
 [FlaschenTaschen]: https://noisebridge.net/wiki/Flaschen_Taschen
 [Muro de botellas]: http://www.zuloark.com/muro-de-botellas/
@@ -132,4 +132,5 @@ installation right now):
 [netpbm]: http://netpbm.sourceforge.net/
 [2025-video]: https://www.youtube.com/watch?v=hs8FoROzE4M
 [7of9-video]: https://www.youtube.com/watch?v=Uc2-8ntcEpY
+[spixels-hardware]: https://github.com/hzeller/spixels/tree/master/hardware
 [spixels]: http://spixels.org/
