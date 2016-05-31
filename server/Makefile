@@ -43,7 +43,7 @@ OBJECTS=ft-thread.o opc-server.o udp-server.o pixel-push-server.o composite-flas
 # Nested if/else are very awkward, so we just compare each possible outcome
 ifeq ($(FT_BACKEND), ft)
    DEFINES=-DFT_BACKEND=0
-   OBJECTS+=crate-column-flaschen-taschen.o crate-mapping.o column-assembly.o
+   OBJECTS+=crate-column-flaschen-taschen.o column-assembly.o
    INCLUDES+=-I$(SPIXELS_INCDIR)
    STATIC_LIBS+=$(SPIXELS_LIBRARY)
 endif
@@ -51,7 +51,7 @@ endif
 ifeq ($(FT_BACKEND), rgb-matrix)
    DEFINES=-DFT_BACKEND=1
    INCLUDES+=-I$(RGB_INCDIR)
-   OBJECTS+=rgb-flaschen-taschen.o
+   OBJECTS+=rgb-matrix-flaschen-taschen.o
    STATIC_LIBS+=$(RGB_LIBRARY)
    LDFLAGS+=$(RGB_LDFLAGS)
 endif

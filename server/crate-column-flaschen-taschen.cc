@@ -22,6 +22,24 @@
 
 #include "led-strip.h"
 
+namespace {
+// This is how the mapping looks from the back of the crate. So wiring is
+// always happening on the left of the crate.
+
+//     ^-- Next crate on the top of this
+//     |
+int kCrateMapping[5][5] = {
+    { 24, 23, 22, 21, 20 },
+    {  3,  4, 11, 12, 19 },
+    {  2,  5, 10, 13, 18 },
+    {  1,  6,  9, 14, 17 },
+    {  0,  7,  8, 15, 16 },
+};
+//-----^
+//     |
+//     +-- Previous crate enters here (bottom)
+}  // namespace
+
 CrateColumnFlaschenTaschen::CrateColumnFlaschenTaschen(spixels::LEDStrip *strip)
     : strip_(strip), height_(strip->count() / 25) {
 }

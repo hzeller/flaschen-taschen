@@ -20,9 +20,6 @@
 #include <vector>
 #include <string>
 
-// Crate mapping. Strip position at kCrateMapping[4-y][x]
-extern int kCrateMapping[5][5];
-
 namespace spixels {
 class MultiSPI;
 class LEDStrip;
