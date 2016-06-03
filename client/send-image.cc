@@ -297,7 +297,7 @@ int main(int argc, char *argv[]) {
     }
 
     // Don't let leftovers cover up content.
-    if ((interrupt_received && off_z > 0) || time(NULL) >= timeout) {
+    if ((interrupt_received && off_z > 0) || time(NULL) >= end_time) {
         display.Clear();
         display.Send();
     }
