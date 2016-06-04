@@ -19,14 +19,15 @@
 #include <stdint.h>
 
 struct Color {
-    Color() {}
-    Color(int rr, int gg, int bb) : r(rr), g(gg), b(bb){}
+    Color() : _a(255) {}
+    Color(int rr, int gg, int bb) : r(rr), g(gg), b(bb), _a(255){}
 
     bool is_black() const { return r == 0 && g == 0 && b == 0; }
 
     uint8_t r;
     uint8_t g;
     uint8_t b;
+    uint8_t _a;
 };
 
 // We have multiple implementations for FlaschenTaschen, using the
