@@ -19,8 +19,7 @@ make nice pixels.
 
 ![](./img/ft-completed.jpg)
 
-In [this video][7of9-video], you see the state close to completion. Or how about
-[Star Wars](https://www.youtube.com/watch?v=s3pGp_Vf4Pk) on the completed
+How about [Star Wars](https://youtu.be/OEUFIpM10FE) on the completed
 display ?
 
 The set-up is 9 crates wide and 7 crates high for a total of
@@ -31,7 +30,7 @@ update the display.
 
 This is how it looks from the back:
 
-<a href="img/crate-arrange.jpg"><img src="img/crate-arrange.jpg" width="300px"></a>
+<a href="doc/wiring.md"><img src="img/crate-arrange.jpg" width="300px"></a>
 
 ## Tutorial: getting started
 
@@ -54,8 +53,7 @@ installation, then you can start your own FlaschenTaschen server that displays
 the pixels as colored spaces in a terminal. Note, you need a fairly recent
 terminal that can display 24 Bit color (Konsole can do that for a while, more
 recent Gnome terminals as well. Also, newer xterms can do that as well. If you
-are on a Mac, the default terminal app won't work, you have to get an external
-app for that).
+are on a Mac, an iTerm2 version 3.x will work).
 
 <a href="server/#terminal"><img src="img/terminal-screenshot.png" width="200px"></a>
 

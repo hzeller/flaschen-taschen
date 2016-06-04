@@ -79,4 +79,20 @@ a stress relief flap screwed to the wood ?
 
 ![](../img/crate-descriptions.jpg)
 
+## The Result
+
+This is how it looks when it is all connected within the final display: the
+data connectors are chained from crate to crate. A separate spine with power
+is supplying 5V to each crate individually.
+
+Due to the cabeling, this is also fault tolerant: if power gets disconnected
+on one crate, it will be powered, through GND/+5V line of the data cables, from
+the two adjacent crates above and below.
+
+All data and power connectors run up on the left side, so it is very simple to
+stack crates without much thinking when moving the installation. The cable-ties
+to secure the crates are the reusable kind.
+
+![](../img/crate-arrange.jpg)
+
 [Lineman splice]: http://makezine.com/2012/02/28/how-to-splice-wire-to-nasa-standards/

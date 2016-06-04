@@ -84,8 +84,9 @@ pretty much like a standard framebuffer).
 
 ![](../img/pixelpusher.png)
 
-### Installation
-Within Noisebridge, the hostname is `ft.noise`.
+### Network address of Installations
+Within Noisebridge, the hostname is `ft.noise`. The smaller 25x20 display we
+had for testing is called `ftkleine.noise`.
 
 [ppm]: http://netpbm.sourceforge.net/doc/ppm.html
 [remote-ft]: ../client/udp-flaschen-taschen.h
