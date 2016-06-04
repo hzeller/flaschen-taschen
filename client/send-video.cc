@@ -180,14 +180,14 @@ int main(int argc, char *argv[]) {
         return -1;
 
     // Determine required buffer size and allocate buffer
-    numBytes=avpicture_get_size(PIX_FMT_RGB24, pCodecCtx->width,
+    numBytes=avpicture_get_size(AV_PIX_FMT_RGB24, pCodecCtx->width,
                                 pCodecCtx->height);
     buffer=(uint8_t *)av_malloc(numBytes*sizeof(uint8_t));
 
     // Assign appropriate parts of buffer to image planes in pFrameRGB
     // Note that pFrameRGB is an AVFrame, but AVFrame is a superset
     // of AVPicture
-    avpicture_fill((AVPicture *)pFrameRGB, buffer, PIX_FMT_RGB24,
+    avpicture_fill((AVPicture *)pFrameRGB, buffer, AV_PIX_FMT_RGB24,
                    pCodecCtx->width, pCodecCtx->height);
 
     // initialize SWS context for software scaling
@@ -195,7 +195,7 @@ int main(int argc, char *argv[]) {
                              pCodecCtx->height,
                              pCodecCtx->pix_fmt,
                              display.width(), display.height(),
-                             PIX_FMT_RGB24,
+                             AV_PIX_FMT_RGB24,
                              SWS_BILINEAR,
                              NULL,
                              NULL,
