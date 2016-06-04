@@ -78,6 +78,13 @@ UDPFlaschenTaschen::UDPFlaschenTaschen(int socket, int width, int height)
     int header_len = snprintf(header, sizeof(header),
                               "P6\n%d %d\n255\n", width, height);
     buf_size_ = header_len + width_ * height_ * sizeof(Color) + kFooterLen;
+    if (buf_size_ > 65535) {
+        fprintf(stderr, "Size %dx%d won't fit in a UDP packet anymore "
+                "(needed buffer of %d bytes larger than UDP limit 64k).\n"
+                "Sorry, bailing out\n",
+                width_, height_, (int)buf_size_);
+        abort();
+    }
     buffer_ = new char[buf_size_];
     bzero(buffer_, buf_size_);
     strcpy(buffer_, header);
