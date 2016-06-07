@@ -2,6 +2,7 @@ import time
 import colorsys
 
 import flaschen
+from flaschen import hsv
 
 UDP_IP = 'bookcase.noise'
 UDP_PORT = 1337
@@ -9,10 +10,6 @@ NUM_LEDS = 810
 MAX_FPS = 10
 
 ft = flaschen.Flaschen(UDP_IP, UDP_PORT, NUM_LEDS, 1)
-
-def hsv(h, s, v):
-  rgb = colorsys.hsv_to_rgb(h/255.0, s/255.0, v/255.0)
-  return tuple([int(x * 255.0) for x in rgb])
 
 def fill_rainbow(ft, num, initial_hue, deltahue):
   h = initial_hue;

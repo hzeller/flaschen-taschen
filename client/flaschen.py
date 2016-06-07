@@ -13,6 +13,7 @@
 # along with this program.  If not, see <http://gnu.org/licenses/gpl-2.0.txt>
 
 import socket
+import colorsys
 
 class Flaschen(object):
   '''A Framebuffer display interface that sends a frame via UDP.'''
@@ -74,3 +75,7 @@ class Flaschen(object):
 
   def clear(self):
     self.fill((0, 0, 0))
+
+def hsv(h, s, v):
+  rgb = colorsys.hsv_to_rgb(h/255.0, s/255.0, v/255.0)
+  return tuple([int(x * 255.0) for x in rgb])
