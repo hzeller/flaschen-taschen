@@ -9,7 +9,7 @@ are all supported:
 Receives UDP packets with a raw [PPM file][ppm] (`P6`) on port 1337 in a
 single datagram per image.
 A ppm file has a simple text header followed by the binary RGB image data.
-We add another feature: 'offset'; since the header is already defined in a
+We have another feature: 'offset'; since the header is already defined in a
 fixed way, we add a footer after the binary image data to be backward compatible.
 
 A 10x10 image looks like this (header + data + optional footer). End-of-line
@@ -23,9 +23,25 @@ P6     # Magic number
 ![](../img/udp.png)<br/>
 ```
 5      # optional x offset
-5      # optional y offset
-0      # optional z offset.
+8      # optional y offset
+10     # optional z offset.
 ```
+
+Upcoming, but not everywhere deployed yet (so: don't use yet unless you're
+at Toorcamp currently talking to the Noisebridge installation), is the ability
+to provide the offsets directly in a specially formatted header comment.
+
+That way, it is possible to use PPM image packages that provide control over
+a comment. The comment must start with exactly `#FT:`. In the following example,
+the (x,y) offset is (5,8), the layer (z-offset) is 10:
+
+```
+P6     # Magic number
+10 10  # width height (decimal, number in ASCII)
+#FT: 5 8 10
+255    # values per color (fixed). After newline, 10 * 10 * 3 bytes RGB data follows
+```
+![](../img/udp.png)<br/>
 
 The optional offset determines where the image is displayed on the
 Flaschen Taschen display relative to the top left corner (provided in the

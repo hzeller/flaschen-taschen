@@ -16,18 +16,48 @@
 
 #include "ppm-reader.h"
 
+#include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
 
-static const char *skipWhitespace(const char *buffer, const char *end) {
+// We also parse meta values in comments, so readNextNumber() and
+// skipWhitespace() also take ImageMetaInfo to extract recursively.
+static int readNextNumber(const char **start, const char *end,
+                          struct ImageMetaInfo *info);
+static const char *skipWhitespace(const char *buffer, const char *end,
+                                  struct ImageMetaInfo *info);
+
+static void parseOffsets(const char *start, const char *end,
+                         struct ImageMetaInfo *info) {
+    info->offset_x = readNextNumber(&start, end, NULL);
+    if (start != NULL) {
+        info->offset_y = readNextNumber(&start, end, NULL);
+    }
+    if (start != NULL) {
+        info->layer = readNextNumber(&start, end, NULL);
+    }
+}
+
+static void parseSpecialComment(const char *start, const char *end,
+                                struct ImageMetaInfo *info) {
+    if (info == NULL) return;
+    if (end - start < 4) return;
+    if (strncmp(start, "#FT:", 4) != 0) return;
+    parseOffsets(start + 4, end, info);
+}
+
+static const char *skipWhitespace(const char *buffer, const char *end,
+                                  struct ImageMetaInfo *info) {
     for (;;) {
         while (buffer < end && isspace(*buffer))
             ++buffer;
         if (buffer >= end)
             return NULL;
         if (*buffer == '#') {
+            const char *start = buffer;
             while (buffer < end && *buffer != '\n') // read to end of line.
                 ++buffer;
+            parseSpecialComment(start, buffer, info);
             continue;  // Back to whitespace eating.
         }
         return buffer;
@@ -37,8 +67,9 @@ static const char *skipWhitespace(const char *buffer, const char *end) {
 // Read next number. Start reading at *start; modifies the *start pointer
 // to point to the character just after the decimal number or NULL if reading
 // was not successful.
-static int readNextNumber(const char **start, const char *end) {
-    const char *start_number = skipWhitespace(*start, end);
+static int readNextNumber(const char **start, const char *end,
+                          struct ImageMetaInfo *info) {
+    const char *start_number = skipWhitespace(*start, end, info);
     if (start_number == NULL) { *start = NULL; return 0; }
     char *end_number = NULL;
     int result = strtol(start_number, &end_number, 10);
@@ -55,11 +86,11 @@ const char *ReadImageData(const char *in_buffer, size_t buf_len,
     }
     const char *const end = in_buffer + buf_len;
     const char *parse_buffer = in_buffer + 2;
-    const int width = readNextNumber(&parse_buffer, end);
+    const int width = readNextNumber(&parse_buffer, end, info);
     if (parse_buffer == NULL) return in_buffer;
-    const int height = readNextNumber(&parse_buffer, end);
+    const int height = readNextNumber(&parse_buffer, end, info);
     if (parse_buffer == NULL) return in_buffer;
-    const int range = readNextNumber(&parse_buffer, end);
+    const int range = readNextNumber(&parse_buffer, end, info);
     if (parse_buffer == NULL) return in_buffer;
     if (!isspace(*parse_buffer++)) return in_buffer;   // last char before data
     // Now make sure that the rest of the buffer still makes sense
@@ -71,14 +102,9 @@ const char *ReadImageData(const char *in_buffer, size_t buf_len,
         // Our extension: at the end of the binary data, we provide an optional
         // offset. We can't store it in the header, as it is fixed in number
         // of fields. But nobody cares what is at the end of the buffer.
-        const char *offset_data = parse_buffer + expected_image_data;
-        info->offset_x = readNextNumber(&offset_data, end);
-        if (offset_data != NULL) {
-            info->offset_y = readNextNumber(&offset_data, end);
-        }
-        if (offset_data != NULL) {
-            info->layer = readNextNumber(&offset_data, end);
-        }
+        // Note, this also can be supplied in the specially formatted comment
+        // in the header.
+        parseOffsets(parse_buffer + expected_image_data, end, info);
     }
     info->width = width;
     info->height = height;

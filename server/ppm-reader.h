@@ -36,5 +36,7 @@ struct ImageMetaInfo {
 // that we are compatible as well with 'raw' images.
 // Image info is left untouched when image does not contain any
 // information.
+// This also extracts the FlaschenTaschen extension to the PPM image format
+// that contains the offset.
 const char *ReadImageData(const char *in_buffer, size_t buf_len,
 			  struct ImageMetaInfo *info_out);
