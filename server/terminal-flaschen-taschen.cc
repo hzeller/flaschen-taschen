@@ -30,13 +30,6 @@
 // so each pixel needs to be fixed width. Thus we do %03 (which luckily is
 // not interpreted as octal by the terminal)
 
-// Setting this Unicode character seems to confuse at least konsole. Also,
-// it is pretty dark.
-//#define PIXEL_FORMAT   "\033[38;2;%03d;%03d;%03dm●"   // Sent per pixel.
-
-// This is a little dark.
-//#define PIXEL_FORMAT   "\033[38;2;%03d;%03d;%03dm*"   // Sent per pixel.
-
 // So, let's just send two spaces. First space here, rest separate below.
 #define PIXEL_FORMAT   "\033[48;2;%03d;%03d;%03dm "   // Sent per pixel.
 
