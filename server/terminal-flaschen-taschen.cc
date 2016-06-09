@@ -41,6 +41,7 @@
 #define PIXEL_FORMAT   "\033[48;2;%03d;%03d;%03dm "   // Sent per pixel.
 
 #define FPS_PLACEHOLDER "___________"
+#define FPS_BACKSPACE   "\b\b\b\b\b\b\b\b\b\b\b"
 
 TerminalFlaschenTaschen::TerminalFlaschenTaschen(int fd, int width, int height)
     : terminal_fd_(fd), width_(width), height_(height), is_first_(true),
@@ -48,12 +49,11 @@ TerminalFlaschenTaschen::TerminalFlaschenTaschen(int fd, int width, int height)
     buffer_.append(SCREEN_PREFIX);
     initial_offset_ = buffer_.size();
     char scratch[64];
-    snprintf(scratch, sizeof(scratch), PIXEL_FORMAT, 0, 0, 0); // black.
-    pixel_offset_ = strlen(scratch) + 1;   // one extra space.
+    snprintf(scratch, sizeof(scratch), PIXEL_FORMAT " ", 0, 0, 0); // black.
+    pixel_offset_ = strlen(scratch);
     for (int y = 0; y < height; ++y) {
         for (int x = 0; x < width; ++x) {
             buffer_.append(scratch);
-            buffer_.append(" ");          // Need to add space here.
         }
         buffer_.append("\n");
     }
@@ -61,9 +61,9 @@ TerminalFlaschenTaschen::TerminalFlaschenTaschen(int fd, int width, int height)
     buffer_.append(SCREEN_POSTFIX);
 
     fps_offset_ = buffer_.size();
-    buffer_.append(FPS_PLACEHOLDER "\n\n");
+    buffer_.append(FPS_PLACEHOLDER FPS_BACKSPACE);
 
-    snprintf(scratch, sizeof(scratch), SCREEN_CURSOR_UP_FORMAT, height + 2);
+    snprintf(scratch, sizeof(scratch), SCREEN_CURSOR_UP_FORMAT, height);
     buffer_.append(scratch);
 }
 TerminalFlaschenTaschen::~TerminalFlaschenTaschen() {
@@ -98,6 +98,7 @@ void TerminalFlaschenTaschen::Send() {
     if (last_time_ > 0 && duration > 500 && duration < 10000000) {
         const float fps = 1e6 / duration;
         snprintf(fps_place, strlen(FPS_PLACEHOLDER)+1, "%7.1f fps", fps);
+        fps_place[strlen(FPS_PLACEHOLDER)] = '\b';
     } else {
         memcpy(fps_place, FPS_PLACEHOLDER, strlen(FPS_PLACEHOLDER));
     }
