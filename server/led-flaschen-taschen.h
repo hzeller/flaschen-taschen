@@ -124,7 +124,7 @@ private:
     size_t pixel_offset_;
     size_t fps_offset_;
     bool is_first_;
-    std::string buffer_;
+    Color *buffer_;
     int64_t last_time_;
 };
 
