@@ -15,7 +15,6 @@ simple-animation: simple-animation.cc
 simple-example: simple-example.cc
 send-text: send-text.cc
 game-client: game-client.cc
-burn-in: burn-in.cc
 
 pong-game: pong-game.cc game-engine.cc libftclient.a
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
