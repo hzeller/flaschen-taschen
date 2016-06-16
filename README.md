@@ -68,6 +68,8 @@ $ make FT_BACKEND=terminal
 $ ./ft-server   #  this will now show a black 'screen'
 ```
 
+(looks too big on screen ? Try adding the option `--hd-terminal`)
+
 If you want to dig into details and understand the various server
 implementations, check out the [server README](./server/README.md).
 

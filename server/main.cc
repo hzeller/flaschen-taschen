@@ -73,6 +73,9 @@ static int usage(const char *progname) {
     fprintf(stderr, "usage: %s [options]\n", progname);
     fprintf(stderr, "Options:\n"
             "\t-D <width>x<height> : Output dimension. Default 45x35\n"
+#if FT_BACKEND == 2
+            "\t--hd-terminal       : Make terminal with higher resolution.\n"
+#endif
             "\t-I <interface>      : Which network interface to wait for\n"
             "\t                      to be ready (e.g eth0. Empty string '' for no "
             "waiting).\n"
@@ -94,11 +97,15 @@ int main(int argc, char *argv[]) {
     bool as_daemon = false;
     bool run_opc = false;
     bool run_pixel_pusher = false;
+#if FT_BACKEND == 2
+    bool hd_terminal = false;
+#endif
 
     enum LongOptionsOnly {
         OPT_OPC_SERVER = 1000,
         OPT_PIXEL_PUSHER = 1001,
         OPT_LAYER_TIMEOUT = 1002,
+        OPT_HD_TERMINAL = 1003,
     };
 
     static struct option long_options[] = {
@@ -108,6 +115,9 @@ int main(int argc, char *argv[]) {
         { "layer-timeout",      required_argument, NULL,  OPT_LAYER_TIMEOUT },
         { "opc",                no_argument,       NULL,  OPT_OPC_SERVER },
         { "pixel-pusher",       no_argument,       NULL,  OPT_PIXEL_PUSHER },
+#if FT_BACKEND == 2
+        { "hd-terminal",        no_argument,       NULL,  OPT_HD_TERMINAL },
+#endif
         { 0,                    0,                 0,    0  },
     };
 
@@ -135,6 +145,11 @@ int main(int argc, char *argv[]) {
         case OPT_PIXEL_PUSHER:
             run_pixel_pusher = true;
             break;
+#if FT_BACKEND == 2
+        case OPT_HD_TERMINAL:
+            hd_terminal = true;
+            break;
+#endif
         default:
             return usage(argv[0]);
         }
@@ -149,29 +164,33 @@ int main(int argc, char *argv[]) {
     using spixels::CreateWS2801Strip;
     static const int kLedsPerCol = 7 * 25;
     MultiSPI *const spi = spixels::CreateDMAMultiSPI();
-    ColumnAssembly display(spi);
+    ColumnAssembly *display = new ColumnAssembly(spi);
 
 #define MAKE_COLUMN(port) new CrateColumnFlaschenTaschen(CreateWS2801Strip(spi, port, kLedsPerCol))
 
     // Looking from the back of the display: leftmost column first.
-    display.AddColumn(MAKE_COLUMN(MultiSPI::SPI_P8));
-    display.AddColumn(MAKE_COLUMN(MultiSPI::SPI_P7));
-    display.AddColumn(MAKE_COLUMN(MultiSPI::SPI_P6));
-    display.AddColumn(MAKE_COLUMN(MultiSPI::SPI_P5));
+    display->AddColumn(MAKE_COLUMN(MultiSPI::SPI_P8));
+    display->AddColumn(MAKE_COLUMN(MultiSPI::SPI_P7));
+    display->AddColumn(MAKE_COLUMN(MultiSPI::SPI_P6));
+    display->AddColumn(MAKE_COLUMN(MultiSPI::SPI_P5));
 
     // Center column. Connected to front part
-    display.AddColumn(MAKE_COLUMN(MultiSPI::SPI_P13));
+    display->AddColumn(MAKE_COLUMN(MultiSPI::SPI_P13));
 
     // Rest: continue on the back part
-    display.AddColumn(MAKE_COLUMN(MultiSPI::SPI_P4));
-    display.AddColumn(MAKE_COLUMN(MultiSPI::SPI_P3));
-    display.AddColumn(MAKE_COLUMN(MultiSPI::SPI_P2));
-    display.AddColumn(MAKE_COLUMN(MultiSPI::SPI_P1));
+    display->AddColumn(MAKE_COLUMN(MultiSPI::SPI_P4));
+    display->AddColumn(MAKE_COLUMN(MultiSPI::SPI_P3));
+    display->AddColumn(MAKE_COLUMN(MultiSPI::SPI_P2));
+    display->AddColumn(MAKE_COLUMN(MultiSPI::SPI_P1));
 #undef MAKE_COLUMN
 #elif FT_BACKEND == 1
-    RGBMatrixFlaschenTaschen display(0, 0, width, height);
+    RGBMatrixFlaschenTaschen *display
+        = new RGBMatrixFlaschenTaschen(0, 0, width, height);
 #elif FT_BACKEND == 2
-    TerminalFlaschenTaschen display(STDOUT_FILENO, width, height);
+    TerminalFlaschenTaschen *display =
+        hd_terminal
+        ? new HDTerminalFlaschenTaschen(STDOUT_FILENO, width, height)
+        : new TerminalFlaschenTaschen(STDOUT_FILENO, width, height);
 #endif
 
     // Start all the services and report problems (such as sockets already
@@ -185,7 +204,7 @@ int main(int argc, char *argv[]) {
         return 1;
     }
     if (run_pixel_pusher
-        && !pixel_pusher_init(interface.c_str(), &display)) {
+        && !pixel_pusher_init(interface.c_str(), display)) {
         return 1;
     }
 
@@ -197,15 +216,15 @@ int main(int argc, char *argv[]) {
     // Only after we have become a daemon, we can do all the things that
     // require starting threads. These can be various realtime priorities,
     // we so need to stay root until all threads are set up.
-    display.PostDaemonInit();
+    display->PostDaemonInit();
 
-    display.Send();  // Clear screen.
+    display->Send();  // Clear screen.
 
     ft::Mutex mutex;
 
     // The display we expose to the user provides composite layering which can
     // be used by the UDP server.
-    CompositeFlaschenTaschen layered_display(&display, 16);
+    CompositeFlaschenTaschen layered_display(display, 16);
     layered_display.StartLayerGarbageCollection(&mutex, layer_timeout);
 
     // Optional services as thread.
@@ -219,4 +238,5 @@ int main(int argc, char *argv[]) {
         return 1;
 
     udp_server_run_blocking(&layered_display, &mutex);  // last server blocks.
+    delete display;
 }

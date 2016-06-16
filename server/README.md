@@ -77,6 +77,14 @@ result in a terminal.
   ./ft-server -D45x35
 ```
 
+This also has an option to have a more compact representation - the resolution
+is twice as high which allows to display it on smaller terminals. However,
+it depends a bit more on your terminal to properly display UTF-8 characters:
+
+```bash
+./ft-server -D45x35 --hd-terminal
+```
+
 ![](../img/terminal-screenshot.png)
 <img src="../img/terminal-screenshot-nb.png" width="100px">
 

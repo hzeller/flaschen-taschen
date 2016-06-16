@@ -116,7 +116,7 @@ public:
     void SetPixel(int x, int y, const Color &col);
     void Send();
 
-private:
+protected:
     const int terminal_fd_;
     const int width_;
     const int height_;
@@ -126,6 +126,18 @@ private:
     bool is_first_;
     std::string buffer_;
     int64_t last_time_;
+};
+
+// Similar, but higher res.
+class HDTerminalFlaschenTaschen : public TerminalFlaschenTaschen {
+public:
+    HDTerminalFlaschenTaschen(int terminal_fd, int width, int heigh);
+
+    void SetPixel(int x, int y, const Color &col);
+
+private:
+    size_t lower_row_pixel_offset_;
+    size_t color_fmt_length_;
 };
 
 #endif // LED_FLASCHEN_TASCHEN_H_

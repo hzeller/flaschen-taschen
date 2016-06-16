@@ -58,7 +58,7 @@ endif
 
 ifeq ($(FT_BACKEND), terminal)
    DEFINES=-DFT_BACKEND=2
-   OBJECTS+=terminal-flaschen-taschen.o
+   OBJECTS+=terminal-flaschen-taschen.o hd-terminal-flaschen-taschen.o
 endif
 
 CFLAGS=-Wall -O3 $(INCLUDES) $(DEFINES)
