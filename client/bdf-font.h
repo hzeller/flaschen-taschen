@@ -45,6 +45,10 @@ public:
                   const Color &color, const Color *background_color,
                   uint32_t unicode_codepoint) const;
 
+    // Create a new font from this font, which represents an outline of the
+    // original font.
+    Font *CreateOutlineFont() const;
+
 private:
     Font(const Font& x);  // No copy constructor. Use references or pointer instead.
 
@@ -60,20 +64,25 @@ private:
 
 // Draw text, encoded in UTF-8, with given "font" at "x","y" with "color".
 // "background_color" can be NULL for transparency.
-// The "y" position is the baseline of the font.
+// The "y" position is the bottom of the font.
+// "extra_spacing" allows for additional spacing between characters (can be
+// negative)
 // Returns how far we advance on the screen.
 int DrawText(FlaschenTaschen *c, const Font &font, int x, int y,
              const Color &color, const Color *background_color,
-             const char *utf8_text);
+             const char *utf8_text,
+             int extra_spacing = 0);
 
 // Draw text as above, but vertically, encoded in UTF-8, with given "font" at
 // "x","y" with "color".
 // "background_color" can be NULL for transparency.
 // The "y" position is the baseline of the font.
+// "extra_spacing" allows for additional spacing between characters (can be
+// negative)
 // Returns font height to advance up on the screen.
 int VerticalDrawText(FlaschenTaschen *c, const Font &font, int x, int y,
-             const Color &color, const Color *background_color,
-             const char *utf8_text);
+                     const Color &color, const Color *background_color,
+                     const char *utf8_text, int extra_spacing = 0);
 }  // namespace ft
 
 #endif  // RPI_GRAPHICS_H

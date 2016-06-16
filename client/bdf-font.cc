@@ -104,6 +104,45 @@ bool Font::LoadFont(const char *path) {
     return true;
 }
 
+Font *Font::CreateOutlineFont() const {
+    Font *r = new Font();
+    const int kBorder = 1;
+    r->font_height_ = font_height_ + 2*kBorder;
+    r->base_line_ = base_line_ + kBorder;
+    for (CodepointGlyphMap::const_iterator it = glyphs_.begin();
+         it != glyphs_.end(); ++it) {
+        const Glyph *orig = it->second;
+        const int height = orig->height + 2 * kBorder;
+        const size_t alloc_size = sizeof(Glyph) + height * sizeof(rowbitmap_t);
+        Glyph *const tmp_glyph = (Glyph*) calloc(1, alloc_size);
+        tmp_glyph->width  = orig->width  + 2*kBorder;
+        tmp_glyph->height = height;
+        tmp_glyph->y_offset = orig->y_offset - kBorder;
+        // TODO: we don't really need bounding box, right ?
+        const rowbitmap_t fill_pattern = 0b111;
+        const rowbitmap_t start_mask   = 0b010;
+        // Fill the border
+        for (int h = 0; h < orig->height; ++h) {
+            rowbitmap_t fill = fill_pattern;
+            rowbitmap_t orig_bitmap = orig->bitmap[h] >> kBorder;
+            for (rowbitmap_t m = start_mask; m; m <<= 1, fill <<= 1) {
+                if (orig_bitmap & m) {
+                    tmp_glyph->bitmap[h+kBorder-1] |= fill;
+                    tmp_glyph->bitmap[h+kBorder+0] |= fill;
+                    tmp_glyph->bitmap[h+kBorder+1] |= fill;
+                }
+            }
+        }
+        // Remove original font again.
+        for (int h = 0; h < orig->height; ++h) {
+            rowbitmap_t orig_bitmap = orig->bitmap[h] >> kBorder;
+            tmp_glyph->bitmap[h+kBorder] &= ~orig_bitmap;
+        }
+        r->glyphs_[it->first] = tmp_glyph;
+    }
+    return r;
+}
+
 const Font::Glyph *Font::FindGlyph(uint32_t unicode_codepoint) const {
     CodepointGlyphMap::const_iterator found = glyphs_.find(unicode_codepoint);
     if (found == glyphs_.end())
@@ -123,7 +162,7 @@ int Font::DrawGlyph(FlaschenTaschen *c, int x_pos, int y_pos,
     if (g == NULL) g = FindGlyph(kUnicodeReplacementCodepoint);
     if (g == NULL) return 0;
     if (x_pos > 0 - g->width && x_pos < c->width()) { // clip.
-        y_pos = y_pos - g->height - g->y_offset;
+        y_pos = y_pos - g->height - g->y_offset; // TODO: fix baseline use.
         for (int y = 0; y < g->height; ++y) {
             const rowbitmap_t row = g->bitmap[y];
             rowbitmap_t x_mask = 0x80000000;
@@ -141,23 +180,24 @@ int Font::DrawGlyph(FlaschenTaschen *c, int x_pos, int y_pos,
 
 int DrawText(FlaschenTaschen *c, const Font &font,
              int x, int y, const Color &color, const Color *background_color,
-             const char *utf8_text) {
+             const char *utf8_text, int extra_spacing) {
     const int start_x = x;
     while (*utf8_text) {
         const uint32_t cp = utf8_next_codepoint(utf8_text);
         x += font.DrawGlyph(c, x, y, color, background_color, cp);
+        x += extra_spacing;
     }
     return x - start_x;
 }
 
-int VerticalDrawText(FlaschenTaschen *c, const Font &font,
-             int x, int y, const Color &color, const Color *background_color,
-             const char *utf8_text) {
+int VerticalDrawText(FlaschenTaschen *c, const Font &font, int x, int y,
+                     const Color &color, const Color *background_color,
+                     const char *utf8_text, int extra_spacing) {
     const int start_y = y;
     while (*utf8_text) {
         const uint32_t cp = utf8_next_codepoint(utf8_text);
         font.DrawGlyph(c, x, y, color, background_color, cp);
-        y += font.height() ;
+        y += font.height() + extra_spacing;
     }
     return y - start_y;
 }

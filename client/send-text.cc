@@ -30,9 +30,9 @@
 #define DEFAULT_HEIGHT 35
 #define WIDEST_GLYPH 'W'
 
-volatile bool interrupt_received = false;
+volatile bool got_ctrl_c = false;
 static void InterruptHandler(int signo) {
-  interrupt_received = true;
+  got_ctrl_c = true;
 }
 
 static int usage(const char *progname) {
@@ -43,9 +43,11 @@ static int usage(const char *progname) {
             "\t-h <host>       : Flaschen-Taschen display hostname.\n"
             "\t-f <fontfile>   : Path to *.bdf font file\n"
             "\t-s<ms>          : Scroll milliseconds per pixel (default 60). 0 for no-scroll.\n"
-            "\t-o              : Only run once, don't scroll forever.\n"
+            "\t-O              : Only run once, don't scroll forever.\n"
+            "\t-S<px>          : Letter spacing in pixels (default: 0)\n"
             "\t-c<RRGGBB>      : Text color as hex (default: FFFFFF)\n"
             "\t-b<RRGGBB>      : Background color as hex (default: 000000)\n"
+            "\t-o<RRGGBB>      : Outline color as hex (default: no outline)\n"
             "\t-v              : Scroll text vertically \n"
             );
 
@@ -59,17 +61,20 @@ int main(int argc, char *argv[]) {
     int off_y = 0;
     int off_z = 1;
     int scroll_delay_ms = 50;
+    int letter_spacing = 0;
     bool run_forever = true;
     bool vertical = false;
+    bool with_outline = false;
     const char *host = NULL;
 
     Color fg(0xff, 0xff, 0xff);
     Color bg(0, 0, 0);
+    Color outline(0, 0, 0);
     int r, g, b;
 
-    ft::Font font;
+    ft::Font text_font;
     int opt;
-    while ((opt = getopt(argc, argv, "f:g:h:s:voc:b:l:")) != -1) {
+    while ((opt = getopt(argc, argv, "f:g:h:s:vo:c:b:l:OS:")) != -1) {
         switch (opt) {
         case 'g':
             if (sscanf(optarg, "%dx%d%d%d%d", &width, &height, &off_x, &off_y, &off_z)
@@ -82,12 +87,15 @@ int main(int argc, char *argv[]) {
             host = strdup(optarg); // leaking. Ignore.
             break;
         case 'f':
-            if (!font.LoadFont(optarg)) {
+            if (!text_font.LoadFont(optarg)) {
                 fprintf(stderr, "Couldn't load font '%s'\n", optarg);
             }
             break;
-        case 'o':
+        case 'O':
             run_forever = false;
+            break;
+        case 'S':
+            letter_spacing = atoi(optarg);
             break;
         case 'l':
             if (sscanf(optarg, "%d", &off_z) != 1 || off_z < 0 || off_z >= 16) {
@@ -103,18 +111,29 @@ int main(int argc, char *argv[]) {
             }
             break;
         case 'c':
-            if (sscanf(optarg, "%02x%02x%02x", &r, &g, &b) != 3) {
-                fprintf(stderr, "Foreground color parse error\n");
+            if (optarg[0] == '-'
+                || sscanf(optarg, "%02x%02x%02x", &r, &g, &b) != 3) {
+                fprintf(stderr, "Foreground color parse error (%s)\n", optarg);
                 return usage(argv[0]);
             }
             fg.r = r; fg.g = g; fg.b = b;
             break;
         case 'b':
-            if (sscanf(optarg, "%02x%02x%02x", &r, &g, &b) != 3) {
-                fprintf(stderr, "Background color parse error\n");
+            if (optarg[0] == '-'
+                || sscanf(optarg, "%02x%02x%02x", &r, &g, &b) != 3) {
+                fprintf(stderr, "Background color parse error (%s)\n", optarg);
                 return usage(argv[0]);
             }
             bg.r = r; bg.g = g; bg.b = b;
+            break;
+        case 'o':
+            if (optarg[0] == '-'
+                || sscanf(optarg, "%02x%02x%02x", &r, &g, &b) != 3) {
+                fprintf(stderr, "Outline color parse error (%s)\n", optarg);
+                return usage(argv[0]);
+            }
+            outline.r = r; outline.g = g; outline.b = b;
+            with_outline = true;
             break;
         case 'v':
             vertical = true;
@@ -124,19 +143,28 @@ int main(int argc, char *argv[]) {
             return usage(argv[0]);
         }
     }
+
     // check for valid initial conditions
-    if (font.height() < 0) {
+    if (text_font.height() < 0) {
         fprintf(stderr, "Need to provide a font.\n");
         return usage(argv[0]);
     }
+
+    ft::Font *measure_font = &text_font;
+    ft::Font *outline_font = NULL;
+    if (with_outline) {
+        outline_font = text_font.CreateOutlineFont();
+        measure_font = outline_font;
+    }
+
     // check height input and use default value if necessary
     if (height < 0) {
-        height = vertical ? DEFAULT_HEIGHT : font.height();
+        height = vertical ? DEFAULT_HEIGHT : measure_font->height();
     }
 
     // check width input and use default font width of WIDEST_GLYPH if necessary
     if (width < 0) {
-        width = vertical ? font.CharacterWidth(WIDEST_GLYPH) : DEFAULT_WIDTH;
+        width = vertical ? measure_font->CharacterWidth(WIDEST_GLYPH) : DEFAULT_WIDTH;
     }
 
     if (width < 1 || height < 1) {
@@ -171,53 +199,83 @@ int main(int argc, char *argv[]) {
     }
 
     // Center in in the available display space.
-    const int y_pos = (height - font.height()) / 2 + font.baseline();
-    const int x_pos = (width - font.CharacterWidth(WIDEST_GLYPH)) / 2 ;
-
-    // dry-run to determine total number of pixels.
-    const int total_height = VerticalDrawText(&display, font, 0, y_pos, fg, NULL, text);
-    const int total_width = strlen(text) * font.height();
-
-    // if rotated, center in in the available display space.
-
+    const int y_pos = (height - measure_font->height()) / 2
+        + measure_font->baseline();
+    const int x_pos = (width - measure_font->CharacterWidth(WIDEST_GLYPH)) / 2
+        + with_outline ? 1 : 0;
 
     signal(SIGTERM, InterruptHandler);
     signal(SIGINT, InterruptHandler);
 
-   // scrolling horizontally l-r or vertically b-t
+    // This nested 'if' is a mess.
+
+    // scrolling horizontally l-r or vertically b-t
     if (scroll_delay_ms > 0) {
         if (!vertical) {
+            // Dry run to determine total width.
+            const int total_width = DrawText(&display, *measure_font,
+                                             0, 0, fg, NULL, text,
+                                             letter_spacing);
             do {
-              display.Fill(bg);
-              for (int s = 0; s < total_width + width && !interrupt_received; ++s) {
-                  DrawText(&display, font, width - s, y_pos, fg, &bg, text);
-                  display.Send();
-                  usleep(scroll_delay_ms * 1000);
-              }
-            } while (run_forever && !interrupt_received);
+                for (int s = 0; s < total_width + width && !got_ctrl_c; ++s) {
+                    display.Fill(bg);
+                    if (outline_font) {
+                        DrawText(&display, *outline_font, width - s, y_pos,
+                                 outline, NULL, text, letter_spacing - 2);
+                    }
+                    DrawText(&display, text_font, width - s + 1, y_pos,
+                             fg, NULL, text, letter_spacing);
+                    display.Send();
+                    usleep(scroll_delay_ms * 1000);
+                }
+            } while (run_forever && !got_ctrl_c);
         }
-        else {  // rotation for vertical banner text
+        else {  // Vertical banner text
+            // Dry run to determine total height.
+            const int total_height = VerticalDrawText(&display, *measure_font,
+                                                      0, 0, fg, NULL, text,
+                                                      letter_spacing);
             do {
-              display.Fill(bg);
-              for (int s = 0; s < total_height + height && !interrupt_received; ++s) {
-                  VerticalDrawText(&display, font, x_pos, height + font.height() - s, fg, &bg, text);
-                  display.Send();
-                  usleep(scroll_delay_ms * 1000);
-               }
-            } while (run_forever && !interrupt_received);
+                for (int s = 0; s < total_height + height && !got_ctrl_c; ++s) {
+                    display.Fill(bg);
+                    if (outline_font) {
+                        VerticalDrawText(&display, *outline_font, x_pos - 1,
+                                         height + measure_font->height() - s,
+                                         outline, NULL,
+                                         text, letter_spacing - 2);
+                    }
+                    VerticalDrawText(&display, text_font, x_pos,
+                                     height + measure_font->height() - s,
+                                     fg, NULL, text, letter_spacing);
+                    display.Send();
+                    usleep(scroll_delay_ms * 1000);
+                }
+            } while (run_forever && !got_ctrl_c);
         }
     }
     // No scrolling, just show directly and once.
     else if (scroll_delay_ms == 0) {
         if (!vertical) {
-          display.Fill(bg);
-          DrawText(&display, font, 0, y_pos, fg, &bg, text);
-          display.Send();
+            display.Fill(bg);
+            if (outline_font) {
+                DrawText(&display, *outline_font, 0, y_pos, outline, NULL,
+                         text, letter_spacing - 2);
+            }
+            DrawText(&display, text_font, 1, y_pos, fg, NULL,
+                     text, letter_spacing);
+            display.Send();
         }
         else {
-          display.Fill(bg);
-          VerticalDrawText(&display, font, x_pos, -1 + font.height() ,fg, &bg, text);
-          display.Send();
+            display.Fill(bg);
+            if (outline_font) {
+                VerticalDrawText(&display, *outline_font,
+                                 x_pos - 1, measure_font->height() - 1,
+                                 outline, NULL, text, letter_spacing - 2);
+            }
+            VerticalDrawText(&display, text_font, x_pos,
+                             measure_font->height() - 1,
+                             fg, NULL, text, letter_spacing);
+            display.Send();
         }
     }
 
@@ -230,7 +288,7 @@ int main(int argc, char *argv[]) {
 
     close(fd);
 
-    if (interrupt_received) {
+    if (got_ctrl_c) {
         fprintf(stderr, "Interrupted. Exit.\n");
     }
     return 0;

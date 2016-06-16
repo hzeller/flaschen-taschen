@@ -49,10 +49,12 @@ Options:
         -h <host>       : Flaschen-Taschen display hostname.
         -f <fontfile>   : Path to *.bdf font file
         -s<ms>          : Scroll milliseconds per pixel (default 60). 0 for no-scroll.
-        -o              : Only run once, don't scroll forever.
+        -O              : Only run once, don't scroll forever.
+        -S<px>          : Letter spacing in pixels (default: 0)
         -c<RRGGBB>      : Text color as hex (default: FFFFFF)
         -b<RRGGBB>      : Background color as hex (default: 000000)
-        -v              : Scroll text vertically 
+        -o<RRGGBB>      : Outline color as hex (default: no outline)
+        -v              : Scroll text vertically
 ```
 
 Sample
@@ -70,6 +72,8 @@ Text has a default layer of 1, so it is hovering above the background image.
 If you don't want that, you can explicitly set it as last value in the geometry
 specification.
 
+If you add a `-o` color, then the font gets an outline of that given color,
+which you can use to create a contrast for the font.
 ## Send-Image
 
 ### Compile
