@@ -85,7 +85,11 @@ it depends a bit more on your terminal to properly display UTF-8 characters:
 ./ft-server -D45x35 --hd-terminal
 ```
 
-![](../img/terminal-screenshot.png)
+Regular terminal             | With `--hd-terminal` Option   |
+-----------------------------|-------------------------------|
+![](../img/terminal-sd.png)  | ![](../img/terminal-hd.png)   |
+
+<img src="../img/terminal-screenshot.png" width="100px">
 <img src="../img/terminal-screenshot-nb.png" width="100px">
 
 

@@ -43,7 +43,9 @@
 HDTerminalFlaschenTaschen::HDTerminalFlaschenTaschen(int fd, int w, int h)
     // Height is rounded up to the next even number.
     : TerminalFlaschenTaschen(fd, w, (h + 1) & ~0x1) {
-    buffer_.clear();  // Nah, let's replace that with our own stuff :)
+}
+
+void HDTerminalFlaschenTaschen::PostDaemonInit() {
     buffer_.append(SCREEN_PREFIX);
     initial_offset_ = buffer_.size();
     char scratch[64];

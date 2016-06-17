@@ -42,8 +42,6 @@ void ColumnAssembly::SetPixel(int x, int y, const Color &col) {
     column->SetPixel(4 - x % 5, height() - y - 1, col);
 }
 
-void ColumnAssembly::PostDaemonInit() {}
-
 void ColumnAssembly::Send() {
     spi_->SendBuffers();
     usleep(50);  // WS2801 triggers on 50usec no data.

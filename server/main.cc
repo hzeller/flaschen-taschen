@@ -184,10 +184,10 @@ int main(int argc, char *argv[]) {
     display->AddColumn(MAKE_COLUMN(MultiSPI::SPI_P1));
 #undef MAKE_COLUMN
 #elif FT_BACKEND == 1
-    RGBMatrixFlaschenTaschen *display
+    ServerFlaschenTaschen *display
         = new RGBMatrixFlaschenTaschen(0, 0, width, height);
 #elif FT_BACKEND == 2
-    TerminalFlaschenTaschen *display =
+    ServerFlaschenTaschen *display =
         hd_terminal
         ? new HDTerminalFlaschenTaschen(STDOUT_FILENO, width, height)
         : new TerminalFlaschenTaschen(STDOUT_FILENO, width, height);

@@ -14,6 +14,7 @@
 
 #include "led-flaschen-taschen.h"
 
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/time.h>
@@ -36,16 +37,27 @@
 #define FPS_PLACEHOLDER "___________"
 #define FPS_BACKSPACE   "\b\b\b\b\b\b\b\b\b\b\b"
 
+static void reliable_write(int fd, const char *buf, size_t size) {
+    int written;
+    while (size && (written = write(fd, buf, size)) > 0) {
+        size -= written;
+        buf += written;
+    }
+}
+
 TerminalFlaschenTaschen::TerminalFlaschenTaschen(int fd, int width, int height)
     : terminal_fd_(fd), width_(width), height_(height), is_first_(true),
-      last_time_(-1) {
+      last_time_usec_(-1) {
+}
+
+void TerminalFlaschenTaschen::PostDaemonInit() {
     buffer_.append(SCREEN_PREFIX);
     initial_offset_ = buffer_.size();
     char scratch[64];
     snprintf(scratch, sizeof(scratch), PIXEL_FORMAT " ", 0, 0, 0); // black.
     pixel_offset_ = strlen(scratch);
-    for (int y = 0; y < height; ++y) {
-        for (int x = 0; x < width; ++x) {
+    for (int y = 0; y < height_; ++y) {
+        for (int x = 0; x < width_; ++x) {
             buffer_.append(scratch);
         }
         buffer_.append("\n");
@@ -56,13 +68,14 @@ TerminalFlaschenTaschen::TerminalFlaschenTaschen(int fd, int width, int height)
     fps_offset_ = buffer_.size();
     buffer_.append(FPS_PLACEHOLDER FPS_BACKSPACE);
 
-    snprintf(scratch, sizeof(scratch), SCREEN_CURSOR_UP_FORMAT, height);
+    snprintf(scratch, sizeof(scratch), SCREEN_CURSOR_UP_FORMAT, height_);
     buffer_.append(scratch);
 }
+
 TerminalFlaschenTaschen::~TerminalFlaschenTaschen() {
     if (!is_first_) {
-        write(terminal_fd_, SCREEN_CLEAR, strlen(SCREEN_CLEAR));
-        write(terminal_fd_, CURSOR_ON, strlen(CURSOR_ON));
+        reliable_write(terminal_fd_, SCREEN_CLEAR, strlen(SCREEN_CLEAR));
+        reliable_write(terminal_fd_, CURSOR_ON, strlen(CURSOR_ON));
     }
 }
 
@@ -78,24 +91,25 @@ void TerminalFlaschenTaschen::SetPixel(int x, int y, const Color &col) {
 
 void TerminalFlaschenTaschen::Send() {
     if (is_first_) {
-        write(terminal_fd_, SCREEN_CLEAR, strlen(SCREEN_CLEAR));
-        write(terminal_fd_, CURSOR_OFF, strlen(CURSOR_OFF));
+        assert(!buffer_.empty());  // Looks like PostDaemonInit() was not called
+        reliable_write(terminal_fd_, SCREEN_CLEAR, strlen(SCREEN_CLEAR));
+        reliable_write(terminal_fd_, CURSOR_OFF, strlen(CURSOR_OFF));
         is_first_ = false;
     }
 
     char *fps_place = const_cast<char*>(buffer_.data()) + fps_offset_;
     struct timeval tp;
     gettimeofday(&tp, NULL);
-    const int64_t time_now_us = tp.tv_sec * 1000000 + tp.tv_usec;
-    const int64_t duration = time_now_us - last_time_;
-    if (last_time_ > 0 && duration > 500 && duration < 10000000) {
+    const int64_t time_now_usec = tp.tv_sec * 1000000 + tp.tv_usec;
+    const int64_t duration = time_now_usec - last_time_usec_;
+    if (last_time_usec_ > 0 && duration > 500 && duration < 10000000) {
         const float fps = 1e6 / duration;
         snprintf(fps_place, strlen(FPS_PLACEHOLDER)+1, "%7.1f fps", fps);
         fps_place[strlen(FPS_PLACEHOLDER)] = '\b';
     } else {
         memcpy(fps_place, FPS_PLACEHOLDER, strlen(FPS_PLACEHOLDER));
     }
-    last_time_ = time_now_us;
+    last_time_usec_ = time_now_usec;
 
-    write(terminal_fd_, buffer_.data(), buffer_.size());
+    reliable_write(terminal_fd_, buffer_.data(), buffer_.size());
 }
