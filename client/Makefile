@@ -9,7 +9,9 @@ MAGICK_LDFLAGS=`GraphicsMagick++-config --ldflags --libs`
 
 FFMPEG_LDFLAGS=`pkg-config --cflags --libs  libavcodec libavformat libswscale libavutil`
 
-all : simple-example simple-animation send-text pong-game game-client
+all : simple-example simple-animation send-text
+
+pong: game-client pong-game
 
 simple-animation: simple-animation.cc
 simple-example: simple-example.cc
