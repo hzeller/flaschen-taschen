@@ -19,9 +19,10 @@
 #include <arpa/inet.h>
 #include <assert.h>
 #include <getopt.h>
+#include <ifaddrs.h>
 #include <limits.h>
-#include <linux/netdevice.h>
 #include <netinet/in.h>
+#include <netpacket/packet.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -67,43 +68,39 @@ int64_t CurrentTimeMicros() {
     return result * 1000000 + tv.tv_usec;
 }
 
-// Given the name of the interface, such as "eth0", fill the IP address and
-// broadcast address into "header"
-// Some socket and ioctl nastiness.
 bool DetermineNetwork(const char *interface, DiscoveryPacketHeader *header) {
-    int s;
-    if ((s = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-        return false;
-    }
+    struct ifaddrs *addr_list = NULL;
 
-    bool success = true;
+    getifaddrs(&addr_list);
+    bool found_ip = false;
+    bool found_mac = false;
 
-    {
-        // Get mac address for given interface name.
-        struct ifreq mac_addr_query;
-        strcpy(mac_addr_query.ifr_name, interface);
-        if (ioctl(s, SIOCGIFHWADDR, &mac_addr_query) == 0) {
-            memcpy(header->mac_address,  mac_addr_query.ifr_hwaddr.sa_data,
+    for (struct ifaddrs *it = addr_list; it; it = it->ifa_next) {
+        if (strcmp(it->ifa_name, interface) != 0)
+            continue;
+        if (it->ifa_addr->sa_family == AF_INET) {
+            // Discovery packet can only do IPv4
+            memcpy(header->ip_address,
+                   &((struct sockaddr_in *)it->ifa_addr)->sin_addr,
+                   sizeof(header->ip_address));
+            found_ip = true;
+        }
+        // TODO: Here, we need some distinction between BSD and Linux. The
+        // following works on Linux, BSD does something with AF_LINK
+        if (it->ifa_addr->sa_family == AF_PACKET) {
+            memcpy(header->mac_address,
+                   ((struct sockaddr_ll*)it->ifa_addr)->sll_addr,
                    sizeof(header->mac_address));
-        } else {
-            perror("Getting hardware address");
-            success = false;
+            found_mac = true;
         }
     }
+    freeifaddrs(addr_list);
 
-    {
-        struct ifreq ip_addr_query;
-        strcpy(ip_addr_query.ifr_name, interface);
-        if (ioctl(s, SIOCGIFADDR, &ip_addr_query) == 0) {
-            struct sockaddr_in *s_in = (struct sockaddr_in *) &ip_addr_query.ifr_addr;
-            memcpy(header->ip_address, &s_in->sin_addr, sizeof(header->ip_address));
-        } else {
-            perror("Getting IP address");
-            success = false;
-        }
+    if (!found_ip || !found_mac) {
+        fprintf(stderr, "%s: %s MAC, %s IP.\n", interface,
+                found_mac ? "Found" : "Did not find",
+                found_ip  ? "Found" : "Did not find");
     }
-
-    close(s);
 
     // Let's print what we're sending.
     char buf[256];
@@ -114,7 +111,7 @@ bool DetermineNetwork(const char *interface, DiscoveryPacketHeader *header) {
     }
     fprintf(stderr, "\n");
 
-    return success;
+    return found_ip && found_mac;
 }
 
 // Threads deriving from this should exit Run() as soon as they see !running_
