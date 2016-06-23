@@ -27,12 +27,12 @@
 #define CURSOR_OFF      "\033[?25l"
 #define CURSOR_ON       "\033[?25h"
 
-// Idea is that we have all colors same width for fast in-place updates.
-// so each pixel needs to be fixed width. Thus we do %03 (which luckily is
+// We have all colors same width for fast in-place updates in a precalculated
+// buffer. So each pixel needs to be fixed width: we do %03d (which luckily is
 // not interpreted as octal by the terminal)
-
-// So, let's just send two spaces. First space here, rest separate below.
-#define PIXEL_FORMAT   "\033[48;2;%03d;%03d;%03dm "   // Sent per pixel.
+#define PIXEL_PREFIX   "\033[48;2;"      // Setting 24-bit background color
+#define COLOR_FORMAT   "%03d;%03d;%03dm" // RGB color formatting
+#define PIXEL_CONTENT  "  "  // Two spaces make a somewhat 1:1 aspect ratio pixel
 
 #define FPS_PLACEHOLDER "___________"
 #define FPS_BACKSPACE   "\b\b\b\b\b\b\b\b\b\b\b"
@@ -54,7 +54,8 @@ void TerminalFlaschenTaschen::PostDaemonInit() {
     buffer_.append(SCREEN_PREFIX);
     initial_offset_ = buffer_.size();
     char scratch[64];
-    snprintf(scratch, sizeof(scratch), PIXEL_FORMAT " ", 0, 0, 0); // black.
+    snprintf(scratch, sizeof(scratch),
+             PIXEL_PREFIX COLOR_FORMAT PIXEL_CONTENT, 0, 0, 0);  // black pixel.
     pixel_offset_ = strlen(scratch);
     for (int y = 0; y < height_; ++y) {
         for (int x = 0; x < width_; ++x) {
@@ -83,10 +84,12 @@ void TerminalFlaschenTaschen::SetPixel(int x, int y, const Color &col) {
     if (x < 0 || x >= width_ || y < 0 || y >= height_) return;
     const int pos = initial_offset_
         + (width_ * y + x) * pixel_offset_
-        + y;  // <- one newline per y
+        + strlen(PIXEL_PREFIX)   // Exactly where the color-formatting starts
+        + y;                     // <- one newline per y
     char *buf = const_cast<char*>(buffer_.data()) + pos;  // Living on the edge
-    snprintf(buf, pixel_offset_, PIXEL_FORMAT, col.r, col.g, col.b);
-    buf[pixel_offset_-1] = ' ';   // overwrite \0-byte with space again.
+    WriteByteDecimal(buf, col.r);      // rrr;___;___
+    WriteByteDecimal(buf + 4, col.g);  // ___;ggg;___
+    WriteByteDecimal(buf + 8, col.b);  // ___;___;bbb
 }
 
 void TerminalFlaschenTaschen::Send() {

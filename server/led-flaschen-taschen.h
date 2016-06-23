@@ -123,6 +123,12 @@ public:
     void Send();
 
 protected:
+    static inline void WriteByteDecimal(char *buf, uint8_t val) {
+        buf[2] = (val % 10) + '0'; val /= 10;
+        buf[1] = (val % 10) + '0'; val /= 10;
+        buf[0] = val + '0';
+    }
+
     const int terminal_fd_;
     const int width_;
     const int height_;
@@ -144,7 +150,6 @@ public:
 
 private:
     size_t lower_row_pixel_offset_;
-    size_t color_fmt_length_;
 };
 
 #endif // LED_FLASCHEN_TASCHEN_H_

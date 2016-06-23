@@ -70,10 +70,7 @@ void HDTerminalFlaschenTaschen::PostDaemonInit() {
     snprintf(scratch, sizeof(scratch), SCREEN_CURSOR_UP_FORMAT, height_/2);
     buffer_.append(scratch);
 
-    // Some useful precalculated lengths.
-    snprintf(scratch, sizeof(scratch), ESCAPE_COLOR_FORMAT, 0, 0, 0);
-    color_fmt_length_ = strlen(scratch);
-
+    // Some useful precalculated length.
     snprintf(scratch, sizeof(scratch),
              ESCAPE_COLOR_FORMAT "m" BOTTOM_PIXEL_COLOR, 0, 0, 0);
     lower_row_pixel_offset_ = strlen(scratch);
@@ -88,6 +85,7 @@ void HDTerminalFlaschenTaschen::SetPixel(int x, int y, const Color &col) {
         + (y % 2) * lower_row_pixel_offset_  // offset for odd-row y-pixels
         + double_row;                        // 1 newline per double row
     char *buf = const_cast<char*>(buffer_.data()) + pos;  // Living on the edge
-    snprintf(buf, color_fmt_length_+1, ESCAPE_COLOR_FORMAT, col.r, col.g, col.b);
-    buf[color_fmt_length_] = 'm';   // overwrite \0-byte with closing 'm' again.
+    WriteByteDecimal(buf, col.r);      // rrr;___;___
+    WriteByteDecimal(buf + 4, col.g);  // ___;ggg;___
+    WriteByteDecimal(buf + 8, col.b);  // ___;___;bbb
 }
