@@ -114,6 +114,10 @@ const Color &UDPFlaschenTaschen::GetPixel(int x, int y) {
 }
 
 void UDPFlaschenTaschen::Send(int fd) {
+    const int kMaxUdpPacket = 65507;
+    if (buf_size_ > kMaxUdpPacket) {
+        fprintf(stderr, "Attempting to send image larger than fits in a UDP packet (%d > %d bytes)\n", (int) buf_size_, kMaxUdpPacket);
+    }
     // Some fudging to make the compiler shut up about non-used return value
     if (write(fd, buffer_, buf_size_) < 0) return;
 }
