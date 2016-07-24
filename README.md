@@ -112,7 +112,19 @@ There are various projects that create demos for F~T. Collecting links here.
 Check out these repositories:
 
   * https://github.com/cgorringe/ft-demos Demos such as [plasma](./img/ft-completed.jpg), lines, quilt, ...
-  * https://github.com/scottyallen/flaschenvnc VNC implementation: cast your screen to FlaschenTaschen ([like so](https://www.youtube.com/watch?v=s3pGp_Vf4Pk))
+  * https://github.com/scottyallen/flaschenvnc VNC implementation:
+   cast your screen to FlaschenTaschen
+   ([like so](https://www.youtube.com/watch?v=s3pGp_Vf4Pk))
+  * A [FlaschenTaschen VLC output](https://git.videolan.org/?p=vlc.git;a=commit;h=cf334f257868d20b6a6ce024994e84ba3e3448c3) by François Revol.
+    It is already submitted upstream, but until it hits distributions, you have
+    to [compile VLC from git](https://wiki.videolan.org/UnixCompile/).
+    Then run it like so:
+
+   ```
+    $ vlc --vout flaschen --flaschen-display=ft.noise \
+          --flaschen-width=45 --flaschen-height=35 \
+          <video-filename-or-YouTube-URL>
+   ```
 
 ## Connecting LED strips to the Pi
 

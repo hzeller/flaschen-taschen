@@ -1,10 +1,10 @@
 Protocols
 =========
 
-To make it simple to illuminate the matrix, there are _three_ protocols that
+To make it simple to illuminate the matrix, there are various protocols that
 are all supported:
 
-### Standard Flaschen Taschen protocol
+## Standard Flaschen Taschen protocol
 
 Receives UDP packets with a raw [PPM file][ppm] (`P6`) on port 1337 in a
 single datagram per image.
@@ -79,9 +79,36 @@ you can use the network-swiss army knife `socat`
 $ jpegtopnm color.jpg | pnmscale -xysize 20 20 | socat STDIO UDP-SENDTO:ft.noise:1337
 ```
 
+#### Notes
+For huge displays (more than 21k pixels) we run into UDP packet size limit of
+roughly 64k. In that case, you need to send several tiles of the image and use
+the offset feature to place them on the screen.
+(We might consider adding a TCP protocol for these cases).
+
+Note, this is _not_ an issue with the large FlaschenTaschen installation at
+Noisebridge (1575 pixels) as it requires less than 8% of the UDP limit. But it
+could be an issue with huge assemblies using an
+[RGB Matrix](../server#rgb-matrix-panel-display) with many small LEDs.
+
+#### Implementations
 You find more in the [client directory](../client) to directly send
 content to the server, including a [convenient class][remote-ft] that provides
 an implementation on the client side.
+
+There is a [C++ API](../client/udp-flaschen-taschen.h) and
+a [Python API](../client/flaschen.py) in that directory.
+
+There is a [FlaschenTaschen VNC implementation](https://github.com/scottyallen/flaschenvnc) by Scotty. Scotty also wrote a server implementation for the ESP8266
+that runs LED strips in the [Noise Square Table] and the Noisebridge library
+shelves.
+
+To watch videos, there is now a [FlaschenTaschen VLC output](https://git.videolan.org/?p=vlc.git;a=commit;h=cf334f257868d20b6a6ce024994e84ba3e3448c3) by François Revol available (until it hits distributions, you have to [compile VLC from git](https://wiki.videolan.org/UnixCompile/)).
+
+## Alternative Protocols
+
+There are a couple of alternative protocols that can be enabled on the command
+line on the FlaschenTaschen binary, but they are typically not enabled. Maybe
+we replace the built-in with separate bridge programs.
 
 ### OpenPixelControl
 
@@ -101,8 +128,13 @@ pretty much like a standard framebuffer).
 ![](../img/pixelpusher.png)
 
 ### Network address of Installations
-Within Noisebridge, the hostname is `ft.noise`. The smaller 25x20 display we
-had for testing is called `ftkleine.noise`.
+Within Noisebridge, the hostname of the large 45x35 pixel installation
+is `ft.noise`.
+The smaller 25x20 display is called `ftkleine.noise`.
+Then there are pixel strip implementations for
+the bookshelves with hostname `bookcase.noise` and
+the [Noise Square Table], hostname `square.noise`.
 
 [ppm]: http://netpbm.sourceforge.net/doc/ppm.html
 [remote-ft]: ../client/udp-flaschen-taschen.h
+[Noise Square Table]: https://noisebridge.net/wiki/Noise_Square_Table
