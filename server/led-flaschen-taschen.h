@@ -87,7 +87,7 @@ namespace rgb_matrix {
 class RGBMatrix;
 }
 
-class RGBMatrixFlaschenTaschen : public FlaschenTaschen {
+class RGBMatrixFlaschenTaschen : public ServerFlaschenTaschen {
 public:
     RGBMatrixFlaschenTaschen(int offset_x, int offset_y,
                              int width, int heigh);
