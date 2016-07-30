@@ -11,3 +11,4 @@ simple-example
 pong-game
 game-client
 *.pyc
+.*
