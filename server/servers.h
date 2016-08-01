@@ -28,7 +28,9 @@ bool udp_server_init(int port);
 void udp_server_run_blocking(CompositeFlaschenTaschen *display,
                              ft::Mutex *mutex);
 
-// Optional services, chosen on command-line
+// Optional services, currently disabled.
+// These should probably be moved out of this project and implemented
+// as a bridge.
 bool opc_server_init(int port);
 void opc_server_run_thread(FlaschenTaschen *display, ft::Mutex *mutex);
 

@@ -41,7 +41,7 @@ RGB_LIBRARY_NAME=rgbmatrix
 RGB_LIBRARY=$(RGB_LIBDIR)/lib$(RGB_LIBRARY_NAME).a
 RGB_LDFLAGS=-lrt -lm -lpthread
 
-INCLUDES=-I../common
+INCLUDES=-I../client/include
 OBJECTS=ft-thread.o udp-server.o composite-flaschen-taschen.o ppm-reader.o
 
 # Nested if/else are very awkward, so we just compare each possible outcome
