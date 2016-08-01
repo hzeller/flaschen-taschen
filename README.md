@@ -19,8 +19,7 @@ make nice pixels.
 
 ![](./img/ft-completed.jpg)
 
-How about [Star Wars](https://youtu.be/OEUFIpM10FE) on the completed
-display ?
+How about watching the [Star Wars](https://youtu.be/OEUFIpM10FE) movie ?
 
 The set-up is 9 crates wide and 7 crates high for a total of
 63 [crates (see wiring here)](./doc/wiring.md) with 25 'pixels' each
@@ -36,8 +35,6 @@ This is how it looks from the back:
 
 To develop visuals for the FlaschenTaschen display once it is ready, here you
 can already play around writing software that updates the networked display.
-(If you're running a Mac, switch to `mac-os-compilable` branch as it has some
-Linux specifics removed).
 
 #### 1. Check out the project
 
@@ -73,23 +70,30 @@ $ ./ft-server   #  this will now show a black 'screen'
 If you want to dig into details and understand the various server
 implementations, check out the [server README](./server/README.md).
 
-#### 3. Run client programs
-In another terminal, go to the [client/](./client) directory, compile
-the programs and run it.
+#### 3. Get started with the API
+FlaschenTasachen provides a [network protocol](./doc/protocols.md), but there
+are also client APIs available - the [api subdirectory](./api) is the best to
+inspect here.
+
+To get started with programming, go to the [examples-api/](./examples-api)
+directory, compile the programs and run it.
 
 ```
-$ cd client
+$ cd examples-api
 $ make simple-animation
 $ ./simple-animation localhost # <- network address of display.
 ```
 
+Now go back to your terminal the `ft-server` is running and you'll see the
+space-invaders animation!
+
 Easiest to get started with the programming is
-to read the [simple-example.cc](./client/simple-example.cc) code, then move on
-to [simple-animation.cc](./client/simple-animation.cc).
+to read the [simple-example.cc](./examples-api/simple-example.cc) code,
+then move on to [simple-animation.cc](./examples-api/simple-animation.cc).
 
 If you want to implement the simple network protocol in another language
 [check out the protocol description](./doc/protocols.md) or look at the
-[C++ implementation](./client/udp-flaschen-taschen.cc)
+[C++ implementation](./api/lib/udp-flaschen-taschen.cc).
 
 For some immediate fun, send a PPM image to your server. Since the server
 already understands that format natively, you can unleash the usual
@@ -99,7 +103,8 @@ already understands that format natively, you can unleash the usual
 bash$ jpegtopnm myimage.jpg | pnmscale -xysize 45 35 > /dev/udp/localhost/1337
 ```
 
-For a tool that decodes images (including animated gifs), compile `send-image`
+For a tool that decodes images (including animated gifs), go to
+the [clients/](./clients) sub-directory compile `send-image`
 (`make send-image`, see
 [Send-Image section in client/](./client/README.md#send-image) for needed
 dependencies), then run

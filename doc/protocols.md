@@ -1,10 +1,12 @@
 Protocols
 =========
 
-To make it simple to illuminate the matrix, there are various protocols that
-are all supported:
+To make it simple to illuminate the matrix, there is a simple network protocol
+that allows to stream images to the FlaschenTaschen installation (we used to
+support some other protocols natively, but they moved out to be done via a
+dedicated bridge).
 
-## Standard Flaschen Taschen protocol
+## Flaschen Taschen Protocol
 
 Receives UDP packets with a raw [PPM file][ppm] (`P6`) on port 1337 in a
 single datagram per image.
@@ -103,29 +105,6 @@ that runs LED strips in the [Noise Square Table] and the Noisebridge library
 shelves.
 
 To watch videos, there is now a [FlaschenTaschen VLC output](https://git.videolan.org/?p=vlc.git;a=commit;h=cf334f257868d20b6a6ce024994e84ba3e3448c3) by François Revol available (until it hits distributions, you have to [compile VLC from git](https://wiki.videolan.org/UnixCompile/)).
-
-## Alternative Protocols
-
-There are a couple of alternative protocols that can be enabled on the command
-line on the FlaschenTaschen binary, but they are typically not enabled. Maybe
-we replace the built-in with separate bridge programs.
-
-### OpenPixelControl
-
-The http://openpixelcontrol.org/ socket listens on standard port 7890
-(Simulated layout row 0: left-right, row 1: right-left, row 2: left-right...;
-this is what their standard `wall.py` script assumes).
-
-![](../img/opc.png)
-
-### PixelPusher
-
-Provides pixel pusher control via standard beacon (this is cool to be used
-together with processing, there are libs that support it).
-(Simulated layout: 10 strips starting on the left with 10 pixels each;
-pretty much like a standard framebuffer).
-
-![](../img/pixelpusher.png)
 
 ### Network address of Installations
 Within Noisebridge, the hostname of the large 45x35 pixel installation
