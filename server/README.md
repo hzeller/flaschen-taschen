@@ -1,7 +1,7 @@
 Server implementation
 =====================
 
-The server implements various [protocols](../doc/protocols.md) so that
+The server implements the [network protocol](../doc/protocols.md) so that
 it is easy to interface with the display over the network.
 
 ## Regular Flaschen Taschen server
@@ -9,7 +9,7 @@ it is easy to interface with the display over the network.
 For the actual Flaschen Taschen display, simply build with
 
 ```
-  make
+  make FT_BACKEND=ft
 ```
 
 (Note, this needs the http://spixels.org library, which is included as git
@@ -21,19 +21,13 @@ These are the options
 usage: ./ft-server [options]
 Options:
         -D <width>x<height> : Output dimension. Default 45x35
-        -I <interface>      : Which network interface to wait for
-                              to be ready (e.g eth0. Empty string '' for no waiting).
-                              Default ''
         --layer-timeout <sec>: Layer timeout: clearing after non-activity (Default: 15)
         -d                  : Become daemon
-        --pixel-pusher      : Run PixelPusher protocol (default: false)
-        --opc               : Run OpenPixelControl protocol (default: false)
-(By default, only the FlaschenTaschen UDP protocol is enabled)
 ```
 
 ```bash
  # Run as root.
- sudo ./ft-server -d --opc --pixel-pusher
+ sudo ./ft-server -d
 ```
 
 To change resolution and composition of the actual display, you have to

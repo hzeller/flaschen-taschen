@@ -6,7 +6,7 @@ which you can implement in any programming language easily.
 To make life simple, these are ready client APIs that you can use to get
 started quickly.
 
-Check out the [API examples](../examples-api) for usage examples.
+Check out the [API examples](../examples-api-use) for usage examples.
 
 If you have an implementation in a new language, consider contributing it here.
 
@@ -45,7 +45,8 @@ $(FTLIB) :
 	make -C $(FLASCHEN_TASCHEN_API_DIR)/lib
 ```
 
-See the [../examples-api/Makefile](../examples-api/Makefile) to get inspired.
+See the [../examples-api-use/Makefile](../examples-api-use/Makefile) to get
+inspired.
 
 ## Python
 (TODO(Scotty): describe how to use the Python library in the `ft/api`

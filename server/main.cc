@@ -77,22 +77,15 @@ static int usage(const char *progname) {
             "\t-D <width>x<height> : Output dimension. Default 45x35\n"
 #if FT_BACKEND == 2
             "\t--hd-terminal       : Make terminal with higher resolution.\n"
-#endif
-            "\t-I <interface>      : Which network interface to wait for\n"
-            "\t                      to be ready (e.g eth0. Empty string '' for no "
-            "waiting).\n"
-            "\t                      Default ''\n"
-            "\t--layer-timeout <sec>: Layer timeout: clearing after non-activity (Default: 15)\n"
+#else
             "\t-d                  : Become daemon\n"
-            "\t--pixel-pusher      : Run PixelPusher protocol (default: false)\n"
-            "\t--opc               : Run OpenPixelControl protocol (default: false)\n"
-            "(By default, only the FlaschenTaschen UDP protocol is enabled)\n"
+#endif
+            "\t--layer-timeout <sec>: Layer timeout: clearing after non-activity (Default: 15)\n"
             );
     return 1;
 }
 
 int main(int argc, char *argv[]) {
-    std::string interface = "";
     int width = 45;
     int height = 35;
     int layer_timeout = 15;
@@ -109,7 +102,6 @@ int main(int argc, char *argv[]) {
     };
 
     static struct option long_options[] = {
-        { "interface",          required_argument, NULL, 'I'},
         { "dimension",          required_argument, NULL, 'D'},
 #if FT_BACKEND != 2
         { "daemon",             no_argument,       NULL, 'd'},
@@ -135,9 +127,6 @@ int main(int argc, char *argv[]) {
             as_daemon = true;
             break;
 #endif
-        case 'I':
-            interface = optarg;
-            break;
         case OPT_LAYER_TIMEOUT:
             layer_timeout = atoi(optarg);
             break;

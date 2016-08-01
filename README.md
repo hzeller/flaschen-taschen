@@ -31,7 +31,15 @@ This is how it looks from the back:
 
 <a href="doc/wiring.md"><img src="img/crate-arrange.jpg" width="300px"></a>
 
-## Tutorial: getting started
+## Sending content to FlaschenTaschen
+
+The [client](./client) directory contains some useful utilities such as
+`send-text`, `send-image` or `send-video` that you might be interested in.
+
+Also, the current development [VLC] natively supports the FlaschenTaschen
+protocol if you want to send a video.
+
+## Tutorial: start local server and create new clients
 
 To develop visuals for the FlaschenTaschen display once it is ready, here you
 can already play around writing software that updates the networked display.
@@ -75,11 +83,12 @@ FlaschenTasachen provides a [network protocol](./doc/protocols.md), but there
 are also client APIs available - the [api subdirectory](./api) is the best to
 inspect here.
 
-To get started with programming, go to the [examples-api/](./examples-api)
-directory, compile the programs and run it.
+To get started with programming, go to the
+[examples-api-use/](./examples-api-use) directory, compile the programs and
+run it.
 
 ```
-$ cd examples-api
+$ cd examples-api-use
 $ make simple-animation
 $ ./simple-animation localhost # <- network address of display.
 ```
@@ -88,8 +97,8 @@ Now go back to your terminal the `ft-server` is running and you'll see the
 space-invaders animation!
 
 Easiest to get started with the programming is
-to read the [simple-example.cc](./examples-api/simple-example.cc) code,
-then move on to [simple-animation.cc](./examples-api/simple-animation.cc).
+to read the [simple-example.cc](./examples-api-use/simple-example.cc) code,
+then move on to [simple-animation.cc](./examples-api-use/simple-animation.cc).
 
 If you want to implement the simple network protocol in another language
 [check out the protocol description](./doc/protocols.md) or look at the
@@ -151,3 +160,4 @@ installation right now):
 [7of9-video]: https://www.youtube.com/watch?v=Uc2-8ntcEpY
 [spixels-hardware]: https://github.com/hzeller/spixels/tree/master/hardware
 [spixels]: http://spixels.org/
+[VLC]: https://www.videolan.org/
