@@ -202,7 +202,7 @@ int main(int argc, char *argv[]) {
     const int y_pos = (height - measure_font->height()) / 2
         + measure_font->baseline();
     const int x_pos = (width - measure_font->CharacterWidth(WIDEST_GLYPH)) / 2
-        + with_outline ? 1 : 0;
+        + (with_outline ? 1 : 0);
 
     signal(SIGTERM, InterruptHandler);
     signal(SIGINT, InterruptHandler);

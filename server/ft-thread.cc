@@ -19,6 +19,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#ifndef __APPLE__
+#  include <time.h>      // clock_gettime()
+#else
+#  include <sys/time.h>  // gettimeofday()
+#endif
 
 namespace ft {
 void *Thread::PthreadCallRun(void *tobject) {
@@ -50,6 +55,7 @@ void Thread::Start(int priority, uint32_t affinity_mask) {
         pthread_setschedparam(thread_, SCHED_FIFO, &p);
     }
 
+#ifndef __APPLE__
     if (affinity_mask != 0) {
         cpu_set_t cpu_mask;
         CPU_ZERO(&cpu_mask);
@@ -60,6 +66,7 @@ void Thread::Start(int priority, uint32_t affinity_mask) {
         }
         pthread_setaffinity_np(thread_, sizeof(cpu_mask), &cpu_mask);
     }
+#endif
 
     started_ = true;
 }
@@ -67,7 +74,14 @@ void Thread::Start(int priority, uint32_t affinity_mask) {
 bool Mutex::WaitOnWithTimeout(pthread_cond_t *cond, int wait_ms) {
     if (wait_ms <= 0) return 1;  // already expired.
     struct timespec abs_time;
+#ifndef __APPLE__
     clock_gettime(CLOCK_REALTIME, &abs_time);
+#else
+    struct timeval apple_time;
+    gettimeofday(&apple_time, NULL);
+    abs_time.tv_sec = apple_time.tv_sec;
+    abs_time.tv_nsec = apple_time.tv_usec * 1000;
+#endif
     abs_time.tv_sec += wait_ms / 1000;
     abs_time.tv_nsec += 1000000 * (wait_ms % 1000);
     if (abs_time.tv_nsec > 1000000000) {

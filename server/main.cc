@@ -41,6 +41,7 @@
 #define DROP_PRIV_USER "daemon"
 #define DROP_PRIV_GROUP "daemon"
 
+#ifndef __APPLE__   // Apple does not have setresuid() etc.
 bool drop_privs(const char *priv_user, const char *priv_group) {
     uid_t ruid, euid, suid;
     if (getresuid(&ruid, &euid, &suid) >= 0) {
@@ -68,6 +69,7 @@ bool drop_privs(const char *priv_user, const char *priv_group) {
     }
     return true;
 }
+#endif
 
 static int usage(const char *progname) {
     fprintf(stderr, "usage: %s [options]\n", progname);
@@ -95,15 +97,11 @@ int main(int argc, char *argv[]) {
     int height = 35;
     int layer_timeout = 15;
     bool as_daemon = false;
-    bool run_opc = false;
-    bool run_pixel_pusher = false;
 #if FT_BACKEND == 2
     bool hd_terminal = false;
 #endif
 
     enum LongOptionsOnly {
-        OPT_OPC_SERVER = 1000,
-        OPT_PIXEL_PUSHER = 1001,
         OPT_LAYER_TIMEOUT = 1002,
         OPT_HD_TERMINAL = 1003,
     };
@@ -113,8 +111,6 @@ int main(int argc, char *argv[]) {
         { "dimension",          required_argument, NULL, 'D'},
         { "daemon",             no_argument,       NULL, 'd'},
         { "layer-timeout",      required_argument, NULL,  OPT_LAYER_TIMEOUT },
-        { "opc",                no_argument,       NULL,  OPT_OPC_SERVER },
-        { "pixel-pusher",       no_argument,       NULL,  OPT_PIXEL_PUSHER },
 #if FT_BACKEND == 2
         { "hd-terminal",        no_argument,       NULL,  OPT_HD_TERMINAL },
 #endif
@@ -138,12 +134,6 @@ int main(int argc, char *argv[]) {
             break;
         case OPT_LAYER_TIMEOUT:
             layer_timeout = atoi(optarg);
-            break;
-        case OPT_OPC_SERVER:
-            run_opc = true;
-            break;
-        case OPT_PIXEL_PUSHER:
-            run_pixel_pusher = true;
             break;
 #if FT_BACKEND == 2
         case OPT_HD_TERMINAL:
@@ -199,15 +189,6 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    // Optional services.
-    if (run_opc && !opc_server_init(7890)) {
-        return 1;
-    }
-    if (run_pixel_pusher
-        && !pixel_pusher_init(interface.c_str(), display)) {
-        return 1;
-    }
-
     // Commandline parsed, immediate errors reported. Time to become daemon.
     if (as_daemon && daemon(0, 0) != 0) {  // Become daemon.
         perror("Failed to become daemon");
@@ -227,15 +208,13 @@ int main(int argc, char *argv[]) {
     CompositeFlaschenTaschen layered_display(display, 16);
     layered_display.StartLayerGarbageCollection(&mutex, layer_timeout);
 
-    // Optional services as thread.
-    if (run_opc) opc_server_run_thread(&layered_display, &mutex);
-    if (run_pixel_pusher) pixel_pusher_run_thread(&layered_display, &mutex);
-
+#ifndef __APPLE__
     // After hardware is set up, all servers are listening and all
     // threads are started with their respective priorities, we can drop
     // privileges.
     if (!drop_privs(DROP_PRIV_USER, DROP_PRIV_GROUP))
         return 1;
+#endif
 
     udp_server_run_blocking(&layered_display, &mutex);  // last server blocks.
     delete display;
