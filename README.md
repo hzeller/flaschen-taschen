@@ -1,3 +1,8 @@
+
+===================================================================================
+Please use the master branch: it works now on MacOS, no need for this mac-os-compilable branch anymore
+===================================================================================
+
 Noisebridge Flaschen Taschen Project
 ====================================
 
