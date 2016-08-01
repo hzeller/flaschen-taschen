@@ -96,7 +96,9 @@ int main(int argc, char *argv[]) {
     int width = 45;
     int height = 35;
     int layer_timeout = 15;
+#if FT_BACKEND != 2
     bool as_daemon = false;
+#endif
 #if FT_BACKEND == 2
     bool hd_terminal = false;
 #endif
@@ -109,7 +111,9 @@ int main(int argc, char *argv[]) {
     static struct option long_options[] = {
         { "interface",          required_argument, NULL, 'I'},
         { "dimension",          required_argument, NULL, 'D'},
+#if FT_BACKEND != 2
         { "daemon",             no_argument,       NULL, 'd'},
+#endif
         { "layer-timeout",      required_argument, NULL,  OPT_LAYER_TIMEOUT },
 #if FT_BACKEND == 2
         { "hd-terminal",        no_argument,       NULL,  OPT_HD_TERMINAL },
@@ -126,9 +130,11 @@ int main(int argc, char *argv[]) {
                 return usage(argv[0]);
             }
             break;
+#if FT_BACKEND != 2
         case 'd':
             as_daemon = true;
             break;
+#endif
         case 'I':
             interface = optarg;
             break;
