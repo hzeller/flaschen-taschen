@@ -189,10 +189,12 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
+#if FT_BACKEND != 2  // terminal thing can not run in background.
     // Commandline parsed, immediate errors reported. Time to become daemon.
     if (as_daemon && daemon(0, 0) != 0) {  // Become daemon.
         perror("Failed to become daemon");
     }
+#endif
 
     // Only after we have become a daemon, we can do all the things that
     // require starting threads. These can be various realtime priorities,
