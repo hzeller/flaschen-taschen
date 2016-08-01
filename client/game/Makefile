@@ -1,22 +1,20 @@
-FLASCHEN_TASCHEN_API_DIR=../client
+FLASCHEN_TASCHEN_API_DIR=../../api
 
 CXXFLAGS=-Wall -O3 -I$(FLASCHEN_TASCHEN_API_DIR)/include -I.
 LDFLAGS=-L$(FLASCHEN_TASCHEN_API_DIR)/lib -lftclient
 FTLIB=$(FLASCHEN_TASCHEN_API_DIR)/lib/libftclient.a
 
-MAGICK_CXXFLAGS=`GraphicsMagick++-config --cppflags --cxxflags`
-MAGICK_LDFLAGS=`GraphicsMagick++-config --ldflags --libs`
+pong: game-client pong-game
 
-FFMPEG_LDFLAGS=`pkg-config --cflags --libs  libavcodec libavformat libswscale libavutil`
+game-client: game-client.cc
 
-all : send-text
-
-send-text: send-text.cc
+pong-game: pong-game.cc game-engine.cc $(FTLIB)
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
 send-image : send-image.cc $(FTLIB)
 	$(CXX) $(CXXFLAGS) $(MAGICK_CXXFLAGS) -o $@ $< $(MAGICK_LDFLAGS) $(LDFLAGS)
 
-send-video: send-video.cc $(FTLIB)
+send-video: send-video.cc libftclient.a
 	$(CXX) $(CXXFLAGS) -o $@ $< $(FFMPEG_LDFLAGS) $(LDFLAGS)
 
 % : %.cc $(FTLIB)
@@ -25,8 +23,8 @@ send-video: send-video.cc $(FTLIB)
 %.o : %.cc
 	$(CXX) $(LIB_CXXFLAGS) -c -o $@ $<
 
-$(FTLIB):
+$(FTLIB) :
 	make -C $(FLASCHEN_TASCHEN_API_DIR)/lib
 
 clean:
-	rm -f send-text send-image send-video
+	rm -f pong-game game-client

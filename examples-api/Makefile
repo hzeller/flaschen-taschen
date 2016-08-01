@@ -1,5 +1,5 @@
 # Some Simple examples to get started.
-FLASCHEN_TASCHEN_API_DIR=..
+FLASCHEN_TASCHEN_API_DIR=../api
 
 CXXFLAGS=-Wall -O3 -I$(FLASCHEN_TASCHEN_API_DIR)/include -I.
 LDFLAGS=-L$(FLASCHEN_TASCHEN_API_DIR)/lib -lftclient

@@ -1,3 +1,4 @@
+# (Hey Scotty, how can I set the 'include' path for python ?)
 import flaschen
 
 UDP_IP = 'localhost'
