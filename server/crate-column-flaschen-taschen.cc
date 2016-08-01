@@ -41,7 +41,7 @@ int kCrateMapping[5][5] = {
 }  // namespace
 
 CrateColumnFlaschenTaschen::CrateColumnFlaschenTaschen(spixels::LEDStrip *strip)
-    : strip_(strip), height_(strip->count() / 25) {
+    : strip_(strip), height_(5 * strip->count() / 25) {
 }
 
 CrateColumnFlaschenTaschen::~CrateColumnFlaschenTaschen() {
