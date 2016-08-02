@@ -13,9 +13,6 @@ simple-example: simple-example.cc
 % : %.cc $(FTLIB)
 	$(CXX) $(CXXFLAGS) -o $@ $< $(LDFLAGS)
 
-%.o : %.cc
-	$(CXX) $(LIB_CXXFLAGS) -c -o $@ $<
-
 $(FTLIB) :
 	make -C $(FLASCHEN_TASCHEN_API_DIR)/lib
 

@@ -27,6 +27,10 @@ git submodule add https://github.com/hzeller/flaschen-taschen.git ft
 This will check out the repository in the subdirectory `ft/`. The api
 will be accessible in `ft/api`.
 
+To users of your programs you can suggest to use `--recursive` when
+they clone your project from git, so that they also automatically get the
+submodules checked out.
+
 ## C++
 If you are using C++, let's hook that in your toplevel Makefile:
 
