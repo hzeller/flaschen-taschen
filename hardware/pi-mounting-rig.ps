@@ -1,0 +1,112 @@
+%!PS-Adobe-3.0
+%%BoundingBox: 0 0 600 300
+
+/mm { 72 25.4 div mul } bind def
+
+/top-text (Noisebridge 2016) def
+/bottom-text (FlaschenTaschen) def
+
+/fontsize 7 mm def
+/text-clearance 1 mm def
+
+/corner-radius 20 mm def
+/margin-y 20 mm def
+/margin-x 9 mm def
+
+/mount-w 15 mm def
+/mount-h 5 mm def
+
+/w 85 mm def
+/h 56 mm def
+/extra-for-sdcard 3 mm def
+
+% w h radius
+/rounded-corner-box {
+   /radius exch def
+   /height exch def
+   /width exch def
+
+   currentpoint
+   gsave
+   translate
+   0 radius add 0 moveto
+   width radius sub 0 lineto
+   width radius sub 0 radius add radius -90 0 arc
+
+   width height radius sub lineto
+   width radius sub height radius sub radius 0 90 arc
+
+   0 radius add height lineto
+   0 radius add height radius sub radius 90 180 arc
+
+   0 0 radius add lineto
+   0 radius add 0 radius add radius 180 270 arc
+   stroke
+   grestore
+} def
+
+0 setlinewidth
+margin-x 1 mm add
+margin-y 1 mm add translate
+
+/zip-tie-holddown {
+    % outline
+    margin-x neg margin-y neg moveto
+    w margin-x 2 mul add h margin-y 2 mul add corner-radius rounded-corner-box
+
+    % zip tiedown holes
+    10 mm   margin-y mount-h add 2 div neg moveto
+    mount-w mount-h mount-h 2 div rounded-corner-box
+
+    w 10 mm sub mount-w sub   margin-y mount-h add 2 div neg moveto
+    mount-w mount-h mount-h 2 div rounded-corner-box
+
+    10 mm  h margin-y mount-h sub 2 div add  moveto
+    mount-w mount-h mount-h 2 div rounded-corner-box
+
+    w 10 mm sub mount-w sub h margin-y mount-h sub 2 div add  moveto
+    mount-w mount-h mount-h 2 div rounded-corner-box
+
+    stroke
+
+    % holes
+    3.5 mm           3.5 mm           1.6 mm 0 360 arc stroke
+    3.5 mm 58 mm add 3.5 mm           1.6 mm 0 360 arc stroke
+    3.5 mm 58 mm add 3.5 mm 49 mm add 1.6 mm 0 360 arc stroke
+    3.5 mm           3.5 mm 49 mm add 1.6 mm 0 360 arc stroke
+} def
+
+%% top part: solid with all the text
+zip-tie-holddown
+
+% We print the text in a different color, so that we can map it to
+% a different layer in DXF
+gsave
+1 0 0 setrgbcolor
+/Courier-Bold findfont fontsize scalefont setfont
+
+% Top text with a little fudging for pleasent look
+w 2 div h margin-y 2 div add mount-h 2 div neg add moveto
+0 fontsize neg rmoveto
+0 text-clearance rmoveto
+top-text dup stringwidth pop 2 div neg 0 rmoveto show
+
+% Bottom text with a little fudging for pleasent look
+w 2 div margin-y 2 div neg mount-h add moveto
+0 text-clearance neg rmoveto
+bottom-text dup stringwidth pop 2 div neg 0 rmoveto show
+grestore
+
+% Standoff: another part for the bottom to raise it a little so that the M3 nuts
+% holding the screws are not poking out the bottom.
+w 2 margin-x mul add 1 mm add 0 translate
+zip-tie-holddown
+
+% The cutout is to have access to the M3 nuts. Also, the 'waste' makes a nice
+% Raspberry Pi base-plate in itself. So make sure that it is useful and add
+% a little space around the SD card on one side (which otherwise pokes out) and
+% the USB and ethernet connector on the other side (similar).
+extra-for-sdcard neg 0 moveto
+w 2 extra-for-sdcard mul add h 3 mm rounded-corner-box
+
+showpage
