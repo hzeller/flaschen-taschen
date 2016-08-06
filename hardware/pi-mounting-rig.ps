@@ -9,16 +9,23 @@
 /fontsize 7 mm def
 /text-clearance 1 mm def
 
+% Size of the Pi
+/w 85 mm def
+/h 56 mm def
+/screw-hole-r 1.6 mm def
+/extra-for-sdcard 3 mm def
+
+% Outer diameter of the rig is larger than the Pi and has some
+% nice rounded corners.
 /corner-radius 20 mm def
 /margin-y 20 mm def
 /margin-x 9 mm def
 
+% Zip-tie mounting hole sizes.
 /mount-w 15 mm def
 /mount-h 5 mm def
 
-/w 85 mm def
-/h 56 mm def
-/extra-for-sdcard 3 mm def
+/Courier-Bold findfont fontsize scalefont setfont
 
 % w h radius
 /rounded-corner-box {
@@ -41,13 +48,9 @@
 
    0 0 radius add lineto
    0 radius add 0 radius add radius 180 270 arc
-   stroke
+   closepath stroke
    grestore
 } def
-
-0 setlinewidth
-margin-x 1 mm add
-margin-y 1 mm add translate
 
 /zip-tie-holddown {
     % outline
@@ -69,21 +72,24 @@ margin-y 1 mm add translate
 
     stroke
 
-    % holes
-    3.5 mm           3.5 mm           1.6 mm 0 360 arc stroke
-    3.5 mm 58 mm add 3.5 mm           1.6 mm 0 360 arc stroke
-    3.5 mm 58 mm add 3.5 mm 49 mm add 1.6 mm 0 360 arc stroke
-    3.5 mm           3.5 mm 49 mm add 1.6 mm 0 360 arc stroke
+    % Pi screw holes.
+    3.5 mm           3.5 mm           screw-hole-r 0 360 arc stroke
+    3.5 mm 58 mm add 3.5 mm           screw-hole-r 0 360 arc stroke
+    3.5 mm 58 mm add 3.5 mm 49 mm add screw-hole-r 0 360 arc stroke
+    3.5 mm           3.5 mm 49 mm add screw-hole-r 0 360 arc stroke
 } def
+
+0 setlinewidth
+margin-x 1 mm add
+margin-y 1 mm add translate
 
 %% top part: solid with all the text
 zip-tie-holddown
 
 % We print the text in a different color, so that we can map it to
-% a different layer in DXF
+% a separate layer in DXF
 gsave
 1 0 0 setrgbcolor
-/Courier-Bold findfont fontsize scalefont setfont
 
 % Top text with a little fudging for pleasent look
 w 2 div h margin-y 2 div add mount-h 2 div neg add moveto

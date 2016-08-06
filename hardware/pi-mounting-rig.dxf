@@ -243,7 +243,7 @@ CONTINUOUS
   0
 LAYER
   5
-472
+47d
 100
 AcDbSymbolTableRecord
 100
@@ -259,7 +259,7 @@ CONTINUOUS
   0
 LAYER
   5
-473
+47e
 100
 AcDbSymbolTableRecord
 100
@@ -275,7 +275,7 @@ CONTINUOUS
   0
 LAYER
   5
-474
+47f
 100
 AcDbSymbolTableRecord
 100
@@ -1115,6 +1115,28 @@ C00-00-00-BLACK
 100
 AcDbLine
  10
+21
+ 20
+0.999959
+ 30
+0.0
+ 11
+21
+ 21
+0.999959
+ 31
+0.0
+  0
+LINE
+  5
+10c
+100
+AcDbEntity
+  8
+C00-00-00-BLACK
+100
+AcDbLine
+ 10
 22.5
  20
 8.50007
@@ -1129,7 +1151,7 @@ AcDbLine
   0
 LINE
   5
-10c
+10d
 100
 AcDbEntity
   8
@@ -1151,7 +1173,7 @@ AcDbLine
   0
 SPLINE
   5
-10d
+10e
 100
 AcDbEntity
   8
@@ -1211,28 +1233,6 @@ AcDbSpline
  20
 11.0001
  30
-0.0
-  0
-LINE
-  5
-10e
-100
-AcDbEntity
-  8
-C00-00-00-BLACK
-100
-AcDbLine
- 10
-35.0001
- 20
-11.0001
- 30
-0.0
- 11
-35.0001
- 21
-11.0001
- 31
 0.0
   0
 LINE
@@ -1257,9 +1257,31 @@ AcDbLine
  31
 0.0
   0
-SPLINE
+LINE
   5
 110
+100
+AcDbEntity
+  8
+C00-00-00-BLACK
+100
+AcDbLine
+ 10
+35.0001
+ 20
+11.0001
+ 30
+0.0
+ 11
+35.0001
+ 21
+11.0001
+ 31
+0.0
+  0
+SPLINE
+  5
+111
 100
 AcDbEntity
   8
@@ -1323,7 +1345,7 @@ AcDbSpline
   0
 LINE
   5
-111
+112
 100
 AcDbEntity
   8
@@ -1345,7 +1367,7 @@ AcDbLine
   0
 LINE
   5
-112
+113
 100
 AcDbEntity
   8
@@ -1367,7 +1389,7 @@ AcDbLine
   0
 SPLINE
   5
-113
+114
 100
 AcDbEntity
   8
@@ -1427,28 +1449,6 @@ AcDbSpline
  20
 11.0001
  30
-0.0
-  0
-LINE
-  5
-114
-100
-AcDbEntity
-  8
-C00-00-00-BLACK
-100
-AcDbLine
- 10
-20
- 20
-11.0001
- 30
-0.0
- 11
-20
- 21
-11.0001
- 31
 0.0
   0
 LINE
@@ -1473,9 +1473,31 @@ AcDbLine
  31
 0.0
   0
-SPLINE
+LINE
   5
 116
+100
+AcDbEntity
+  8
+C00-00-00-BLACK
+100
+AcDbLine
+ 10
+20
+ 20
+11.0001
+ 30
+0.0
+ 11
+20
+ 21
+11.0001
+ 31
+0.0
+  0
+SPLINE
+  5
+117
 100
 AcDbEntity
   8
@@ -1539,7 +1561,29 @@ AcDbSpline
   0
 LINE
   5
-117
+118
+100
+AcDbEntity
+  8
+C00-00-00-BLACK
+100
+AcDbLine
+ 10
+22.5
+ 20
+8.50007
+ 30
+0.0
+ 11
+22.5
+ 21
+8.50007
+ 31
+0.0
+  0
+LINE
+  5
+119
 100
 AcDbEntity
   8
@@ -1557,92 +1601,6 @@ AcDbLine
  21
 8.50007
  31
-0.0
-  0
-LINE
-  5
-118
-100
-AcDbEntity
-  8
-C00-00-00-BLACK
-100
-AcDbLine
- 10
-82.4999
- 20
-8.50007
- 30
-0.0
- 11
-82.4999
- 21
-8.50007
- 31
-0.0
-  0
-SPLINE
-  5
-119
-100
-AcDbEntity
-  8
-C00-00-00-BLACK
-100
-AcDbSpline
-210
-0.0
-220
-0.0
-230
-1.0
- 70
-     0
- 71
-     3
- 72
-     8
- 73
-4
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
- 10
-82.4999
- 20
-8.50007
- 30
-0.0
- 10
-83.8807
- 20
-8.50007
- 30
-0.0
- 10
-85
- 20
-9.61944
- 30
-0.0
- 10
-85
- 20
-11.0001
- 30
 0.0
   0
 LINE
@@ -1655,6 +1613,92 @@ C00-00-00-BLACK
 100
 AcDbLine
  10
+82.4999
+ 20
+8.50007
+ 30
+0.0
+ 11
+82.4999
+ 21
+8.50007
+ 31
+0.0
+  0
+SPLINE
+  5
+11b
+100
+AcDbEntity
+  8
+C00-00-00-BLACK
+100
+AcDbSpline
+210
+0.0
+220
+0.0
+230
+1.0
+ 70
+     0
+ 71
+     3
+ 72
+     8
+ 73
+4
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 10
+82.4999
+ 20
+8.50007
+ 30
+0.0
+ 10
+83.8807
+ 20
+8.50007
+ 30
+0.0
+ 10
+85
+ 20
+9.61944
+ 30
+0.0
+ 10
+85
+ 20
+11.0001
+ 30
+0.0
+  0
+LINE
+  5
+11c
+100
+AcDbEntity
+  8
+C00-00-00-BLACK
+100
+AcDbLine
+ 10
 85
  20
 11.0001
@@ -1669,7 +1713,7 @@ AcDbLine
   0
 LINE
   5
-11b
+11d
 100
 AcDbEntity
   8
@@ -1691,7 +1735,7 @@ AcDbLine
   0
 SPLINE
   5
-11c
+11e
 100
 AcDbEntity
   8
@@ -1755,7 +1799,7 @@ AcDbSpline
   0
 LINE
   5
-11d
+11f
 100
 AcDbEntity
   8
@@ -1777,7 +1821,7 @@ AcDbLine
   0
 LINE
   5
-11e
+120
 100
 AcDbEntity
   8
@@ -1799,7 +1843,7 @@ AcDbLine
   0
 SPLINE
   5
-11f
+121
 100
 AcDbEntity
   8
@@ -1863,7 +1907,7 @@ AcDbSpline
   0
 LINE
   5
-120
+122
 100
 AcDbEntity
   8
@@ -1885,7 +1929,7 @@ AcDbLine
   0
 LINE
   5
-121
+123
 100
 AcDbEntity
   8
@@ -1907,7 +1951,7 @@ AcDbLine
   0
 SPLINE
   5
-122
+124
 100
 AcDbEntity
   8
@@ -1971,7 +2015,29 @@ AcDbSpline
   0
 LINE
   5
-123
+125
+100
+AcDbEntity
+  8
+C00-00-00-BLACK
+100
+AcDbLine
+ 10
+72.5001
+ 20
+8.50007
+ 30
+0.0
+ 11
+72.5001
+ 21
+8.50007
+ 31
+0.0
+  0
+LINE
+  5
+126
 100
 AcDbEntity
   8
@@ -1993,114 +2059,6 @@ AcDbLine
   0
 LINE
   5
-124
-100
-AcDbEntity
-  8
-C00-00-00-BLACK
-100
-AcDbLine
- 10
-32.4999
- 20
-84.5002
- 30
-0.0
- 11
-32.4999
- 21
-84.5002
- 31
-0.0
-  0
-SPLINE
-  5
-125
-100
-AcDbEntity
-  8
-C00-00-00-BLACK
-100
-AcDbSpline
-210
-0.0
-220
-0.0
-230
-1.0
- 70
-     0
- 71
-     3
- 72
-     8
- 73
-4
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
- 10
-32.4999
- 20
-84.5002
- 30
-0.0
- 10
-33.8806
- 20
-84.5002
- 30
-0.0
- 10
-35.0001
- 20
-85.6192
- 30
-0.0
- 10
-35.0001
- 20
-86.9999
- 30
-0.0
-  0
-LINE
-  5
-126
-100
-AcDbEntity
-  8
-C00-00-00-BLACK
-100
-AcDbLine
- 10
-35.0001
- 20
-86.9999
- 30
-0.0
- 11
-35.0001
- 21
-86.9999
- 31
-0.0
-  0
-LINE
-  5
 127
 100
 AcDbEntity
@@ -2109,15 +2067,15 @@ C00-00-00-BLACK
 100
 AcDbLine
  10
-35.0001
+32.4999
  20
-86.9999
+84.5002
  30
 0.0
  11
-35.0001
+32.4999
  21
-86.9999
+84.5002
  31
 0.0
   0
@@ -2161,27 +2119,27 @@ AcDbSpline
  40
 1.0
  10
-35.0001
+32.4999
  20
-86.9999
- 30
-0.0
- 10
-35.0001
- 20
-88.3807
+84.5002
  30
 0.0
  10
 33.8806
  20
-89.5001
+84.5002
  30
 0.0
  10
-32.4999
+35.0001
  20
-89.5001
+85.6192
+ 30
+0.0
+ 10
+35.0001
+ 20
+86.9999
  30
 0.0
   0
@@ -2195,15 +2153,15 @@ C00-00-00-BLACK
 100
 AcDbLine
  10
-32.4999
+35.0001
  20
-89.5001
+86.9999
  30
 0.0
  11
-22.5
+35.0001
  21
-89.5001
+86.9999
  31
 0.0
   0
@@ -2217,15 +2175,15 @@ C00-00-00-BLACK
 100
 AcDbLine
  10
-22.5
+35.0001
  20
-89.5001
+86.9999
  30
 0.0
  11
-22.5
+35.0001
  21
-89.5001
+86.9999
  31
 0.0
   0
@@ -2269,27 +2227,27 @@ AcDbSpline
  40
 1.0
  10
-22.5
+35.0001
  20
-89.5001
+86.9999
  30
 0.0
  10
-21.1194
- 20
-89.5001
- 30
-0.0
- 10
-20
+35.0001
  20
 88.3807
  30
 0.0
  10
-20
+33.8806
  20
-86.9999
+89.5001
+ 30
+0.0
+ 10
+32.4999
+ 20
+89.5001
  30
 0.0
   0
@@ -2303,15 +2261,15 @@ C00-00-00-BLACK
 100
 AcDbLine
  10
-20
+32.4999
  20
-86.9999
+89.5001
  30
 0.0
  11
-20
+22.5
  21
-86.9999
+89.5001
  31
 0.0
   0
@@ -2325,15 +2283,15 @@ C00-00-00-BLACK
 100
 AcDbLine
  10
-20
+22.5
  20
-86.9999
+89.5001
  30
 0.0
  11
-20
+22.5
  21
-86.9999
+89.5001
  31
 0.0
   0
@@ -2377,27 +2335,27 @@ AcDbSpline
  40
 1.0
  10
-20
+22.5
  20
-86.9999
- 30
-0.0
- 10
-20
- 20
-85.6192
+89.5001
  30
 0.0
  10
 21.1194
  20
-84.5002
+89.5001
  30
 0.0
  10
-22.5
+20
  20
-84.5002
+88.3807
+ 30
+0.0
+ 10
+20
+ 20
+86.9999
  30
 0.0
   0
@@ -2411,15 +2369,15 @@ C00-00-00-BLACK
 100
 AcDbLine
  10
-72.5001
+20
  20
-84.5002
+86.9999
  30
 0.0
  11
-82.4999
+20
  21
-84.5002
+86.9999
  31
 0.0
   0
@@ -2433,15 +2391,15 @@ C00-00-00-BLACK
 100
 AcDbLine
  10
-82.4999
+20
  20
-84.5002
+86.9999
  30
 0.0
  11
-82.4999
+20
  21
-84.5002
+86.9999
  31
 0.0
   0
@@ -2485,27 +2443,27 @@ AcDbSpline
  40
 1.0
  10
-82.4999
+20
  20
-84.5002
+86.9999
  30
 0.0
  10
-83.8807
- 20
-84.5002
- 30
-0.0
- 10
-85
+20
  20
 85.6192
  30
 0.0
  10
-85
+21.1194
  20
-86.9999
+84.5002
+ 30
+0.0
+ 10
+22.5
+ 20
+84.5002
  30
 0.0
   0
@@ -2519,6 +2477,136 @@ C00-00-00-BLACK
 100
 AcDbLine
  10
+22.5
+ 20
+84.5002
+ 30
+0.0
+ 11
+22.5
+ 21
+84.5002
+ 31
+0.0
+  0
+LINE
+  5
+133
+100
+AcDbEntity
+  8
+C00-00-00-BLACK
+100
+AcDbLine
+ 10
+72.5001
+ 20
+84.5002
+ 30
+0.0
+ 11
+82.4999
+ 21
+84.5002
+ 31
+0.0
+  0
+LINE
+  5
+134
+100
+AcDbEntity
+  8
+C00-00-00-BLACK
+100
+AcDbLine
+ 10
+82.4999
+ 20
+84.5002
+ 30
+0.0
+ 11
+82.4999
+ 21
+84.5002
+ 31
+0.0
+  0
+SPLINE
+  5
+135
+100
+AcDbEntity
+  8
+C00-00-00-BLACK
+100
+AcDbSpline
+210
+0.0
+220
+0.0
+230
+1.0
+ 70
+     0
+ 71
+     3
+ 72
+     8
+ 73
+4
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 10
+82.4999
+ 20
+84.5002
+ 30
+0.0
+ 10
+83.8807
+ 20
+84.5002
+ 30
+0.0
+ 10
+85
+ 20
+85.6192
+ 30
+0.0
+ 10
+85
+ 20
+86.9999
+ 30
+0.0
+  0
+LINE
+  5
+136
+100
+AcDbEntity
+  8
+C00-00-00-BLACK
+100
+AcDbLine
+ 10
 85
  20
 86.9999
@@ -2533,7 +2621,7 @@ AcDbLine
   0
 LINE
   5
-133
+137
 100
 AcDbEntity
   8
@@ -2555,7 +2643,7 @@ AcDbLine
   0
 SPLINE
   5
-134
+138
 100
 AcDbEntity
   8
@@ -2619,7 +2707,7 @@ AcDbSpline
   0
 LINE
   5
-135
+139
 100
 AcDbEntity
   8
@@ -2641,196 +2729,24 @@ AcDbLine
   0
 LINE
   5
-136
-100
-AcDbEntity
-  8
-C00-00-00-BLACK
-100
-AcDbLine
- 10
-72.5001
- 20
-89.5001
- 30
-0.0
- 11
-72.5001
- 21
-89.5001
- 31
-0.0
-  0
-SPLINE
-  5
-137
-100
-AcDbEntity
-  8
-C00-00-00-BLACK
-100
-AcDbSpline
-210
-0.0
-220
-0.0
-230
-1.0
- 70
-     0
- 71
-     3
- 72
-     8
- 73
-4
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
- 10
-72.5001
- 20
-89.5001
- 30
-0.0
- 10
-71.1193
- 20
-89.5001
- 30
-0.0
- 10
-69.9999
- 20
-88.3807
- 30
-0.0
- 10
-69.9999
- 20
-86.9999
- 30
-0.0
-  0
-LINE
-  5
-138
-100
-AcDbEntity
-  8
-C00-00-00-BLACK
-100
-AcDbLine
- 10
-69.9999
- 20
-86.9999
- 30
-0.0
- 11
-69.9999
- 21
-86.9999
- 31
-0.0
-  0
-LINE
-  5
-139
-100
-AcDbEntity
-  8
-C00-00-00-BLACK
-100
-AcDbLine
- 10
-69.9999
- 20
-86.9999
- 30
-0.0
- 11
-69.9999
- 21
-86.9999
- 31
-0.0
-  0
-SPLINE
-  5
 13a
 100
 AcDbEntity
   8
 C00-00-00-BLACK
 100
-AcDbSpline
-210
-0.0
-220
-0.0
-230
-1.0
- 70
-     0
- 71
-     3
- 72
-     8
- 73
-4
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
- 10
-69.9999
- 20
-86.9999
- 30
-0.0
- 10
-69.9999
- 20
-85.6192
- 30
-0.0
- 10
-71.1193
- 20
-84.5002
- 30
-0.0
+AcDbLine
  10
 72.5001
  20
-84.5002
+89.5001
  30
+0.0
+ 11
+72.5001
+ 21
+89.5001
+ 31
 0.0
   0
 SPLINE
@@ -2873,31 +2789,31 @@ AcDbSpline
  40
 1.0
  10
-15.0999
+72.5001
  20
-24.4999
+89.5001
  30
 0.0
  10
-15.0999
+71.1193
  20
-25.3835
+89.5001
  30
 0.0
  10
-14.3836
+69.9999
  20
-26.1
+88.3807
  30
 0.0
  10
-13.5
+69.9999
  20
-26.1
+86.9999
  30
 0.0
   0
-SPLINE
+LINE
   5
 13c
 100
@@ -2905,63 +2821,21 @@ AcDbEntity
   8
 C00-00-00-BLACK
 100
-AcDbSpline
-210
-0.0
-220
-0.0
-230
-1.0
- 70
-     0
- 71
-     3
- 72
-     8
- 73
-4
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
+AcDbLine
  10
-13.5
+69.9999
  20
-26.1
+86.9999
  30
 0.0
- 10
-12.6165
- 20
-26.1
- 30
-0.0
- 10
-11.9
- 20
-25.3835
- 30
-0.0
- 10
-11.9
- 20
-24.4999
- 30
+ 11
+69.9999
+ 21
+86.9999
+ 31
 0.0
   0
-SPLINE
+LINE
   5
 13d
 100
@@ -2969,60 +2843,18 @@ AcDbEntity
   8
 C00-00-00-BLACK
 100
-AcDbSpline
-210
-0.0
-220
-0.0
-230
-1.0
- 70
-     0
- 71
-     3
- 72
-     8
- 73
-4
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
+AcDbLine
  10
-11.9
+69.9999
  20
-24.4999
+86.9999
  30
 0.0
- 10
-11.9
- 20
-23.6164
- 30
-0.0
- 10
-12.6165
- 20
-22.9
- 30
-0.0
- 10
-13.5
- 20
-22.9
- 30
+ 11
+69.9999
+ 21
+86.9999
+ 31
 0.0
   0
 SPLINE
@@ -3065,31 +2897,31 @@ AcDbSpline
  40
 1.0
  10
-13.5
+69.9999
  20
-22.9
+86.9999
  30
 0.0
  10
-14.3836
+69.9999
  20
-22.9
+85.6192
  30
 0.0
  10
-15.0999
+71.1193
  20
-23.6164
+84.5002
  30
 0.0
  10
-15.0999
+72.5001
  20
-24.4999
+84.5002
  30
 0.0
   0
-SPLINE
+LINE
   5
 13f
 100
@@ -3097,60 +2929,18 @@ AcDbEntity
   8
 C00-00-00-BLACK
 100
-AcDbSpline
-210
-0.0
-220
-0.0
-230
-1.0
- 70
-     0
- 71
-     3
- 72
-     8
- 73
-4
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
+AcDbLine
  10
-73.1001
+72.5001
  20
-24.4999
+84.5002
  30
 0.0
- 10
-73.1001
- 20
-25.3835
- 30
-0.0
- 10
-72.3837
- 20
-26.1
- 30
-0.0
- 10
-71.4999
- 20
-26.1
- 30
+ 11
+72.5001
+ 21
+84.5002
+ 31
 0.0
   0
 SPLINE
@@ -3193,27 +2983,27 @@ AcDbSpline
  40
 1.0
  10
-71.4999
+15.0999
  20
-26.1
+24.4999
  30
 0.0
  10
-70.6166
- 20
-26.1
- 30
-0.0
- 10
-69.9001
+15.0999
  20
 25.3835
  30
 0.0
  10
-69.9001
+14.3836
  20
-24.4999
+26.1
+ 30
+0.0
+ 10
+13.5
+ 20
+26.1
  30
 0.0
   0
@@ -3257,27 +3047,27 @@ AcDbSpline
  40
 1.0
  10
-69.9001
+13.5
+ 20
+26.1
+ 30
+0.0
+ 10
+12.6165
+ 20
+26.1
+ 30
+0.0
+ 10
+11.9
+ 20
+25.3835
+ 30
+0.0
+ 10
+11.9
  20
 24.4999
- 30
-0.0
- 10
-69.9001
- 20
-23.6164
- 30
-0.0
- 10
-70.6166
- 20
-22.9
- 30
-0.0
- 10
-71.4999
- 20
-22.9
  30
 0.0
   0
@@ -3321,27 +3111,27 @@ AcDbSpline
  40
 1.0
  10
-71.4999
+11.9
  20
-22.9
+24.4999
  30
 0.0
  10
-72.3837
- 20
-22.9
- 30
-0.0
- 10
-73.1001
+11.9
  20
 23.6164
  30
 0.0
  10
-73.1001
+12.6165
  20
-24.4999
+22.9
+ 30
+0.0
+ 10
+13.5
+ 20
+22.9
  30
 0.0
   0
@@ -3385,27 +3175,27 @@ AcDbSpline
  40
 1.0
  10
-73.1001
+13.5
  20
-73.4998
+22.9
  30
 0.0
  10
-73.1001
+14.3836
  20
-74.3835
+22.9
  30
 0.0
  10
-72.3837
+15.0999
  20
-75.1
+23.6164
  30
 0.0
  10
-71.4999
+15.0999
  20
-75.1
+24.4999
  30
 0.0
   0
@@ -3449,6 +3239,326 @@ AcDbSpline
  40
 1.0
  10
+73.1001
+ 20
+24.4999
+ 30
+0.0
+ 10
+73.1001
+ 20
+25.3835
+ 30
+0.0
+ 10
+72.3837
+ 20
+26.1
+ 30
+0.0
+ 10
+71.4999
+ 20
+26.1
+ 30
+0.0
+  0
+SPLINE
+  5
+145
+100
+AcDbEntity
+  8
+C00-00-00-BLACK
+100
+AcDbSpline
+210
+0.0
+220
+0.0
+230
+1.0
+ 70
+     0
+ 71
+     3
+ 72
+     8
+ 73
+4
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 10
+71.4999
+ 20
+26.1
+ 30
+0.0
+ 10
+70.6166
+ 20
+26.1
+ 30
+0.0
+ 10
+69.9001
+ 20
+25.3835
+ 30
+0.0
+ 10
+69.9001
+ 20
+24.4999
+ 30
+0.0
+  0
+SPLINE
+  5
+146
+100
+AcDbEntity
+  8
+C00-00-00-BLACK
+100
+AcDbSpline
+210
+0.0
+220
+0.0
+230
+1.0
+ 70
+     0
+ 71
+     3
+ 72
+     8
+ 73
+4
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 10
+69.9001
+ 20
+24.4999
+ 30
+0.0
+ 10
+69.9001
+ 20
+23.6164
+ 30
+0.0
+ 10
+70.6166
+ 20
+22.9
+ 30
+0.0
+ 10
+71.4999
+ 20
+22.9
+ 30
+0.0
+  0
+SPLINE
+  5
+147
+100
+AcDbEntity
+  8
+C00-00-00-BLACK
+100
+AcDbSpline
+210
+0.0
+220
+0.0
+230
+1.0
+ 70
+     0
+ 71
+     3
+ 72
+     8
+ 73
+4
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 10
+71.4999
+ 20
+22.9
+ 30
+0.0
+ 10
+72.3837
+ 20
+22.9
+ 30
+0.0
+ 10
+73.1001
+ 20
+23.6164
+ 30
+0.0
+ 10
+73.1001
+ 20
+24.4999
+ 30
+0.0
+  0
+SPLINE
+  5
+148
+100
+AcDbEntity
+  8
+C00-00-00-BLACK
+100
+AcDbSpline
+210
+0.0
+220
+0.0
+230
+1.0
+ 70
+     0
+ 71
+     3
+ 72
+     8
+ 73
+4
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 10
+73.1001
+ 20
+73.4998
+ 30
+0.0
+ 10
+73.1001
+ 20
+74.3835
+ 30
+0.0
+ 10
+72.3837
+ 20
+75.1
+ 30
+0.0
+ 10
+71.4999
+ 20
+75.1
+ 30
+0.0
+  0
+SPLINE
+  5
+149
+100
+AcDbEntity
+  8
+C00-00-00-BLACK
+100
+AcDbSpline
+210
+0.0
+220
+0.0
+230
+1.0
+ 70
+     0
+ 71
+     3
+ 72
+     8
+ 73
+4
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 10
 71.4999
  20
 75.1
@@ -3475,7 +3585,7 @@ AcDbSpline
   0
 SPLINE
   5
-145
+14a
 100
 AcDbEntity
   8
@@ -3539,7 +3649,7 @@ AcDbSpline
   0
 SPLINE
   5
-146
+14b
 100
 AcDbEntity
   8
@@ -3603,7 +3713,7 @@ AcDbSpline
   0
 SPLINE
   5
-147
+14c
 100
 AcDbEntity
   8
@@ -3667,7 +3777,7 @@ AcDbSpline
   0
 SPLINE
   5
-148
+14d
 100
 AcDbEntity
   8
@@ -3731,7 +3841,7 @@ AcDbSpline
   0
 SPLINE
   5
-149
+14e
 100
 AcDbEntity
   8
@@ -3795,7 +3905,7 @@ AcDbSpline
   0
 SPLINE
   5
-14a
+14f
 100
 AcDbEntity
   8
@@ -3859,7 +3969,7 @@ AcDbSpline
   0
 LINE
   5
-14b
+150
 100
 AcDbEntity
   8
@@ -3881,7 +3991,7 @@ AcDbLine
   0
 LINE
   5
-14c
+151
 100
 AcDbEntity
   8
@@ -3903,7 +4013,7 @@ AcDbLine
   0
 LINE
   5
-14d
+152
 100
 AcDbEntity
   8
@@ -3925,7 +4035,7 @@ AcDbLine
   0
 SPLINE
   5
-14e
+153
 100
 AcDbEntity
   8
@@ -3989,7 +4099,7 @@ AcDbSpline
   0
 SPLINE
   5
-14f
+154
 100
 AcDbEntity
   8
@@ -4053,7 +4163,7 @@ AcDbSpline
   0
 SPLINE
   5
-150
+155
 100
 AcDbEntity
   8
@@ -4117,7 +4227,7 @@ AcDbSpline
   0
 LINE
   5
-151
+156
 100
 AcDbEntity
   8
@@ -4139,7 +4249,7 @@ AcDbLine
   0
 SPLINE
   5
-152
+157
 100
 AcDbEntity
   8
@@ -4203,7 +4313,7 @@ AcDbSpline
   0
 SPLINE
   5
-153
+158
 100
 AcDbEntity
   8
@@ -4267,7 +4377,7 @@ AcDbSpline
   0
 SPLINE
   5
-154
+159
 100
 AcDbEntity
   8
@@ -4331,7 +4441,7 @@ AcDbSpline
   0
 SPLINE
   5
-155
+15a
 100
 AcDbEntity
   8
@@ -4395,7 +4505,7 @@ AcDbSpline
   0
 LINE
   5
-156
+15b
 100
 AcDbEntity
   8
@@ -4417,7 +4527,7 @@ AcDbLine
   0
 LINE
   5
-157
+15c
 100
 AcDbEntity
   8
@@ -4439,7 +4549,7 @@ AcDbLine
   0
 LINE
   5
-158
+15d
 100
 AcDbEntity
   8
@@ -4461,7 +4571,7 @@ AcDbLine
   0
 LINE
   5
-159
+15e
 100
 AcDbEntity
   8
@@ -4483,7 +4593,7 @@ AcDbLine
   0
 SPLINE
   5
-15a
+15f
 100
 AcDbEntity
   8
@@ -4547,7 +4657,7 @@ AcDbSpline
   0
 SPLINE
   5
-15b
+160
 100
 AcDbEntity
   8
@@ -4611,7 +4721,7 @@ AcDbSpline
   0
 SPLINE
   5
-15c
+161
 100
 AcDbEntity
   8
@@ -4675,7 +4785,7 @@ AcDbSpline
   0
 SPLINE
   5
-15d
+162
 100
 AcDbEntity
   8
@@ -4739,7 +4849,7 @@ AcDbSpline
   0
 LINE
   5
-15e
+163
 100
 AcDbEntity
   8
@@ -4761,7 +4871,7 @@ AcDbLine
   0
 LINE
   5
-15f
+164
 100
 AcDbEntity
   8
@@ -4783,7 +4893,7 @@ AcDbLine
   0
 SPLINE
   5
-160
+165
 100
 AcDbEntity
   8
@@ -4847,7 +4957,7 @@ AcDbSpline
   0
 SPLINE
   5
-161
+166
 100
 AcDbEntity
   8
@@ -4911,7 +5021,7 @@ AcDbSpline
   0
 SPLINE
   5
-162
+167
 100
 AcDbEntity
   8
@@ -4975,7 +5085,7 @@ AcDbSpline
   0
 LINE
   5
-163
+168
 100
 AcDbEntity
   8
@@ -4997,7 +5107,7 @@ AcDbLine
   0
 SPLINE
   5
-164
+169
 100
 AcDbEntity
   8
@@ -5061,7 +5171,7 @@ AcDbSpline
   0
 SPLINE
   5
-165
+16a
 100
 AcDbEntity
   8
@@ -5125,7 +5235,7 @@ AcDbSpline
   0
 SPLINE
   5
-166
+16b
 100
 AcDbEntity
   8
@@ -5189,7 +5299,7 @@ AcDbSpline
   0
 LINE
   5
-167
+16c
 100
 AcDbEntity
   8
@@ -5211,7 +5321,7 @@ AcDbLine
   0
 LINE
   5
-168
+16d
 100
 AcDbEntity
   8
@@ -5233,7 +5343,7 @@ AcDbLine
   0
 SPLINE
   5
-169
+16e
 100
 AcDbEntity
   8
@@ -5297,7 +5407,7 @@ AcDbSpline
   0
 SPLINE
   5
-16a
+16f
 100
 AcDbEntity
   8
@@ -5361,7 +5471,7 @@ AcDbSpline
   0
 SPLINE
   5
-16b
+170
 100
 AcDbEntity
   8
@@ -5425,7 +5535,7 @@ AcDbSpline
   0
 SPLINE
   5
-16c
+171
 100
 AcDbEntity
   8
@@ -5489,7 +5599,7 @@ AcDbSpline
   0
 LINE
   5
-16d
+172
 100
 AcDbEntity
   8
@@ -5511,7 +5621,7 @@ AcDbLine
   0
 SPLINE
   5
-16e
+173
 100
 AcDbEntity
   8
@@ -5575,7 +5685,7 @@ AcDbSpline
   0
 SPLINE
   5
-16f
+174
 100
 AcDbEntity
   8
@@ -5639,7 +5749,7 @@ AcDbSpline
   0
 SPLINE
   5
-170
+175
 100
 AcDbEntity
   8
@@ -5703,7 +5813,7 @@ AcDbSpline
   0
 SPLINE
   5
-171
+176
 100
 AcDbEntity
   8
@@ -5767,7 +5877,7 @@ AcDbSpline
   0
 LINE
   5
-172
+177
 100
 AcDbEntity
   8
@@ -5789,7 +5899,7 @@ AcDbLine
   0
 LINE
   5
-173
+178
 100
 AcDbEntity
   8
@@ -5811,7 +5921,7 @@ AcDbLine
   0
 SPLINE
   5
-174
+179
 100
 AcDbEntity
   8
@@ -5875,7 +5985,7 @@ AcDbSpline
   0
 SPLINE
   5
-175
+17a
 100
 AcDbEntity
   8
@@ -5939,7 +6049,7 @@ AcDbSpline
   0
 SPLINE
   5
-176
+17b
 100
 AcDbEntity
   8
@@ -6003,7 +6113,7 @@ AcDbSpline
   0
 LINE
   5
-177
+17c
 100
 AcDbEntity
   8
@@ -6025,7 +6135,7 @@ AcDbLine
   0
 LINE
   5
-178
+17d
 100
 AcDbEntity
   8
@@ -6047,7 +6157,7 @@ AcDbLine
   0
 LINE
   5
-179
+17e
 100
 AcDbEntity
   8
@@ -6069,7 +6179,7 @@ AcDbLine
   0
 SPLINE
   5
-17a
+17f
 100
 AcDbEntity
   8
@@ -6133,7 +6243,7 @@ AcDbSpline
   0
 SPLINE
   5
-17b
+180
 100
 AcDbEntity
   8
@@ -6197,7 +6307,7 @@ AcDbSpline
   0
 SPLINE
   5
-17c
+181
 100
 AcDbEntity
   8
@@ -6261,7 +6371,7 @@ AcDbSpline
   0
 SPLINE
   5
-17d
+182
 100
 AcDbEntity
   8
@@ -6325,7 +6435,7 @@ AcDbSpline
   0
 LINE
   5
-17e
+183
 100
 AcDbEntity
   8
@@ -6347,7 +6457,7 @@ AcDbLine
   0
 SPLINE
   5
-17f
+184
 100
 AcDbEntity
   8
@@ -6411,7 +6521,7 @@ AcDbSpline
   0
 SPLINE
   5
-180
+185
 100
 AcDbEntity
   8
@@ -6475,7 +6585,7 @@ AcDbSpline
   0
 SPLINE
   5
-181
+186
 100
 AcDbEntity
   8
@@ -6539,7 +6649,7 @@ AcDbSpline
   0
 SPLINE
   5
-182
+187
 100
 AcDbEntity
   8
@@ -6603,7 +6713,7 @@ AcDbSpline
   0
 LINE
   5
-183
+188
 100
 AcDbEntity
   8
@@ -6625,7 +6735,7 @@ AcDbLine
   0
 LINE
   5
-184
+189
 100
 AcDbEntity
   8
@@ -6647,7 +6757,7 @@ AcDbLine
   0
 LINE
   5
-185
+18a
 100
 AcDbEntity
   8
@@ -6669,7 +6779,7 @@ AcDbLine
   0
 LINE
   5
-186
+18b
 100
 AcDbEntity
   8
@@ -6691,7 +6801,7 @@ AcDbLine
   0
 LINE
   5
-187
+18c
 100
 AcDbEntity
   8
@@ -6713,7 +6823,7 @@ AcDbLine
   0
 LINE
   5
-188
+18d
 100
 AcDbEntity
   8
@@ -6735,7 +6845,7 @@ AcDbLine
   0
 SPLINE
   5
-189
+18e
 100
 AcDbEntity
   8
@@ -6799,7 +6909,7 @@ AcDbSpline
   0
 SPLINE
   5
-18a
+18f
 100
 AcDbEntity
   8
@@ -6863,7 +6973,7 @@ AcDbSpline
   0
 SPLINE
   5
-18b
+190
 100
 AcDbEntity
   8
@@ -6927,7 +7037,7 @@ AcDbSpline
   0
 SPLINE
   5
-18c
+191
 100
 AcDbEntity
   8
@@ -6991,7 +7101,7 @@ AcDbSpline
   0
 SPLINE
   5
-18d
+192
 100
 AcDbEntity
   8
@@ -7055,7 +7165,7 @@ AcDbSpline
   0
 SPLINE
   5
-18e
+193
 100
 AcDbEntity
   8
@@ -7119,7 +7229,7 @@ AcDbSpline
   0
 SPLINE
   5
-18f
+194
 100
 AcDbEntity
   8
@@ -7183,7 +7293,7 @@ AcDbSpline
   0
 SPLINE
   5
-190
+195
 100
 AcDbEntity
   8
@@ -7247,7 +7357,7 @@ AcDbSpline
   0
 SPLINE
   5
-191
+196
 100
 AcDbEntity
   8
@@ -7311,7 +7421,7 @@ AcDbSpline
   0
 SPLINE
   5
-192
+197
 100
 AcDbEntity
   8
@@ -7375,7 +7485,7 @@ AcDbSpline
   0
 SPLINE
   5
-193
+198
 100
 AcDbEntity
   8
@@ -7439,7 +7549,7 @@ AcDbSpline
   0
 SPLINE
   5
-194
+199
 100
 AcDbEntity
   8
@@ -7503,7 +7613,7 @@ AcDbSpline
   0
 SPLINE
   5
-195
+19a
 100
 AcDbEntity
   8
@@ -7567,7 +7677,7 @@ AcDbSpline
   0
 LINE
   5
-196
+19b
 100
 AcDbEntity
   8
@@ -7589,7 +7699,7 @@ AcDbLine
   0
 SPLINE
   5
-197
+19c
 100
 AcDbEntity
   8
@@ -7653,7 +7763,7 @@ AcDbSpline
   0
 SPLINE
   5
-198
+19d
 100
 AcDbEntity
   8
@@ -7717,7 +7827,7 @@ AcDbSpline
   0
 SPLINE
   5
-199
+19e
 100
 AcDbEntity
   8
@@ -7781,7 +7891,7 @@ AcDbSpline
   0
 SPLINE
   5
-19a
+19f
 100
 AcDbEntity
   8
@@ -7845,7 +7955,7 @@ AcDbSpline
   0
 SPLINE
   5
-19b
+1a0
 100
 AcDbEntity
   8
@@ -7909,7 +8019,7 @@ AcDbSpline
   0
 SPLINE
   5
-19c
+1a1
 100
 AcDbEntity
   8
@@ -7973,7 +8083,7 @@ AcDbSpline
   0
 SPLINE
   5
-19d
+1a2
 100
 AcDbEntity
   8
@@ -8037,7 +8147,7 @@ AcDbSpline
   0
 SPLINE
   5
-19e
+1a3
 100
 AcDbEntity
   8
@@ -8101,7 +8211,7 @@ AcDbSpline
   0
 SPLINE
   5
-19f
+1a4
 100
 AcDbEntity
   8
@@ -8165,7 +8275,7 @@ AcDbSpline
   0
 SPLINE
   5
-1a0
+1a5
 100
 AcDbEntity
   8
@@ -8229,7 +8339,7 @@ AcDbSpline
   0
 SPLINE
   5
-1a1
+1a6
 100
 AcDbEntity
   8
@@ -8293,7 +8403,7 @@ AcDbSpline
   0
 SPLINE
   5
-1a2
+1a7
 100
 AcDbEntity
   8
@@ -8357,7 +8467,7 @@ AcDbSpline
   0
 SPLINE
   5
-1a3
+1a8
 100
 AcDbEntity
   8
@@ -8421,7 +8531,7 @@ AcDbSpline
   0
 LINE
   5
-1a4
+1a9
 100
 AcDbEntity
   8
@@ -8443,7 +8553,7 @@ AcDbLine
   0
 LINE
   5
-1a5
+1aa
 100
 AcDbEntity
   8
@@ -8465,7 +8575,7 @@ AcDbLine
   0
 SPLINE
   5
-1a6
+1ab
 100
 AcDbEntity
   8
@@ -8529,7 +8639,7 @@ AcDbSpline
   0
 SPLINE
   5
-1a7
+1ac
 100
 AcDbEntity
   8
@@ -8593,7 +8703,7 @@ AcDbSpline
   0
 SPLINE
   5
-1a8
+1ad
 100
 AcDbEntity
   8
@@ -8657,7 +8767,7 @@ AcDbSpline
   0
 SPLINE
   5
-1a9
+1ae
 100
 AcDbEntity
   8
@@ -8721,7 +8831,7 @@ AcDbSpline
   0
 SPLINE
   5
-1aa
+1af
 100
 AcDbEntity
   8
@@ -8785,7 +8895,7 @@ AcDbSpline
   0
 SPLINE
   5
-1ab
+1b0
 100
 AcDbEntity
   8
@@ -8849,7 +8959,7 @@ AcDbSpline
   0
 SPLINE
   5
-1ac
+1b1
 100
 AcDbEntity
   8
@@ -8913,7 +9023,7 @@ AcDbSpline
   0
 SPLINE
   5
-1ad
+1b2
 100
 AcDbEntity
   8
@@ -8977,7 +9087,7 @@ AcDbSpline
   0
 SPLINE
   5
-1ae
+1b3
 100
 AcDbEntity
   8
@@ -9041,7 +9151,7 @@ AcDbSpline
   0
 LINE
   5
-1af
+1b4
 100
 AcDbEntity
   8
@@ -9063,7 +9173,7 @@ AcDbLine
   0
 SPLINE
   5
-1b0
+1b5
 100
 AcDbEntity
   8
@@ -9127,7 +9237,7 @@ AcDbSpline
   0
 SPLINE
   5
-1b1
+1b6
 100
 AcDbEntity
   8
@@ -9191,7 +9301,7 @@ AcDbSpline
   0
 LINE
   5
-1b2
+1b7
 100
 AcDbEntity
   8
@@ -9213,7 +9323,7 @@ AcDbLine
   0
 LINE
   5
-1b3
+1b8
 100
 AcDbEntity
   8
@@ -9235,7 +9345,7 @@ AcDbLine
   0
 SPLINE
   5
-1b4
+1b9
 100
 AcDbEntity
   8
@@ -9299,7 +9409,7 @@ AcDbSpline
   0
 SPLINE
   5
-1b5
+1ba
 100
 AcDbEntity
   8
@@ -9363,7 +9473,7 @@ AcDbSpline
   0
 SPLINE
   5
-1b6
+1bb
 100
 AcDbEntity
   8
@@ -9427,7 +9537,7 @@ AcDbSpline
   0
 SPLINE
   5
-1b7
+1bc
 100
 AcDbEntity
   8
@@ -9491,7 +9601,7 @@ AcDbSpline
   0
 LINE
   5
-1b8
+1bd
 100
 AcDbEntity
   8
@@ -9513,7 +9623,7 @@ AcDbLine
   0
 LINE
   5
-1b9
+1be
 100
 AcDbEntity
   8
@@ -9535,7 +9645,7 @@ AcDbLine
   0
 LINE
   5
-1ba
+1bf
 100
 AcDbEntity
   8
@@ -9557,7 +9667,7 @@ AcDbLine
   0
 SPLINE
   5
-1bb
+1c0
 100
 AcDbEntity
   8
@@ -9621,7 +9731,7 @@ AcDbSpline
   0
 SPLINE
   5
-1bc
+1c1
 100
 AcDbEntity
   8
@@ -9685,7 +9795,7 @@ AcDbSpline
   0
 SPLINE
   5
-1bd
+1c2
 100
 AcDbEntity
   8
@@ -9749,7 +9859,7 @@ AcDbSpline
   0
 SPLINE
   5
-1be
+1c3
 100
 AcDbEntity
   8
@@ -9813,7 +9923,7 @@ AcDbSpline
   0
 LINE
   5
-1bf
+1c4
 100
 AcDbEntity
   8
@@ -9835,7 +9945,7 @@ AcDbLine
   0
 LINE
   5
-1c0
+1c5
 100
 AcDbEntity
   8
@@ -9857,7 +9967,7 @@ AcDbLine
   0
 SPLINE
   5
-1c1
+1c6
 100
 AcDbEntity
   8
@@ -9921,7 +10031,7 @@ AcDbSpline
   0
 SPLINE
   5
-1c2
+1c7
 100
 AcDbEntity
   8
@@ -9985,7 +10095,7 @@ AcDbSpline
   0
 SPLINE
   5
-1c3
+1c8
 100
 AcDbEntity
   8
@@ -10049,7 +10159,7 @@ AcDbSpline
   0
 SPLINE
   5
-1c4
+1c9
 100
 AcDbEntity
   8
@@ -10113,7 +10223,7 @@ AcDbSpline
   0
 SPLINE
   5
-1c5
+1ca
 100
 AcDbEntity
   8
@@ -10177,7 +10287,7 @@ AcDbSpline
   0
 SPLINE
   5
-1c6
+1cb
 100
 AcDbEntity
   8
@@ -10241,7 +10351,7 @@ AcDbSpline
   0
 LINE
   5
-1c7
+1cc
 100
 AcDbEntity
   8
@@ -10263,7 +10373,7 @@ AcDbLine
   0
 SPLINE
   5
-1c8
+1cd
 100
 AcDbEntity
   8
@@ -10327,7 +10437,7 @@ AcDbSpline
   0
 SPLINE
   5
-1c9
+1ce
 100
 AcDbEntity
   8
@@ -10391,7 +10501,7 @@ AcDbSpline
   0
 SPLINE
   5
-1ca
+1cf
 100
 AcDbEntity
   8
@@ -10455,7 +10565,7 @@ AcDbSpline
   0
 SPLINE
   5
-1cb
+1d0
 100
 AcDbEntity
   8
@@ -10519,7 +10629,7 @@ AcDbSpline
   0
 SPLINE
   5
-1cc
+1d1
 100
 AcDbEntity
   8
@@ -10583,7 +10693,7 @@ AcDbSpline
   0
 SPLINE
   5
-1cd
+1d2
 100
 AcDbEntity
   8
@@ -10647,7 +10757,7 @@ AcDbSpline
   0
 SPLINE
   5
-1ce
+1d3
 100
 AcDbEntity
   8
@@ -10711,7 +10821,7 @@ AcDbSpline
   0
 LINE
   5
-1cf
+1d4
 100
 AcDbEntity
   8
@@ -10733,7 +10843,7 @@ AcDbLine
   0
 LINE
   5
-1d0
+1d5
 100
 AcDbEntity
   8
@@ -10755,7 +10865,7 @@ AcDbLine
   0
 SPLINE
   5
-1d1
+1d6
 100
 AcDbEntity
   8
@@ -10819,7 +10929,7 @@ AcDbSpline
   0
 SPLINE
   5
-1d2
+1d7
 100
 AcDbEntity
   8
@@ -10883,7 +10993,7 @@ AcDbSpline
   0
 SPLINE
   5
-1d3
+1d8
 100
 AcDbEntity
   8
@@ -10947,7 +11057,7 @@ AcDbSpline
   0
 SPLINE
   5
-1d4
+1d9
 100
 AcDbEntity
   8
@@ -11011,7 +11121,7 @@ AcDbSpline
   0
 LINE
   5
-1d5
+1da
 100
 AcDbEntity
   8
@@ -11033,7 +11143,7 @@ AcDbLine
   0
 LINE
   5
-1d6
+1db
 100
 AcDbEntity
   8
@@ -11055,7 +11165,7 @@ AcDbLine
   0
 LINE
   5
-1d7
+1dc
 100
 AcDbEntity
   8
@@ -11077,7 +11187,7 @@ AcDbLine
   0
 SPLINE
   5
-1d8
+1dd
 100
 AcDbEntity
   8
@@ -11141,7 +11251,7 @@ AcDbSpline
   0
 SPLINE
   5
-1d9
+1de
 100
 AcDbEntity
   8
@@ -11205,7 +11315,7 @@ AcDbSpline
   0
 SPLINE
   5
-1da
+1df
 100
 AcDbEntity
   8
@@ -11269,7 +11379,7 @@ AcDbSpline
   0
 SPLINE
   5
-1db
+1e0
 100
 AcDbEntity
   8
@@ -11333,7 +11443,7 @@ AcDbSpline
   0
 LINE
   5
-1dc
+1e1
 100
 AcDbEntity
   8
@@ -11355,7 +11465,7 @@ AcDbLine
   0
 SPLINE
   5
-1dd
+1e2
 100
 AcDbEntity
   8
@@ -11419,7 +11529,7 @@ AcDbSpline
   0
 SPLINE
   5
-1de
+1e3
 100
 AcDbEntity
   8
@@ -11483,7 +11593,7 @@ AcDbSpline
   0
 SPLINE
   5
-1df
+1e4
 100
 AcDbEntity
   8
@@ -11547,7 +11657,7 @@ AcDbSpline
   0
 SPLINE
   5
-1e0
+1e5
 100
 AcDbEntity
   8
@@ -11611,7 +11721,7 @@ AcDbSpline
   0
 LINE
   5
-1e1
+1e6
 100
 AcDbEntity
   8
@@ -11633,7 +11743,7 @@ AcDbLine
   0
 LINE
   5
-1e2
+1e7
 100
 AcDbEntity
   8
@@ -11655,7 +11765,7 @@ AcDbLine
   0
 SPLINE
   5
-1e3
+1e8
 100
 AcDbEntity
   8
@@ -11719,7 +11829,7 @@ AcDbSpline
   0
 SPLINE
   5
-1e4
+1e9
 100
 AcDbEntity
   8
@@ -11783,7 +11893,7 @@ AcDbSpline
   0
 SPLINE
   5
-1e5
+1ea
 100
 AcDbEntity
   8
@@ -11847,7 +11957,7 @@ AcDbSpline
   0
 SPLINE
   5
-1e6
+1eb
 100
 AcDbEntity
   8
@@ -11911,7 +12021,7 @@ AcDbSpline
   0
 SPLINE
   5
-1e7
+1ec
 100
 AcDbEntity
   8
@@ -11975,7 +12085,7 @@ AcDbSpline
   0
 SPLINE
   5
-1e8
+1ed
 100
 AcDbEntity
   8
@@ -12039,7 +12149,7 @@ AcDbSpline
   0
 SPLINE
   5
-1e9
+1ee
 100
 AcDbEntity
   8
@@ -12103,7 +12213,7 @@ AcDbSpline
   0
 LINE
   5
-1ea
+1ef
 100
 AcDbEntity
   8
@@ -12125,7 +12235,7 @@ AcDbLine
   0
 LINE
   5
-1eb
+1f0
 100
 AcDbEntity
   8
@@ -12147,7 +12257,7 @@ AcDbLine
   0
 SPLINE
   5
-1ec
+1f1
 100
 AcDbEntity
   8
@@ -12211,7 +12321,7 @@ AcDbSpline
   0
 SPLINE
   5
-1ed
+1f2
 100
 AcDbEntity
   8
@@ -12275,7 +12385,7 @@ AcDbSpline
   0
 SPLINE
   5
-1ee
+1f3
 100
 AcDbEntity
   8
@@ -12339,7 +12449,7 @@ AcDbSpline
   0
 LINE
   5
-1ef
+1f4
 100
 AcDbEntity
   8
@@ -12361,7 +12471,7 @@ AcDbLine
   0
 LINE
   5
-1f0
+1f5
 100
 AcDbEntity
   8
@@ -12383,7 +12493,7 @@ AcDbLine
   0
 LINE
   5
-1f1
+1f6
 100
 AcDbEntity
   8
@@ -12405,7 +12515,7 @@ AcDbLine
   0
 SPLINE
   5
-1f2
+1f7
 100
 AcDbEntity
   8
@@ -12469,7 +12579,7 @@ AcDbSpline
   0
 SPLINE
   5
-1f3
+1f8
 100
 AcDbEntity
   8
@@ -12533,7 +12643,7 @@ AcDbSpline
   0
 SPLINE
   5
-1f4
+1f9
 100
 AcDbEntity
   8
@@ -12597,7 +12707,7 @@ AcDbSpline
   0
 SPLINE
   5
-1f5
+1fa
 100
 AcDbEntity
   8
@@ -12661,7 +12771,7 @@ AcDbSpline
   0
 LINE
   5
-1f6
+1fb
 100
 AcDbEntity
   8
@@ -12683,7 +12793,7 @@ AcDbLine
   0
 SPLINE
   5
-1f7
+1fc
 100
 AcDbEntity
   8
@@ -12747,7 +12857,7 @@ AcDbSpline
   0
 SPLINE
   5
-1f8
+1fd
 100
 AcDbEntity
   8
@@ -12811,7 +12921,7 @@ AcDbSpline
   0
 SPLINE
   5
-1f9
+1fe
 100
 AcDbEntity
   8
@@ -12875,7 +12985,7 @@ AcDbSpline
   0
 SPLINE
   5
-1fa
+1ff
 100
 AcDbEntity
   8
@@ -12939,7 +13049,7 @@ AcDbSpline
   0
 LINE
   5
-1fb
+200
 100
 AcDbEntity
   8
@@ -12961,7 +13071,7 @@ AcDbLine
   0
 LINE
   5
-1fc
+201
 100
 AcDbEntity
   8
@@ -12983,7 +13093,7 @@ AcDbLine
   0
 LINE
   5
-1fd
+202
 100
 AcDbEntity
   8
@@ -13005,7 +13115,7 @@ AcDbLine
   0
 LINE
   5
-1fe
+203
 100
 AcDbEntity
   8
@@ -13027,7 +13137,7 @@ AcDbLine
   0
 LINE
   5
-1ff
+204
 100
 AcDbEntity
   8
@@ -13049,7 +13159,7 @@ AcDbLine
   0
 LINE
   5
-200
+205
 100
 AcDbEntity
   8
@@ -13071,7 +13181,7 @@ AcDbLine
   0
 LINE
   5
-201
+206
 100
 AcDbEntity
   8
@@ -13093,7 +13203,7 @@ AcDbLine
   0
 SPLINE
   5
-202
+207
 100
 AcDbEntity
   8
@@ -13157,7 +13267,7 @@ AcDbSpline
   0
 SPLINE
   5
-203
+208
 100
 AcDbEntity
   8
@@ -13221,7 +13331,7 @@ AcDbSpline
   0
 SPLINE
   5
-204
+209
 100
 AcDbEntity
   8
@@ -13285,7 +13395,7 @@ AcDbSpline
   0
 SPLINE
   5
-205
+20a
 100
 AcDbEntity
   8
@@ -13349,7 +13459,7 @@ AcDbSpline
   0
 LINE
   5
-206
+20b
 100
 AcDbEntity
   8
@@ -13371,7 +13481,7 @@ AcDbLine
   0
 LINE
   5
-207
+20c
 100
 AcDbEntity
   8
@@ -13393,7 +13503,7 @@ AcDbLine
   0
 SPLINE
   5
-208
+20d
 100
 AcDbEntity
   8
@@ -13457,7 +13567,7 @@ AcDbSpline
   0
 SPLINE
   5
-209
+20e
 100
 AcDbEntity
   8
@@ -13521,7 +13631,7 @@ AcDbSpline
   0
 SPLINE
   5
-20a
+20f
 100
 AcDbEntity
   8
@@ -13585,7 +13695,7 @@ AcDbSpline
   0
 SPLINE
   5
-20b
+210
 100
 AcDbEntity
   8
@@ -13649,7 +13759,7 @@ AcDbSpline
   0
 SPLINE
   5
-20c
+211
 100
 AcDbEntity
   8
@@ -13713,7 +13823,7 @@ AcDbSpline
   0
 SPLINE
   5
-20d
+212
 100
 AcDbEntity
   8
@@ -13777,7 +13887,7 @@ AcDbSpline
   0
 LINE
   5
-20e
+213
 100
 AcDbEntity
   8
@@ -13799,7 +13909,7 @@ AcDbLine
   0
 LINE
   5
-20f
+214
 100
 AcDbEntity
   8
@@ -13821,7 +13931,7 @@ AcDbLine
   0
 SPLINE
   5
-210
+215
 100
 AcDbEntity
   8
@@ -13885,7 +13995,7 @@ AcDbSpline
   0
 SPLINE
   5
-211
+216
 100
 AcDbEntity
   8
@@ -13949,7 +14059,7 @@ AcDbSpline
   0
 SPLINE
   5
-212
+217
 100
 AcDbEntity
   8
@@ -14013,7 +14123,7 @@ AcDbSpline
   0
 SPLINE
   5
-213
+218
 100
 AcDbEntity
   8
@@ -14077,7 +14187,7 @@ AcDbSpline
   0
 LINE
   5
-214
+219
 100
 AcDbEntity
   8
@@ -14099,7 +14209,7 @@ AcDbLine
   0
 LINE
   5
-215
+21a
 100
 AcDbEntity
   8
@@ -14121,7 +14231,7 @@ AcDbLine
   0
 SPLINE
   5
-216
+21b
 100
 AcDbEntity
   8
@@ -14185,7 +14295,7 @@ AcDbSpline
   0
 SPLINE
   5
-217
+21c
 100
 AcDbEntity
   8
@@ -14249,7 +14359,7 @@ AcDbSpline
   0
 SPLINE
   5
-218
+21d
 100
 AcDbEntity
   8
@@ -14313,7 +14423,7 @@ AcDbSpline
   0
 SPLINE
   5
-219
+21e
 100
 AcDbEntity
   8
@@ -14377,7 +14487,7 @@ AcDbSpline
   0
 SPLINE
   5
-21a
+21f
 100
 AcDbEntity
   8
@@ -14441,7 +14551,7 @@ AcDbSpline
   0
 SPLINE
   5
-21b
+220
 100
 AcDbEntity
   8
@@ -14505,7 +14615,7 @@ AcDbSpline
   0
 SPLINE
   5
-21c
+221
 100
 AcDbEntity
   8
@@ -14569,7 +14679,7 @@ AcDbSpline
   0
 SPLINE
   5
-21d
+222
 100
 AcDbEntity
   8
@@ -14633,7 +14743,7 @@ AcDbSpline
   0
 LINE
   5
-21e
+223
 100
 AcDbEntity
   8
@@ -14655,7 +14765,7 @@ AcDbLine
   0
 SPLINE
   5
-21f
+224
 100
 AcDbEntity
   8
@@ -14719,7 +14829,7 @@ AcDbSpline
   0
 SPLINE
   5
-220
+225
 100
 AcDbEntity
   8
@@ -14783,7 +14893,7 @@ AcDbSpline
   0
 SPLINE
   5
-221
+226
 100
 AcDbEntity
   8
@@ -14847,7 +14957,7 @@ AcDbSpline
   0
 SPLINE
   5
-222
+227
 100
 AcDbEntity
   8
@@ -14911,7 +15021,7 @@ AcDbSpline
   0
 LINE
   5
-223
+228
 100
 AcDbEntity
   8
@@ -14933,7 +15043,7 @@ AcDbLine
   0
 SPLINE
   5
-224
+229
 100
 AcDbEntity
   8
@@ -14997,7 +15107,7 @@ AcDbSpline
   0
 LINE
   5
-225
+22a
 100
 AcDbEntity
   8
@@ -15019,7 +15129,7 @@ AcDbLine
   0
 SPLINE
   5
-226
+22b
 100
 AcDbEntity
   8
@@ -15083,7 +15193,7 @@ AcDbSpline
   0
 SPLINE
   5
-227
+22c
 100
 AcDbEntity
   8
@@ -15147,7 +15257,7 @@ AcDbSpline
   0
 SPLINE
   5
-228
+22d
 100
 AcDbEntity
   8
@@ -15211,7 +15321,7 @@ AcDbSpline
   0
 SPLINE
   5
-229
+22e
 100
 AcDbEntity
   8
@@ -15275,7 +15385,7 @@ AcDbSpline
   0
 LINE
   5
-22a
+22f
 100
 AcDbEntity
   8
@@ -15297,7 +15407,7 @@ AcDbLine
   0
 SPLINE
   5
-22b
+230
 100
 AcDbEntity
   8
@@ -15361,7 +15471,7 @@ AcDbSpline
   0
 LINE
   5
-22c
+231
 100
 AcDbEntity
   8
@@ -15383,7 +15493,7 @@ AcDbLine
   0
 LINE
   5
-22d
+232
 100
 AcDbEntity
   8
@@ -15405,7 +15515,7 @@ AcDbLine
   0
 SPLINE
   5
-22e
+233
 100
 AcDbEntity
   8
@@ -15469,7 +15579,7 @@ AcDbSpline
   0
 SPLINE
   5
-22f
+234
 100
 AcDbEntity
   8
@@ -15533,7 +15643,7 @@ AcDbSpline
   0
 SPLINE
   5
-230
+235
 100
 AcDbEntity
   8
@@ -15597,7 +15707,7 @@ AcDbSpline
   0
 SPLINE
   5
-231
+236
 100
 AcDbEntity
   8
@@ -15661,7 +15771,7 @@ AcDbSpline
   0
 LINE
   5
-232
+237
 100
 AcDbEntity
   8
@@ -15683,7 +15793,7 @@ AcDbLine
   0
 LINE
   5
-233
+238
 100
 AcDbEntity
   8
@@ -15705,7 +15815,7 @@ AcDbLine
   0
 SPLINE
   5
-234
+239
 100
 AcDbEntity
   8
@@ -15769,7 +15879,7 @@ AcDbSpline
   0
 SPLINE
   5
-235
+23a
 100
 AcDbEntity
   8
@@ -15833,7 +15943,7 @@ AcDbSpline
   0
 SPLINE
   5
-236
+23b
 100
 AcDbEntity
   8
@@ -15897,7 +16007,7 @@ AcDbSpline
   0
 SPLINE
   5
-237
+23c
 100
 AcDbEntity
   8
@@ -15961,7 +16071,7 @@ AcDbSpline
   0
 LINE
   5
-238
+23d
 100
 AcDbEntity
   8
@@ -15983,7 +16093,7 @@ AcDbLine
   0
 LINE
   5
-239
+23e
 100
 AcDbEntity
   8
@@ -16005,7 +16115,7 @@ AcDbLine
   0
 SPLINE
   5
-23a
+23f
 100
 AcDbEntity
   8
@@ -16069,7 +16179,7 @@ AcDbSpline
   0
 SPLINE
   5
-23b
+240
 100
 AcDbEntity
   8
@@ -16133,7 +16243,7 @@ AcDbSpline
   0
 SPLINE
   5
-23c
+241
 100
 AcDbEntity
   8
@@ -16197,7 +16307,7 @@ AcDbSpline
   0
 SPLINE
   5
-23d
+242
 100
 AcDbEntity
   8
@@ -16261,7 +16371,7 @@ AcDbSpline
   0
 SPLINE
   5
-23e
+243
 100
 AcDbEntity
   8
@@ -16325,7 +16435,7 @@ AcDbSpline
   0
 SPLINE
   5
-23f
+244
 100
 AcDbEntity
   8
@@ -16389,7 +16499,7 @@ AcDbSpline
   0
 SPLINE
   5
-240
+245
 100
 AcDbEntity
   8
@@ -16453,7 +16563,7 @@ AcDbSpline
   0
 SPLINE
   5
-241
+246
 100
 AcDbEntity
   8
@@ -16517,7 +16627,7 @@ AcDbSpline
   0
 SPLINE
   5
-242
+247
 100
 AcDbEntity
   8
@@ -16581,7 +16691,7 @@ AcDbSpline
   0
 LINE
   5
-243
+248
 100
 AcDbEntity
   8
@@ -16603,7 +16713,7 @@ AcDbLine
   0
 SPLINE
   5
-244
+249
 100
 AcDbEntity
   8
@@ -16667,7 +16777,7 @@ AcDbSpline
   0
 SPLINE
   5
-245
+24a
 100
 AcDbEntity
   8
@@ -16731,7 +16841,7 @@ AcDbSpline
   0
 LINE
   5
-246
+24b
 100
 AcDbEntity
   8
@@ -16753,7 +16863,7 @@ AcDbLine
   0
 LINE
   5
-247
+24c
 100
 AcDbEntity
   8
@@ -16775,7 +16885,7 @@ AcDbLine
   0
 SPLINE
   5
-248
+24d
 100
 AcDbEntity
   8
@@ -16839,7 +16949,7 @@ AcDbSpline
   0
 SPLINE
   5
-249
+24e
 100
 AcDbEntity
   8
@@ -16903,7 +17013,7 @@ AcDbSpline
   0
 SPLINE
   5
-24a
+24f
 100
 AcDbEntity
   8
@@ -16967,7 +17077,7 @@ AcDbSpline
   0
 SPLINE
   5
-24b
+250
 100
 AcDbEntity
   8
@@ -17031,7 +17141,7 @@ AcDbSpline
   0
 SPLINE
   5
-24c
+251
 100
 AcDbEntity
   8
@@ -17095,7 +17205,7 @@ AcDbSpline
   0
 SPLINE
   5
-24d
+252
 100
 AcDbEntity
   8
@@ -17159,7 +17269,7 @@ AcDbSpline
   0
 SPLINE
   5
-24e
+253
 100
 AcDbEntity
   8
@@ -17223,7 +17333,7 @@ AcDbSpline
   0
 SPLINE
   5
-24f
+254
 100
 AcDbEntity
   8
@@ -17287,7 +17397,7 @@ AcDbSpline
   0
 SPLINE
   5
-250
+255
 100
 AcDbEntity
   8
@@ -17351,7 +17461,7 @@ AcDbSpline
   0
 SPLINE
   5
-251
+256
 100
 AcDbEntity
   8
@@ -17415,7 +17525,7 @@ AcDbSpline
   0
 SPLINE
   5
-252
+257
 100
 AcDbEntity
   8
@@ -17479,7 +17589,7 @@ AcDbSpline
   0
 LINE
   5
-253
+258
 100
 AcDbEntity
   8
@@ -17501,7 +17611,7 @@ AcDbLine
   0
 LINE
   5
-254
+259
 100
 AcDbEntity
   8
@@ -17523,7 +17633,7 @@ AcDbLine
   0
 LINE
   5
-255
+25a
 100
 AcDbEntity
   8
@@ -17545,7 +17655,7 @@ AcDbLine
   0
 LINE
   5
-256
+25b
 100
 AcDbEntity
   8
@@ -17567,7 +17677,7 @@ AcDbLine
   0
 SPLINE
   5
-257
+25c
 100
 AcDbEntity
   8
@@ -17631,7 +17741,7 @@ AcDbSpline
   0
 SPLINE
   5
-258
+25d
 100
 AcDbEntity
   8
@@ -17695,7 +17805,7 @@ AcDbSpline
   0
 SPLINE
   5
-259
+25e
 100
 AcDbEntity
   8
@@ -17759,7 +17869,7 @@ AcDbSpline
   0
 LINE
   5
-25a
+25f
 100
 AcDbEntity
   8
@@ -17781,7 +17891,7 @@ AcDbLine
   0
 SPLINE
   5
-25b
+260
 100
 AcDbEntity
   8
@@ -17845,7 +17955,7 @@ AcDbSpline
   0
 SPLINE
   5
-25c
+261
 100
 AcDbEntity
   8
@@ -17904,284 +18014,6 @@ AcDbSpline
 75.6024
  20
 82.9723
- 30
-0.0
-  0
-SPLINE
-  5
-25d
-100
-AcDbEntity
-  8
-CFF-00-00
-100
-AcDbSpline
-210
-0.0
-220
-0.0
-230
-1.0
- 70
-     0
- 71
-     3
- 72
-     8
- 73
-4
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
- 10
-75.6024
- 20
-82.9723
- 30
-0.0
- 10
-75.2027
- 20
-82.9723
- 30
-0.0
- 10
-74.8661
- 20
-82.8386
- 30
-0.0
- 10
-74.628
- 20
-82.5867
- 30
-0.0
-  0
-SPLINE
-  5
-25e
-100
-AcDbEntity
-  8
-CFF-00-00
-100
-AcDbSpline
-210
-0.0
-220
-0.0
-230
-1.0
- 70
-     0
- 71
-     3
- 72
-     8
- 73
-4
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
- 10
-74.628
- 20
-82.5867
- 30
-0.0
- 10
-74.2774
- 20
-82.2219
- 30
-0.0
- 10
-74.0816
- 20
-81.6539
- 30
-0.0
- 10
-74.0816
- 20
-81.0161
- 30
-0.0
-  0
-LINE
-  5
-25f
-100
-AcDbEntity
-  8
-CFF-00-00
-100
-AcDbLine
- 10
-74.0816
- 20
-81.0161
- 30
-0.0
- 11
-74.0816
- 21
-80.3508
- 31
-0.0
-  0
-SPLINE
-  5
-260
-100
-AcDbEntity
-  8
-CFF-00-00
-100
-AcDbSpline
-210
-0.0
-220
-0.0
-230
-1.0
- 70
-     0
- 71
-     3
- 72
-     8
- 73
-4
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
- 10
-74.0816
- 20
-80.3508
- 30
-0.0
- 10
-74.0816
- 20
-79.7126
- 30
-0.0
- 10
-74.2774
- 20
-79.145
- 30
-0.0
- 10
-74.628
- 20
-78.7806
- 30
-0.0
-  0
-SPLINE
-  5
-261
-100
-AcDbEntity
-  8
-CFF-00-00
-100
-AcDbSpline
-210
-0.0
-220
-0.0
-230
-1.0
- 70
-     0
- 71
-     3
- 72
-     8
- 73
-4
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
- 10
-74.628
- 20
-78.7806
- 30
-0.0
- 10
-74.8661
- 20
-78.528
- 30
-0.0
- 10
-75.2027
- 20
-78.395
- 30
-0.0
- 10
-75.6024
- 20
-78.395
  30
 0.0
   0
@@ -18227,6 +18059,284 @@ AcDbSpline
  10
 75.6024
  20
+82.9723
+ 30
+0.0
+ 10
+75.2027
+ 20
+82.9723
+ 30
+0.0
+ 10
+74.8661
+ 20
+82.8386
+ 30
+0.0
+ 10
+74.628
+ 20
+82.5867
+ 30
+0.0
+  0
+SPLINE
+  5
+263
+100
+AcDbEntity
+  8
+CFF-00-00
+100
+AcDbSpline
+210
+0.0
+220
+0.0
+230
+1.0
+ 70
+     0
+ 71
+     3
+ 72
+     8
+ 73
+4
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 10
+74.628
+ 20
+82.5867
+ 30
+0.0
+ 10
+74.2774
+ 20
+82.2219
+ 30
+0.0
+ 10
+74.0816
+ 20
+81.6539
+ 30
+0.0
+ 10
+74.0816
+ 20
+81.0161
+ 30
+0.0
+  0
+LINE
+  5
+264
+100
+AcDbEntity
+  8
+CFF-00-00
+100
+AcDbLine
+ 10
+74.0816
+ 20
+81.0161
+ 30
+0.0
+ 11
+74.0816
+ 21
+80.3508
+ 31
+0.0
+  0
+SPLINE
+  5
+265
+100
+AcDbEntity
+  8
+CFF-00-00
+100
+AcDbSpline
+210
+0.0
+220
+0.0
+230
+1.0
+ 70
+     0
+ 71
+     3
+ 72
+     8
+ 73
+4
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 10
+74.0816
+ 20
+80.3508
+ 30
+0.0
+ 10
+74.0816
+ 20
+79.7126
+ 30
+0.0
+ 10
+74.2774
+ 20
+79.145
+ 30
+0.0
+ 10
+74.628
+ 20
+78.7806
+ 30
+0.0
+  0
+SPLINE
+  5
+266
+100
+AcDbEntity
+  8
+CFF-00-00
+100
+AcDbSpline
+210
+0.0
+220
+0.0
+230
+1.0
+ 70
+     0
+ 71
+     3
+ 72
+     8
+ 73
+4
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 10
+74.628
+ 20
+78.7806
+ 30
+0.0
+ 10
+74.8661
+ 20
+78.528
+ 30
+0.0
+ 10
+75.2027
+ 20
+78.395
+ 30
+0.0
+ 10
+75.6024
+ 20
+78.395
+ 30
+0.0
+  0
+SPLINE
+  5
+267
+100
+AcDbEntity
+  8
+CFF-00-00
+100
+AcDbSpline
+210
+0.0
+220
+0.0
+230
+1.0
+ 70
+     0
+ 71
+     3
+ 72
+     8
+ 73
+4
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 10
+75.6024
+ 20
 78.395
  30
 0.0
@@ -18251,7 +18361,7 @@ AcDbSpline
   0
 SPLINE
   5
-263
+268
 100
 AcDbEntity
   8
@@ -18315,7 +18425,7 @@ AcDbSpline
   0
 LINE
   5
-264
+269
 100
 AcDbEntity
   8
@@ -18337,290 +18447,290 @@ AcDbLine
   0
 SPLINE
   5
-265
-100
-AcDbEntity
-  8
-CFF-00-00
-100
-AcDbSpline
-210
-0.0
-220
-0.0
-230
-1.0
- 70
-     0
- 71
-     3
- 72
-     8
- 73
-4
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
- 10
-74.7822
- 20
-81.0652
- 30
-0.0
- 10
-74.7822
- 20
-81.794
- 30
-0.0
- 10
-75.105
- 20
-82.271
- 30
-0.0
- 10
-75.6024
- 20
-82.271
- 30
-0.0
-  0
-SPLINE
-  5
-266
-100
-AcDbEntity
-  8
-CFF-00-00
-100
-AcDbSpline
-210
-0.0
-220
-0.0
-230
-1.0
- 70
-     0
- 71
-     3
- 72
-     8
- 73
-4
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
- 10
-75.6024
- 20
-82.271
- 30
-0.0
- 10
-76.0998
- 20
-82.271
- 30
-0.0
- 10
-76.4226
- 20
-81.794
- 30
-0.0
- 10
-76.4226
- 20
-81.0652
- 30
-0.0
-  0
-LINE
-  5
-267
-100
-AcDbEntity
-  8
-CFF-00-00
-100
-AcDbLine
- 10
-76.4226
- 20
-81.0652
- 30
-0.0
- 11
-76.4226
- 21
-80.301
- 31
-0.0
-  0
-SPLINE
-  5
-268
-100
-AcDbEntity
-  8
-CFF-00-00
-100
-AcDbSpline
-210
-0.0
-220
-0.0
-230
-1.0
- 70
-     0
- 71
-     3
- 72
-     8
- 73
-4
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
- 10
-76.4226
- 20
-80.301
- 30
-0.0
- 10
-76.4226
- 20
-79.5722
- 30
-0.0
- 10
-76.0998
- 20
-79.096
- 30
-0.0
- 10
-75.6024
- 20
-79.096
- 30
-0.0
-  0
-SPLINE
-  5
-269
-100
-AcDbEntity
-  8
-CFF-00-00
-100
-AcDbSpline
-210
-0.0
-220
-0.0
-230
-1.0
- 70
-     0
- 71
-     3
- 72
-     8
- 73
-4
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
- 10
-75.6024
- 20
-79.096
- 30
-0.0
- 10
-75.105
- 20
-79.096
- 30
-0.0
- 10
-74.7822
- 20
-79.5722
- 30
-0.0
- 10
-74.7822
- 20
-80.301
- 30
-0.0
-  0
-LINE
-  5
 26a
 100
 AcDbEntity
   8
 CFF-00-00
 100
+AcDbSpline
+210
+0.0
+220
+0.0
+230
+1.0
+ 70
+     0
+ 71
+     3
+ 72
+     8
+ 73
+4
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 10
+74.7822
+ 20
+81.0652
+ 30
+0.0
+ 10
+74.7822
+ 20
+81.794
+ 30
+0.0
+ 10
+75.105
+ 20
+82.271
+ 30
+0.0
+ 10
+75.6024
+ 20
+82.271
+ 30
+0.0
+  0
+SPLINE
+  5
+26b
+100
+AcDbEntity
+  8
+CFF-00-00
+100
+AcDbSpline
+210
+0.0
+220
+0.0
+230
+1.0
+ 70
+     0
+ 71
+     3
+ 72
+     8
+ 73
+4
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 10
+75.6024
+ 20
+82.271
+ 30
+0.0
+ 10
+76.0998
+ 20
+82.271
+ 30
+0.0
+ 10
+76.4226
+ 20
+81.794
+ 30
+0.0
+ 10
+76.4226
+ 20
+81.0652
+ 30
+0.0
+  0
+LINE
+  5
+26c
+100
+AcDbEntity
+  8
+CFF-00-00
+100
+AcDbLine
+ 10
+76.4226
+ 20
+81.0652
+ 30
+0.0
+ 11
+76.4226
+ 21
+80.301
+ 31
+0.0
+  0
+SPLINE
+  5
+26d
+100
+AcDbEntity
+  8
+CFF-00-00
+100
+AcDbSpline
+210
+0.0
+220
+0.0
+230
+1.0
+ 70
+     0
+ 71
+     3
+ 72
+     8
+ 73
+4
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 10
+76.4226
+ 20
+80.301
+ 30
+0.0
+ 10
+76.4226
+ 20
+79.5722
+ 30
+0.0
+ 10
+76.0998
+ 20
+79.096
+ 30
+0.0
+ 10
+75.6024
+ 20
+79.096
+ 30
+0.0
+  0
+SPLINE
+  5
+26e
+100
+AcDbEntity
+  8
+CFF-00-00
+100
+AcDbSpline
+210
+0.0
+220
+0.0
+230
+1.0
+ 70
+     0
+ 71
+     3
+ 72
+     8
+ 73
+4
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 10
+75.6024
+ 20
+79.096
+ 30
+0.0
+ 10
+75.105
+ 20
+79.096
+ 30
+0.0
+ 10
+74.7822
+ 20
+79.5722
+ 30
+0.0
+ 10
+74.7822
+ 20
+80.301
+ 30
+0.0
+  0
+LINE
+  5
+26f
+100
+AcDbEntity
+  8
+CFF-00-00
+100
 AcDbLine
  10
 74.7822
@@ -18637,7 +18747,7 @@ AcDbLine
   0
 LINE
   5
-26b
+270
 100
 AcDbEntity
   8
@@ -18659,7 +18769,7 @@ AcDbLine
   0
 SPLINE
   5
-26c
+271
 100
 AcDbEntity
   8
@@ -18723,7 +18833,7 @@ AcDbSpline
   0
 SPLINE
   5
-26d
+272
 100
 AcDbEntity
   8
@@ -18787,7 +18897,7 @@ AcDbSpline
   0
 SPLINE
   5
-26e
+273
 100
 AcDbEntity
   8
@@ -18851,7 +18961,7 @@ AcDbSpline
   0
 LINE
   5
-26f
+274
 100
 AcDbEntity
   8
@@ -18873,7 +18983,7 @@ AcDbLine
   0
 LINE
   5
-270
+275
 100
 AcDbEntity
   8
@@ -18895,7 +19005,7 @@ AcDbLine
   0
 LINE
   5
-271
+276
 100
 AcDbEntity
   8
@@ -18917,7 +19027,7 @@ AcDbLine
   0
 SPLINE
   5
-272
+277
 100
 AcDbEntity
   8
@@ -18981,7 +19091,7 @@ AcDbSpline
   0
 SPLINE
   5
-273
+278
 100
 AcDbEntity
   8
@@ -19045,7 +19155,7 @@ AcDbSpline
   0
 SPLINE
   5
-274
+279
 100
 AcDbEntity
   8
@@ -19109,7 +19219,7 @@ AcDbSpline
   0
 SPLINE
   5
-275
+27a
 100
 AcDbEntity
   8
@@ -19173,7 +19283,7 @@ AcDbSpline
   0
 LINE
   5
-276
+27b
 100
 AcDbEntity
   8
@@ -19195,7 +19305,7 @@ AcDbLine
   0
 SPLINE
   5
-277
+27c
 100
 AcDbEntity
   8
@@ -19259,7 +19369,7 @@ AcDbSpline
   0
 SPLINE
   5
-278
+27d
 100
 AcDbEntity
   8
@@ -19323,7 +19433,7 @@ AcDbSpline
   0
 SPLINE
   5
-279
+27e
 100
 AcDbEntity
   8
@@ -19387,7 +19497,7 @@ AcDbSpline
   0
 LINE
   5
-27a
+27f
 100
 AcDbEntity
   8
@@ -19409,7 +19519,7 @@ AcDbLine
   0
 LINE
   5
-27b
+280
 100
 AcDbEntity
   8
@@ -19431,7 +19541,7 @@ AcDbLine
   0
 SPLINE
   5
-27c
+281
 100
 AcDbEntity
   8
@@ -19495,7 +19605,7 @@ AcDbSpline
   0
 SPLINE
   5
-27d
+282
 100
 AcDbEntity
   8
@@ -19559,7 +19669,7 @@ AcDbSpline
   0
 SPLINE
   5
-27e
+283
 100
 AcDbEntity
   8
@@ -19623,7 +19733,7 @@ AcDbSpline
   0
 SPLINE
   5
-27f
+284
 100
 AcDbEntity
   8
@@ -19687,7 +19797,7 @@ AcDbSpline
   0
 SPLINE
   5
-280
+285
 100
 AcDbEntity
   8
@@ -19751,7 +19861,7 @@ AcDbSpline
   0
 SPLINE
   5
-281
+286
 100
 AcDbEntity
   8
@@ -19815,7 +19925,7 @@ AcDbSpline
   0
 SPLINE
   5
-282
+287
 100
 AcDbEntity
   8
@@ -19879,7 +19989,7 @@ AcDbSpline
   0
 SPLINE
   5
-283
+288
 100
 AcDbEntity
   8
@@ -19943,7 +20053,7 @@ AcDbSpline
   0
 SPLINE
   5
-284
+289
 100
 AcDbEntity
   8
@@ -20007,7 +20117,7 @@ AcDbSpline
   0
 SPLINE
   5
-285
+28a
 100
 AcDbEntity
   8
@@ -20071,7 +20181,7 @@ AcDbSpline
   0
 SPLINE
   5
-286
+28b
 100
 AcDbEntity
   8
@@ -20135,7 +20245,7 @@ AcDbSpline
   0
 SPLINE
   5
-287
+28c
 100
 AcDbEntity
   8
@@ -20199,7 +20309,7 @@ AcDbSpline
   0
 SPLINE
   5
-288
+28d
 100
 AcDbEntity
   8
@@ -20263,7 +20373,7 @@ AcDbSpline
   0
 SPLINE
   5
-289
+28e
 100
 AcDbEntity
   8
@@ -20327,7 +20437,7 @@ AcDbSpline
   0
 LINE
   5
-28a
+28f
 100
 AcDbEntity
   8
@@ -20349,7 +20459,7 @@ AcDbLine
   0
 SPLINE
   5
-28b
+290
 100
 AcDbEntity
   8
@@ -20413,7 +20523,7 @@ AcDbSpline
   0
 SPLINE
   5
-28c
+291
 100
 AcDbEntity
   8
@@ -20477,7 +20587,7 @@ AcDbSpline
   0
 SPLINE
   5
-28d
+292
 100
 AcDbEntity
   8
@@ -20541,7 +20651,7 @@ AcDbSpline
   0
 SPLINE
   5
-28e
+293
 100
 AcDbEntity
   8
@@ -20605,7 +20715,7 @@ AcDbSpline
   0
 LINE
   5
-28f
+294
 100
 AcDbEntity
   8
@@ -20627,7 +20737,7 @@ AcDbLine
   0
 LINE
   5
-290
+295
 100
 AcDbEntity
   8
@@ -20649,7 +20759,7 @@ AcDbLine
   0
 LINE
   5
-291
+296
 100
 AcDbEntity
   8
@@ -20671,7 +20781,7 @@ AcDbLine
   0
 SPLINE
   5
-292
+297
 100
 AcDbEntity
   8
@@ -20735,7 +20845,7 @@ AcDbSpline
   0
 SPLINE
   5
-293
+298
 100
 AcDbEntity
   8
@@ -20799,7 +20909,7 @@ AcDbSpline
   0
 SPLINE
   5
-294
+299
 100
 AcDbEntity
   8
@@ -20863,7 +20973,7 @@ AcDbSpline
   0
 SPLINE
   5
-295
+29a
 100
 AcDbEntity
   8
@@ -20927,7 +21037,7 @@ AcDbSpline
   0
 LINE
   5
-296
+29b
 100
 AcDbEntity
   8
@@ -20949,7 +21059,7 @@ AcDbLine
   0
 SPLINE
   5
-297
+29c
 100
 AcDbEntity
   8
@@ -21013,7 +21123,7 @@ AcDbSpline
   0
 SPLINE
   5
-298
+29d
 100
 AcDbEntity
   8
@@ -21077,7 +21187,7 @@ AcDbSpline
   0
 SPLINE
   5
-299
+29e
 100
 AcDbEntity
   8
@@ -21141,7 +21251,7 @@ AcDbSpline
   0
 SPLINE
   5
-29a
+29f
 100
 AcDbEntity
   8
@@ -21205,7 +21315,7 @@ AcDbSpline
   0
 LINE
   5
-29b
+2a0
 100
 AcDbEntity
   8
@@ -21227,7 +21337,7 @@ AcDbLine
   0
 LINE
   5
-29c
+2a1
 100
 AcDbEntity
   8
@@ -21249,7 +21359,7 @@ AcDbLine
   0
 LINE
   5
-29d
+2a2
 100
 AcDbEntity
   8
@@ -21271,7 +21381,7 @@ AcDbLine
   0
 LINE
   5
-29e
+2a3
 100
 AcDbEntity
   8
@@ -21293,7 +21403,7 @@ AcDbLine
   0
 LINE
   5
-29f
+2a4
 100
 AcDbEntity
   8
@@ -21315,7 +21425,7 @@ AcDbLine
   0
 SPLINE
   5
-2a0
+2a5
 100
 AcDbEntity
   8
@@ -21379,7 +21489,7 @@ AcDbSpline
   0
 SPLINE
   5
-2a1
+2a6
 100
 AcDbEntity
   8
@@ -21443,7 +21553,7 @@ AcDbSpline
   0
 SPLINE
   5
-2a2
+2a7
 100
 AcDbEntity
   8
@@ -21507,7 +21617,7 @@ AcDbSpline
   0
 SPLINE
   5
-2a3
+2a8
 100
 AcDbEntity
   8
@@ -21571,7 +21681,7 @@ AcDbSpline
   0
 LINE
   5
-2a4
+2a9
 100
 AcDbEntity
   8
@@ -21593,7 +21703,7 @@ AcDbLine
   0
 LINE
   5
-2a5
+2aa
 100
 AcDbEntity
   8
@@ -21615,7 +21725,7 @@ AcDbLine
   0
 SPLINE
   5
-2a6
+2ab
 100
 AcDbEntity
   8
@@ -21679,7 +21789,7 @@ AcDbSpline
   0
 SPLINE
   5
-2a7
+2ac
 100
 AcDbEntity
   8
@@ -21743,7 +21853,7 @@ AcDbSpline
   0
 SPLINE
   5
-2a8
+2ad
 100
 AcDbEntity
   8
@@ -21807,7 +21917,7 @@ AcDbSpline
   0
 SPLINE
   5
-2a9
+2ae
 100
 AcDbEntity
   8
@@ -21871,7 +21981,7 @@ AcDbSpline
   0
 LINE
   5
-2aa
+2af
 100
 AcDbEntity
   8
@@ -21893,7 +22003,7 @@ AcDbLine
   0
 LINE
   5
-2ab
+2b0
 100
 AcDbEntity
   8
@@ -21915,7 +22025,7 @@ AcDbLine
   0
 LINE
   5
-2ac
+2b1
 100
 AcDbEntity
   8
@@ -21937,7 +22047,7 @@ AcDbLine
   0
 SPLINE
   5
-2ad
+2b2
 100
 AcDbEntity
   8
@@ -22001,7 +22111,7 @@ AcDbSpline
   0
 SPLINE
   5
-2ae
+2b3
 100
 AcDbEntity
   8
@@ -22065,7 +22175,7 @@ AcDbSpline
   0
 SPLINE
   5
-2af
+2b4
 100
 AcDbEntity
   8
@@ -22129,7 +22239,7 @@ AcDbSpline
   0
 SPLINE
   5
-2b0
+2b5
 100
 AcDbEntity
   8
@@ -22193,7 +22303,7 @@ AcDbSpline
   0
 LINE
   5
-2b1
+2b6
 100
 AcDbEntity
   8
@@ -22215,7 +22325,7 @@ AcDbLine
   0
 SPLINE
   5
-2b2
+2b7
 100
 AcDbEntity
   8
@@ -22279,7 +22389,7 @@ AcDbSpline
   0
 SPLINE
   5
-2b3
+2b8
 100
 AcDbEntity
   8
@@ -22343,7 +22453,7 @@ AcDbSpline
   0
 SPLINE
   5
-2b4
+2b9
 100
 AcDbEntity
   8
@@ -22407,7 +22517,7 @@ AcDbSpline
   0
 LINE
   5
-2b5
+2ba
 100
 AcDbEntity
   8
@@ -22429,7 +22539,7 @@ AcDbLine
   0
 LINE
   5
-2b6
+2bb
 100
 AcDbEntity
   8
@@ -22451,7 +22561,7 @@ AcDbLine
   0
 LINE
   5
-2b7
+2bc
 100
 AcDbEntity
   8
@@ -22473,7 +22583,7 @@ AcDbLine
   0
 SPLINE
   5
-2b8
+2bd
 100
 AcDbEntity
   8
@@ -22537,7 +22647,7 @@ AcDbSpline
   0
 SPLINE
   5
-2b9
+2be
 100
 AcDbEntity
   8
@@ -22601,7 +22711,7 @@ AcDbSpline
   0
 SPLINE
   5
-2ba
+2bf
 100
 AcDbEntity
   8
@@ -22665,7 +22775,7 @@ AcDbSpline
   0
 LINE
   5
-2bb
+2c0
 100
 AcDbEntity
   8
@@ -22687,7 +22797,7 @@ AcDbLine
   0
 LINE
   5
-2bc
+2c1
 100
 AcDbEntity
   8
@@ -22709,7 +22819,7 @@ AcDbLine
   0
 LINE
   5
-2bd
+2c2
 100
 AcDbEntity
   8
@@ -22731,7 +22841,7 @@ AcDbLine
   0
 SPLINE
   5
-2be
+2c3
 100
 AcDbEntity
   8
@@ -22795,7 +22905,7 @@ AcDbSpline
   0
 SPLINE
   5
-2bf
+2c4
 100
 AcDbEntity
   8
@@ -22859,7 +22969,7 @@ AcDbSpline
   0
 SPLINE
   5
-2c0
+2c5
 100
 AcDbEntity
   8
@@ -22923,7 +23033,7 @@ AcDbSpline
   0
 SPLINE
   5
-2c1
+2c6
 100
 AcDbEntity
   8
@@ -22987,7 +23097,7 @@ AcDbSpline
   0
 LINE
   5
-2c2
+2c7
 100
 AcDbEntity
   8
@@ -23009,7 +23119,7 @@ AcDbLine
   0
 SPLINE
   5
-2c3
+2c8
 100
 AcDbEntity
   8
@@ -23073,7 +23183,7 @@ AcDbSpline
   0
 SPLINE
   5
-2c4
+2c9
 100
 AcDbEntity
   8
@@ -23137,7 +23247,7 @@ AcDbSpline
   0
 SPLINE
   5
-2c5
+2ca
 100
 AcDbEntity
   8
@@ -23201,7 +23311,7 @@ AcDbSpline
   0
 SPLINE
   5
-2c6
+2cb
 100
 AcDbEntity
   8
@@ -23265,7 +23375,7 @@ AcDbSpline
   0
 LINE
   5
-2c7
+2cc
 100
 AcDbEntity
   8
@@ -23287,7 +23397,7 @@ AcDbLine
   0
 LINE
   5
-2c8
+2cd
 100
 AcDbEntity
   8
@@ -23309,7 +23419,7 @@ AcDbLine
   0
 LINE
   5
-2c9
+2ce
 100
 AcDbEntity
   8
@@ -23331,7 +23441,7 @@ AcDbLine
   0
 SPLINE
   5
-2ca
+2cf
 100
 AcDbEntity
   8
@@ -23395,7 +23505,7 @@ AcDbSpline
   0
 SPLINE
   5
-2cb
+2d0
 100
 AcDbEntity
   8
@@ -23459,7 +23569,7 @@ AcDbSpline
   0
 SPLINE
   5
-2cc
+2d1
 100
 AcDbEntity
   8
@@ -23523,7 +23633,7 @@ AcDbSpline
   0
 LINE
   5
-2cd
+2d2
 100
 AcDbEntity
   8
@@ -23545,7 +23655,7 @@ AcDbLine
   0
 LINE
   5
-2ce
+2d3
 100
 AcDbEntity
   8
@@ -23567,7 +23677,7 @@ AcDbLine
   0
 SPLINE
   5
-2cf
+2d4
 100
 AcDbEntity
   8
@@ -23631,7 +23741,7 @@ AcDbSpline
   0
 SPLINE
   5
-2d0
+2d5
 100
 AcDbEntity
   8
@@ -23695,7 +23805,7 @@ AcDbSpline
   0
 SPLINE
   5
-2d1
+2d6
 100
 AcDbEntity
   8
@@ -23759,7 +23869,7 @@ AcDbSpline
   0
 SPLINE
   5
-2d2
+2d7
 100
 AcDbEntity
   8
@@ -23823,7 +23933,7 @@ AcDbSpline
   0
 SPLINE
   5
-2d3
+2d8
 100
 AcDbEntity
   8
@@ -23887,7 +23997,7 @@ AcDbSpline
   0
 SPLINE
   5
-2d4
+2d9
 100
 AcDbEntity
   8
@@ -23951,7 +24061,7 @@ AcDbSpline
   0
 SPLINE
   5
-2d5
+2da
 100
 AcDbEntity
   8
@@ -24015,7 +24125,7 @@ AcDbSpline
   0
 LINE
   5
-2d6
+2db
 100
 AcDbEntity
   8
@@ -24037,7 +24147,7 @@ AcDbLine
   0
 SPLINE
   5
-2d7
+2dc
 100
 AcDbEntity
   8
@@ -24101,7 +24211,7 @@ AcDbSpline
   0
 SPLINE
   5
-2d8
+2dd
 100
 AcDbEntity
   8
@@ -24165,7 +24275,7 @@ AcDbSpline
   0
 SPLINE
   5
-2d9
+2de
 100
 AcDbEntity
   8
@@ -24229,7 +24339,7 @@ AcDbSpline
   0
 SPLINE
   5
-2da
+2df
 100
 AcDbEntity
   8
@@ -24293,7 +24403,7 @@ AcDbSpline
   0
 SPLINE
   5
-2db
+2e0
 100
 AcDbEntity
   8
@@ -24357,7 +24467,7 @@ AcDbSpline
   0
 LINE
   5
-2dc
+2e1
 100
 AcDbEntity
   8
@@ -24379,7 +24489,7 @@ AcDbLine
   0
 SPLINE
   5
-2dd
+2e2
 100
 AcDbEntity
   8
@@ -24443,7 +24553,7 @@ AcDbSpline
   0
 SPLINE
   5
-2de
+2e3
 100
 AcDbEntity
   8
@@ -24507,7 +24617,7 @@ AcDbSpline
   0
 SPLINE
   5
-2df
+2e4
 100
 AcDbEntity
   8
@@ -24571,7 +24681,7 @@ AcDbSpline
   0
 SPLINE
   5
-2e0
+2e5
 100
 AcDbEntity
   8
@@ -24635,7 +24745,7 @@ AcDbSpline
   0
 LINE
   5
-2e1
+2e6
 100
 AcDbEntity
   8
@@ -24657,7 +24767,7 @@ AcDbLine
   0
 SPLINE
   5
-2e2
+2e7
 100
 AcDbEntity
   8
@@ -24721,7 +24831,7 @@ AcDbSpline
   0
 SPLINE
   5
-2e3
+2e8
 100
 AcDbEntity
   8
@@ -24785,7 +24895,7 @@ AcDbSpline
   0
 SPLINE
   5
-2e4
+2e9
 100
 AcDbEntity
   8
@@ -24849,7 +24959,7 @@ AcDbSpline
   0
 SPLINE
   5
-2e5
+2ea
 100
 AcDbEntity
   8
@@ -24913,7 +25023,7 @@ AcDbSpline
   0
 SPLINE
   5
-2e6
+2eb
 100
 AcDbEntity
   8
@@ -24977,7 +25087,7 @@ AcDbSpline
   0
 SPLINE
   5
-2e7
+2ec
 100
 AcDbEntity
   8
@@ -25041,7 +25151,7 @@ AcDbSpline
   0
 SPLINE
   5
-2e8
+2ed
 100
 AcDbEntity
   8
@@ -25105,7 +25215,7 @@ AcDbSpline
   0
 SPLINE
   5
-2e9
+2ee
 100
 AcDbEntity
   8
@@ -25169,7 +25279,7 @@ AcDbSpline
   0
 SPLINE
   5
-2ea
+2ef
 100
 AcDbEntity
   8
@@ -25233,7 +25343,7 @@ AcDbSpline
   0
 SPLINE
   5
-2eb
+2f0
 100
 AcDbEntity
   8
@@ -25297,7 +25407,7 @@ AcDbSpline
   0
 SPLINE
   5
-2ec
+2f1
 100
 AcDbEntity
   8
@@ -25361,7 +25471,7 @@ AcDbSpline
   0
 SPLINE
   5
-2ed
+2f2
 100
 AcDbEntity
   8
@@ -25425,7 +25535,7 @@ AcDbSpline
   0
 SPLINE
   5
-2ee
+2f3
 100
 AcDbEntity
   8
@@ -25489,7 +25599,7 @@ AcDbSpline
   0
 LINE
   5
-2ef
+2f4
 100
 AcDbEntity
   8
@@ -25511,7 +25621,7 @@ AcDbLine
   0
 SPLINE
   5
-2f0
+2f5
 100
 AcDbEntity
   8
@@ -25575,7 +25685,7 @@ AcDbSpline
   0
 SPLINE
   5
-2f1
+2f6
 100
 AcDbEntity
   8
@@ -25639,7 +25749,7 @@ AcDbSpline
   0
 SPLINE
   5
-2f2
+2f7
 100
 AcDbEntity
   8
@@ -25703,7 +25813,7 @@ AcDbSpline
   0
 SPLINE
   5
-2f3
+2f8
 100
 AcDbEntity
   8
@@ -25767,7 +25877,7 @@ AcDbSpline
   0
 SPLINE
   5
-2f4
+2f9
 100
 AcDbEntity
   8
@@ -25831,7 +25941,7 @@ AcDbSpline
   0
 SPLINE
   5
-2f5
+2fa
 100
 AcDbEntity
   8
@@ -25895,7 +26005,7 @@ AcDbSpline
   0
 SPLINE
   5
-2f6
+2fb
 100
 AcDbEntity
   8
@@ -25959,7 +26069,7 @@ AcDbSpline
   0
 SPLINE
   5
-2f7
+2fc
 100
 AcDbEntity
   8
@@ -26023,7 +26133,7 @@ AcDbSpline
   0
 SPLINE
   5
-2f8
+2fd
 100
 AcDbEntity
   8
@@ -26087,7 +26197,7 @@ AcDbSpline
   0
 SPLINE
   5
-2f9
+2fe
 100
 AcDbEntity
   8
@@ -26151,7 +26261,7 @@ AcDbSpline
   0
 SPLINE
   5
-2fa
+2ff
 100
 AcDbEntity
   8
@@ -26215,7 +26325,7 @@ AcDbSpline
   0
 SPLINE
   5
-2fb
+300
 100
 AcDbEntity
   8
@@ -26279,7 +26389,7 @@ AcDbSpline
   0
 SPLINE
   5
-2fc
+301
 100
 AcDbEntity
   8
@@ -26343,7 +26453,7 @@ AcDbSpline
   0
 LINE
   5
-2fd
+302
 100
 AcDbEntity
   8
@@ -26365,7 +26475,7 @@ AcDbLine
   0
 SPLINE
   5
-2fe
+303
 100
 AcDbEntity
   8
@@ -26429,7 +26539,7 @@ AcDbSpline
   0
 SPLINE
   5
-2ff
+304
 100
 AcDbEntity
   8
@@ -26493,7 +26603,7 @@ AcDbSpline
   0
 SPLINE
   5
-300
+305
 100
 AcDbEntity
   8
@@ -26557,7 +26667,7 @@ AcDbSpline
   0
 SPLINE
   5
-301
+306
 100
 AcDbEntity
   8
@@ -26621,7 +26731,7 @@ AcDbSpline
   0
 SPLINE
   5
-302
+307
 100
 AcDbEntity
   8
@@ -26685,7 +26795,7 @@ AcDbSpline
   0
 SPLINE
   5
-303
+308
 100
 AcDbEntity
   8
@@ -26749,7 +26859,7 @@ AcDbSpline
   0
 SPLINE
   5
-304
+309
 100
 AcDbEntity
   8
@@ -26813,7 +26923,7 @@ AcDbSpline
   0
 SPLINE
   5
-305
+30a
 100
 AcDbEntity
   8
@@ -26877,7 +26987,7 @@ AcDbSpline
   0
 SPLINE
   5
-306
+30b
 100
 AcDbEntity
   8
@@ -26941,7 +27051,7 @@ AcDbSpline
   0
 SPLINE
   5
-307
+30c
 100
 AcDbEntity
   8
@@ -27005,7 +27115,7 @@ AcDbSpline
   0
 SPLINE
   5
-308
+30d
 100
 AcDbEntity
   8
@@ -27069,7 +27179,7 @@ AcDbSpline
   0
 SPLINE
   5
-309
+30e
 100
 AcDbEntity
   8
@@ -27133,7 +27243,7 @@ AcDbSpline
   0
 SPLINE
   5
-30a
+30f
 100
 AcDbEntity
   8
@@ -27197,7 +27307,7 @@ AcDbSpline
   0
 SPLINE
   5
-30b
+310
 100
 AcDbEntity
   8
@@ -27261,7 +27371,7 @@ AcDbSpline
   0
 SPLINE
   5
-30c
+311
 100
 AcDbEntity
   8
@@ -27325,7 +27435,7 @@ AcDbSpline
   0
 SPLINE
   5
-30d
+312
 100
 AcDbEntity
   8
@@ -27389,7 +27499,7 @@ AcDbSpline
   0
 SPLINE
   5
-30e
+313
 100
 AcDbEntity
   8
@@ -27453,7 +27563,7 @@ AcDbSpline
   0
 SPLINE
   5
-30f
+314
 100
 AcDbEntity
   8
@@ -27517,7 +27627,7 @@ AcDbSpline
   0
 SPLINE
   5
-310
+315
 100
 AcDbEntity
   8
@@ -27581,7 +27691,7 @@ AcDbSpline
   0
 SPLINE
   5
-311
+316
 100
 AcDbEntity
   8
@@ -27645,7 +27755,7 @@ AcDbSpline
   0
 SPLINE
   5
-312
+317
 100
 AcDbEntity
   8
@@ -27709,7 +27819,7 @@ AcDbSpline
   0
 LINE
   5
-313
+318
 100
 AcDbEntity
   8
@@ -27731,7 +27841,7 @@ AcDbLine
   0
 LINE
   5
-314
+319
 100
 AcDbEntity
   8
@@ -27753,7 +27863,7 @@ AcDbLine
   0
 SPLINE
   5
-315
+31a
 100
 AcDbEntity
   8
@@ -27817,7 +27927,7 @@ AcDbSpline
   0
 SPLINE
   5
-316
+31b
 100
 AcDbEntity
   8
@@ -27881,7 +27991,7 @@ AcDbSpline
   0
 SPLINE
   5
-317
+31c
 100
 AcDbEntity
   8
@@ -27945,7 +28055,7 @@ AcDbSpline
   0
 SPLINE
   5
-318
+31d
 100
 AcDbEntity
   8
@@ -28009,7 +28119,7 @@ AcDbSpline
   0
 LINE
   5
-319
+31e
 100
 AcDbEntity
   8
@@ -28031,7 +28141,7 @@ AcDbLine
   0
 LINE
   5
-31a
+31f
 100
 AcDbEntity
   8
@@ -28053,7 +28163,7 @@ AcDbLine
   0
 LINE
   5
-31b
+320
 100
 AcDbEntity
   8
@@ -28075,7 +28185,7 @@ AcDbLine
   0
 SPLINE
   5
-31c
+321
 100
 AcDbEntity
   8
@@ -28139,7 +28249,7 @@ AcDbSpline
   0
 SPLINE
   5
-31d
+322
 100
 AcDbEntity
   8
@@ -28203,7 +28313,7 @@ AcDbSpline
   0
 SPLINE
   5
-31e
+323
 100
 AcDbEntity
   8
@@ -28267,7 +28377,7 @@ AcDbSpline
   0
 SPLINE
   5
-31f
+324
 100
 AcDbEntity
   8
@@ -28331,7 +28441,7 @@ AcDbSpline
   0
 LINE
   5
-320
+325
 100
 AcDbEntity
   8
@@ -28353,7 +28463,7 @@ AcDbLine
   0
 SPLINE
   5
-321
+326
 100
 AcDbEntity
   8
@@ -28417,7 +28527,7 @@ AcDbSpline
   0
 SPLINE
   5
-322
+327
 100
 AcDbEntity
   8
@@ -28481,7 +28591,7 @@ AcDbSpline
   0
 SPLINE
   5
-323
+328
 100
 AcDbEntity
   8
@@ -28545,7 +28655,7 @@ AcDbSpline
   0
 SPLINE
   5
-324
+329
 100
 AcDbEntity
   8
@@ -28609,7 +28719,7 @@ AcDbSpline
   0
 LINE
   5
-325
+32a
 100
 AcDbEntity
   8
@@ -28631,7 +28741,7 @@ AcDbLine
   0
 LINE
   5
-326
+32b
 100
 AcDbEntity
   8
@@ -28653,7 +28763,7 @@ AcDbLine
   0
 SPLINE
   5
-327
+32c
 100
 AcDbEntity
   8
@@ -28717,7 +28827,7 @@ AcDbSpline
   0
 SPLINE
   5
-328
+32d
 100
 AcDbEntity
   8
@@ -28781,7 +28891,7 @@ AcDbSpline
   0
 SPLINE
   5
-329
+32e
 100
 AcDbEntity
   8
@@ -28845,7 +28955,7 @@ AcDbSpline
   0
 LINE
   5
-32a
+32f
 100
 AcDbEntity
   8
@@ -28867,7 +28977,7 @@ AcDbLine
   0
 LINE
   5
-32b
+330
 100
 AcDbEntity
   8
@@ -28889,7 +28999,7 @@ AcDbLine
   0
 SPLINE
   5
-32c
+331
 100
 AcDbEntity
   8
@@ -28953,7 +29063,7 @@ AcDbSpline
   0
 SPLINE
   5
-32d
+332
 100
 AcDbEntity
   8
@@ -29017,7 +29127,7 @@ AcDbSpline
   0
 SPLINE
   5
-32e
+333
 100
 AcDbEntity
   8
@@ -29081,7 +29191,7 @@ AcDbSpline
   0
 SPLINE
   5
-32f
+334
 100
 AcDbEntity
   8
@@ -29145,7 +29255,7 @@ AcDbSpline
   0
 LINE
   5
-330
+335
 100
 AcDbEntity
   8
@@ -29167,7 +29277,7 @@ AcDbLine
   0
 SPLINE
   5
-331
+336
 100
 AcDbEntity
   8
@@ -29231,7 +29341,7 @@ AcDbSpline
   0
 SPLINE
   5
-332
+337
 100
 AcDbEntity
   8
@@ -29295,7 +29405,7 @@ AcDbSpline
   0
 SPLINE
   5
-333
+338
 100
 AcDbEntity
   8
@@ -29359,7 +29469,7 @@ AcDbSpline
   0
 LINE
   5
-334
+339
 100
 AcDbEntity
   8
@@ -29381,7 +29491,7 @@ AcDbLine
   0
 LINE
   5
-335
+33a
 100
 AcDbEntity
   8
@@ -29403,7 +29513,7 @@ AcDbLine
   0
 SPLINE
   5
-336
+33b
 100
 AcDbEntity
   8
@@ -29467,7 +29577,7 @@ AcDbSpline
   0
 SPLINE
   5
-337
+33c
 100
 AcDbEntity
   8
@@ -29531,7 +29641,7 @@ AcDbSpline
   0
 LINE
   5
-338
+33d
 100
 AcDbEntity
   8
@@ -29553,7 +29663,7 @@ AcDbLine
   0
 LINE
   5
-339
+33e
 100
 AcDbEntity
   8
@@ -29575,7 +29685,7 @@ AcDbLine
   0
 SPLINE
   5
-33a
+33f
 100
 AcDbEntity
   8
@@ -29639,7 +29749,7 @@ AcDbSpline
   0
 SPLINE
   5
-33b
+340
 100
 AcDbEntity
   8
@@ -29703,7 +29813,7 @@ AcDbSpline
   0
 SPLINE
   5
-33c
+341
 100
 AcDbEntity
   8
@@ -29767,7 +29877,7 @@ AcDbSpline
   0
 SPLINE
   5
-33d
+342
 100
 AcDbEntity
   8
@@ -29831,7 +29941,7 @@ AcDbSpline
   0
 SPLINE
   5
-33e
+343
 100
 AcDbEntity
   8
@@ -29895,7 +30005,7 @@ AcDbSpline
   0
 SPLINE
   5
-33f
+344
 100
 AcDbEntity
   8
@@ -29959,7 +30069,7 @@ AcDbSpline
   0
 SPLINE
   5
-340
+345
 100
 AcDbEntity
   8
@@ -30023,7 +30133,7 @@ AcDbSpline
   0
 SPLINE
   5
-341
+346
 100
 AcDbEntity
   8
@@ -30087,7 +30197,7 @@ AcDbSpline
   0
 SPLINE
   5
-342
+347
 100
 AcDbEntity
   8
@@ -30151,7 +30261,7 @@ AcDbSpline
   0
 LINE
   5
-343
+348
 100
 AcDbEntity
   8
@@ -30173,7 +30283,7 @@ AcDbLine
   0
 SPLINE
   5
-344
+349
 100
 AcDbEntity
   8
@@ -30237,7 +30347,7 @@ AcDbSpline
   0
 SPLINE
   5
-345
+34a
 100
 AcDbEntity
   8
@@ -30301,7 +30411,7 @@ AcDbSpline
   0
 LINE
   5
-346
+34b
 100
 AcDbEntity
   8
@@ -30323,7 +30433,7 @@ AcDbLine
   0
 LINE
   5
-347
+34c
 100
 AcDbEntity
   8
@@ -30345,7 +30455,7 @@ AcDbLine
   0
 SPLINE
   5
-348
+34d
 100
 AcDbEntity
   8
@@ -30409,7 +30519,7 @@ AcDbSpline
   0
 SPLINE
   5
-349
+34e
 100
 AcDbEntity
   8
@@ -30473,7 +30583,7 @@ AcDbSpline
   0
 SPLINE
   5
-34a
+34f
 100
 AcDbEntity
   8
@@ -30537,7 +30647,7 @@ AcDbSpline
   0
 LINE
   5
-34b
+350
 100
 AcDbEntity
   8
@@ -30559,7 +30669,7 @@ AcDbLine
   0
 LINE
   5
-34c
+351
 100
 AcDbEntity
   8
@@ -30581,7 +30691,7 @@ AcDbLine
   0
 SPLINE
   5
-34d
+352
 100
 AcDbEntity
   8
@@ -30645,7 +30755,7 @@ AcDbSpline
   0
 SPLINE
   5
-34e
+353
 100
 AcDbEntity
   8
@@ -30709,7 +30819,7 @@ AcDbSpline
   0
 SPLINE
   5
-34f
+354
 100
 AcDbEntity
   8
@@ -30773,7 +30883,7 @@ AcDbSpline
   0
 SPLINE
   5
-350
+355
 100
 AcDbEntity
   8
@@ -30837,7 +30947,7 @@ AcDbSpline
   0
 LINE
   5
-351
+356
 100
 AcDbEntity
   8
@@ -30859,7 +30969,7 @@ AcDbLine
   0
 SPLINE
   5
-352
+357
 100
 AcDbEntity
   8
@@ -30923,7 +31033,7 @@ AcDbSpline
   0
 SPLINE
   5
-353
+358
 100
 AcDbEntity
   8
@@ -30987,7 +31097,7 @@ AcDbSpline
   0
 SPLINE
   5
-354
+359
 100
 AcDbEntity
   8
@@ -31051,7 +31161,7 @@ AcDbSpline
   0
 LINE
   5
-355
+35a
 100
 AcDbEntity
   8
@@ -31073,7 +31183,7 @@ AcDbLine
   0
 LINE
   5
-356
+35b
 100
 AcDbEntity
   8
@@ -31095,7 +31205,7 @@ AcDbLine
   0
 SPLINE
   5
-357
+35c
 100
 AcDbEntity
   8
@@ -31159,7 +31269,7 @@ AcDbSpline
   0
 SPLINE
   5
-358
+35d
 100
 AcDbEntity
   8
@@ -31223,7 +31333,7 @@ AcDbSpline
   0
 LINE
   5
-359
+35e
 100
 AcDbEntity
   8
@@ -31245,7 +31355,7 @@ AcDbLine
   0
 SPLINE
   5
-35a
+35f
 100
 AcDbEntity
   8
@@ -31309,7 +31419,7 @@ AcDbSpline
   0
 SPLINE
   5
-35b
+360
 100
 AcDbEntity
   8
@@ -31373,7 +31483,7 @@ AcDbSpline
   0
 LINE
   5
-35c
+361
 100
 AcDbEntity
   8
@@ -31395,7 +31505,7 @@ AcDbLine
   0
 SPLINE
   5
-35d
+362
 100
 AcDbEntity
   8
@@ -31459,7 +31569,7 @@ AcDbSpline
   0
 SPLINE
   5
-35e
+363
 100
 AcDbEntity
   8
@@ -31523,7 +31633,7 @@ AcDbSpline
   0
 LINE
   5
-35f
+364
 100
 AcDbEntity
   8
@@ -31545,7 +31655,7 @@ AcDbLine
   0
 SPLINE
   5
-360
+365
 100
 AcDbEntity
   8
@@ -31609,7 +31719,7 @@ AcDbSpline
   0
 SPLINE
   5
-361
+366
 100
 AcDbEntity
   8
@@ -31673,7 +31783,7 @@ AcDbSpline
   0
 SPLINE
   5
-362
+367
 100
 AcDbEntity
   8
@@ -31737,7 +31847,7 @@ AcDbSpline
   0
 LINE
   5
-363
+368
 100
 AcDbEntity
   8
@@ -31759,7 +31869,7 @@ AcDbLine
   0
 LINE
   5
-364
+369
 100
 AcDbEntity
   8
@@ -31781,7 +31891,7 @@ AcDbLine
   0
 LINE
   5
-365
+36a
 100
 AcDbEntity
   8
@@ -31803,7 +31913,7 @@ AcDbLine
   0
 SPLINE
   5
-366
+36b
 100
 AcDbEntity
   8
@@ -31867,7 +31977,7 @@ AcDbSpline
   0
 SPLINE
   5
-367
+36c
 100
 AcDbEntity
   8
@@ -31931,7 +32041,7 @@ AcDbSpline
   0
 SPLINE
   5
-368
+36d
 100
 AcDbEntity
   8
@@ -31995,7 +32105,7 @@ AcDbSpline
   0
 SPLINE
   5
-369
+36e
 100
 AcDbEntity
   8
@@ -32059,7 +32169,7 @@ AcDbSpline
   0
 LINE
   5
-36a
+36f
 100
 AcDbEntity
   8
@@ -32081,7 +32191,7 @@ AcDbLine
   0
 LINE
   5
-36b
+370
 100
 AcDbEntity
   8
@@ -32103,7 +32213,7 @@ AcDbLine
   0
 LINE
   5
-36c
+371
 100
 AcDbEntity
   8
@@ -32125,7 +32235,7 @@ AcDbLine
   0
 SPLINE
   5
-36d
+372
 100
 AcDbEntity
   8
@@ -32189,7 +32299,7 @@ AcDbSpline
   0
 SPLINE
   5
-36e
+373
 100
 AcDbEntity
   8
@@ -32253,7 +32363,7 @@ AcDbSpline
   0
 SPLINE
   5
-36f
+374
 100
 AcDbEntity
   8
@@ -32317,7 +32427,7 @@ AcDbSpline
   0
 SPLINE
   5
-370
+375
 100
 AcDbEntity
   8
@@ -32381,7 +32491,7 @@ AcDbSpline
   0
 LINE
   5
-371
+376
 100
 AcDbEntity
   8
@@ -32403,7 +32513,7 @@ AcDbLine
   0
 LINE
   5
-372
+377
 100
 AcDbEntity
   8
@@ -32425,7 +32535,7 @@ AcDbLine
   0
 LINE
   5
-373
+378
 100
 AcDbEntity
   8
@@ -32447,7 +32557,7 @@ AcDbLine
   0
 LINE
   5
-374
+379
 100
 AcDbEntity
   8
@@ -32469,7 +32579,7 @@ AcDbLine
   0
 SPLINE
   5
-375
+37a
 100
 AcDbEntity
   8
@@ -32533,7 +32643,7 @@ AcDbSpline
   0
 SPLINE
   5
-376
+37b
 100
 AcDbEntity
   8
@@ -32597,7 +32707,7 @@ AcDbSpline
   0
 SPLINE
   5
-377
+37c
 100
 AcDbEntity
   8
@@ -32661,7 +32771,7 @@ AcDbSpline
   0
 SPLINE
   5
-378
+37d
 100
 AcDbEntity
   8
@@ -32725,7 +32835,7 @@ AcDbSpline
   0
 LINE
   5
-379
+37e
 100
 AcDbEntity
   8
@@ -32747,7 +32857,7 @@ AcDbLine
   0
 SPLINE
   5
-37a
+37f
 100
 AcDbEntity
   8
@@ -32811,7 +32921,7 @@ AcDbSpline
   0
 SPLINE
   5
-37b
+380
 100
 AcDbEntity
   8
@@ -32875,7 +32985,7 @@ AcDbSpline
   0
 SPLINE
   5
-37c
+381
 100
 AcDbEntity
   8
@@ -32939,7 +33049,7 @@ AcDbSpline
   0
 LINE
   5
-37d
+382
 100
 AcDbEntity
   8
@@ -32961,7 +33071,7 @@ AcDbLine
   0
 LINE
   5
-37e
+383
 100
 AcDbEntity
   8
@@ -32983,7 +33093,7 @@ AcDbLine
   0
 LINE
   5
-37f
+384
 100
 AcDbEntity
   8
@@ -33005,7 +33115,7 @@ AcDbLine
   0
 SPLINE
   5
-380
+385
 100
 AcDbEntity
   8
@@ -33069,7 +33179,7 @@ AcDbSpline
   0
 SPLINE
   5
-381
+386
 100
 AcDbEntity
   8
@@ -33133,7 +33243,7 @@ AcDbSpline
   0
 SPLINE
   5
-382
+387
 100
 AcDbEntity
   8
@@ -33197,7 +33307,7 @@ AcDbSpline
   0
 LINE
   5
-383
+388
 100
 AcDbEntity
   8
@@ -33219,7 +33329,7 @@ AcDbLine
   0
 LINE
   5
-384
+389
 100
 AcDbEntity
   8
@@ -33241,7 +33351,7 @@ AcDbLine
   0
 SPLINE
   5
-385
+38a
 100
 AcDbEntity
   8
@@ -33305,7 +33415,7 @@ AcDbSpline
   0
 SPLINE
   5
-386
+38b
 100
 AcDbEntity
   8
@@ -33369,7 +33479,7 @@ AcDbSpline
   0
 SPLINE
   5
-387
+38c
 100
 AcDbEntity
   8
@@ -33433,7 +33543,7 @@ AcDbSpline
   0
 SPLINE
   5
-388
+38d
 100
 AcDbEntity
   8
@@ -33497,7 +33607,7 @@ AcDbSpline
   0
 SPLINE
   5
-389
+38e
 100
 AcDbEntity
   8
@@ -33561,7 +33671,7 @@ AcDbSpline
   0
 SPLINE
   5
-38a
+38f
 100
 AcDbEntity
   8
@@ -33625,7 +33735,7 @@ AcDbSpline
   0
 SPLINE
   5
-38b
+390
 100
 AcDbEntity
   8
@@ -33689,7 +33799,7 @@ AcDbSpline
   0
 LINE
   5
-38c
+391
 100
 AcDbEntity
   8
@@ -33711,7 +33821,7 @@ AcDbLine
   0
 SPLINE
   5
-38d
+392
 100
 AcDbEntity
   8
@@ -33775,7 +33885,7 @@ AcDbSpline
   0
 SPLINE
   5
-38e
+393
 100
 AcDbEntity
   8
@@ -33839,7 +33949,7 @@ AcDbSpline
   0
 SPLINE
   5
-38f
+394
 100
 AcDbEntity
   8
@@ -33903,7 +34013,7 @@ AcDbSpline
   0
 SPLINE
   5
-390
+395
 100
 AcDbEntity
   8
@@ -33967,7 +34077,7 @@ AcDbSpline
   0
 SPLINE
   5
-391
+396
 100
 AcDbEntity
   8
@@ -34031,7 +34141,7 @@ AcDbSpline
   0
 LINE
   5
-392
+397
 100
 AcDbEntity
   8
@@ -34053,7 +34163,7 @@ AcDbLine
   0
 SPLINE
   5
-393
+398
 100
 AcDbEntity
   8
@@ -34117,7 +34227,7 @@ AcDbSpline
   0
 SPLINE
   5
-394
+399
 100
 AcDbEntity
   8
@@ -34181,7 +34291,7 @@ AcDbSpline
   0
 SPLINE
   5
-395
+39a
 100
 AcDbEntity
   8
@@ -34245,7 +34355,7 @@ AcDbSpline
   0
 SPLINE
   5
-396
+39b
 100
 AcDbEntity
   8
@@ -34309,7 +34419,7 @@ AcDbSpline
   0
 LINE
   5
-397
+39c
 100
 AcDbEntity
   8
@@ -34331,7 +34441,7 @@ AcDbLine
   0
 SPLINE
   5
-398
+39d
 100
 AcDbEntity
   8
@@ -34395,7 +34505,7 @@ AcDbSpline
   0
 SPLINE
   5
-399
+39e
 100
 AcDbEntity
   8
@@ -34459,7 +34569,7 @@ AcDbSpline
   0
 SPLINE
   5
-39a
+39f
 100
 AcDbEntity
   8
@@ -34523,7 +34633,7 @@ AcDbSpline
   0
 SPLINE
   5
-39b
+3a0
 100
 AcDbEntity
   8
@@ -34587,7 +34697,7 @@ AcDbSpline
   0
 SPLINE
   5
-39c
+3a1
 100
 AcDbEntity
   8
@@ -34651,7 +34761,7 @@ AcDbSpline
   0
 SPLINE
   5
-39d
+3a2
 100
 AcDbEntity
   8
@@ -34715,7 +34825,7 @@ AcDbSpline
   0
 SPLINE
   5
-39e
+3a3
 100
 AcDbEntity
   8
@@ -34779,7 +34889,7 @@ AcDbSpline
   0
 SPLINE
   5
-39f
+3a4
 100
 AcDbEntity
   8
@@ -34843,7 +34953,7 @@ AcDbSpline
   0
 SPLINE
   5
-3a0
+3a5
 100
 AcDbEntity
   8
@@ -34907,7 +35017,7 @@ AcDbSpline
   0
 SPLINE
   5
-3a1
+3a6
 100
 AcDbEntity
   8
@@ -34971,7 +35081,7 @@ AcDbSpline
   0
 SPLINE
   5
-3a2
+3a7
 100
 AcDbEntity
   8
@@ -35035,7 +35145,7 @@ AcDbSpline
   0
 SPLINE
   5
-3a3
+3a8
 100
 AcDbEntity
   8
@@ -35099,7 +35209,7 @@ AcDbSpline
   0
 SPLINE
   5
-3a4
+3a9
 100
 AcDbEntity
   8
@@ -35163,7 +35273,7 @@ AcDbSpline
   0
 LINE
   5
-3a5
+3aa
 100
 AcDbEntity
   8
@@ -35185,7 +35295,7 @@ AcDbLine
   0
 SPLINE
   5
-3a6
+3ab
 100
 AcDbEntity
   8
@@ -35249,7 +35359,7 @@ AcDbSpline
   0
 SPLINE
   5
-3a7
+3ac
 100
 AcDbEntity
   8
@@ -35313,7 +35423,7 @@ AcDbSpline
   0
 SPLINE
   5
-3a8
+3ad
 100
 AcDbEntity
   8
@@ -35377,7 +35487,7 @@ AcDbSpline
   0
 SPLINE
   5
-3a9
+3ae
 100
 AcDbEntity
   8
@@ -35441,7 +35551,7 @@ AcDbSpline
   0
 SPLINE
   5
-3aa
+3af
 100
 AcDbEntity
   8
@@ -35505,7 +35615,7 @@ AcDbSpline
   0
 SPLINE
   5
-3ab
+3b0
 100
 AcDbEntity
   8
@@ -35569,7 +35679,7 @@ AcDbSpline
   0
 SPLINE
   5
-3ac
+3b1
 100
 AcDbEntity
   8
@@ -35633,7 +35743,7 @@ AcDbSpline
   0
 SPLINE
   5
-3ad
+3b2
 100
 AcDbEntity
   8
@@ -35697,7 +35807,7 @@ AcDbSpline
   0
 SPLINE
   5
-3ae
+3b3
 100
 AcDbEntity
   8
@@ -35761,7 +35871,7 @@ AcDbSpline
   0
 SPLINE
   5
-3af
+3b4
 100
 AcDbEntity
   8
@@ -35825,7 +35935,7 @@ AcDbSpline
   0
 SPLINE
   5
-3b0
+3b5
 100
 AcDbEntity
   8
@@ -35889,7 +35999,7 @@ AcDbSpline
   0
 SPLINE
   5
-3b1
+3b6
 100
 AcDbEntity
   8
@@ -35953,7 +36063,7 @@ AcDbSpline
   0
 SPLINE
   5
-3b2
+3b7
 100
 AcDbEntity
   8
@@ -36017,7 +36127,7 @@ AcDbSpline
   0
 LINE
   5
-3b3
+3b8
 100
 AcDbEntity
   8
@@ -36039,7 +36149,7 @@ AcDbLine
   0
 SPLINE
   5
-3b4
+3b9
 100
 AcDbEntity
   8
@@ -36103,7 +36213,7 @@ AcDbSpline
   0
 SPLINE
   5
-3b5
+3ba
 100
 AcDbEntity
   8
@@ -36167,7 +36277,7 @@ AcDbSpline
   0
 SPLINE
   5
-3b6
+3bb
 100
 AcDbEntity
   8
@@ -36231,7 +36341,7 @@ AcDbSpline
   0
 SPLINE
   5
-3b7
+3bc
 100
 AcDbEntity
   8
@@ -36295,7 +36405,7 @@ AcDbSpline
   0
 SPLINE
   5
-3b8
+3bd
 100
 AcDbEntity
   8
@@ -36359,7 +36469,7 @@ AcDbSpline
   0
 SPLINE
   5
-3b9
+3be
 100
 AcDbEntity
   8
@@ -36423,7 +36533,7 @@ AcDbSpline
   0
 SPLINE
   5
-3ba
+3bf
 100
 AcDbEntity
   8
@@ -36487,7 +36597,7 @@ AcDbSpline
   0
 SPLINE
   5
-3bb
+3c0
 100
 AcDbEntity
   8
@@ -36551,7 +36661,7 @@ AcDbSpline
   0
 SPLINE
   5
-3bc
+3c1
 100
 AcDbEntity
   8
@@ -36615,7 +36725,7 @@ AcDbSpline
   0
 SPLINE
   5
-3bd
+3c2
 100
 AcDbEntity
   8
@@ -36679,7 +36789,7 @@ AcDbSpline
   0
 SPLINE
   5
-3be
+3c3
 100
 AcDbEntity
   8
@@ -36743,7 +36853,7 @@ AcDbSpline
   0
 SPLINE
   5
-3bf
+3c4
 100
 AcDbEntity
   8
@@ -36807,7 +36917,7 @@ AcDbSpline
   0
 SPLINE
   5
-3c0
+3c5
 100
 AcDbEntity
   8
@@ -36871,7 +36981,7 @@ AcDbSpline
   0
 SPLINE
   5
-3c1
+3c6
 100
 AcDbEntity
   8
@@ -36935,7 +37045,7 @@ AcDbSpline
   0
 SPLINE
   5
-3c2
+3c7
 100
 AcDbEntity
   8
@@ -36999,7 +37109,7 @@ AcDbSpline
   0
 SPLINE
   5
-3c3
+3c8
 100
 AcDbEntity
   8
@@ -37063,7 +37173,7 @@ AcDbSpline
   0
 SPLINE
   5
-3c4
+3c9
 100
 AcDbEntity
   8
@@ -37127,7 +37237,7 @@ AcDbSpline
   0
 SPLINE
   5
-3c5
+3ca
 100
 AcDbEntity
   8
@@ -37191,7 +37301,7 @@ AcDbSpline
   0
 SPLINE
   5
-3c6
+3cb
 100
 AcDbEntity
   8
@@ -37255,7 +37365,7 @@ AcDbSpline
   0
 SPLINE
   5
-3c7
+3cc
 100
 AcDbEntity
   8
@@ -37319,7 +37429,7 @@ AcDbSpline
   0
 SPLINE
   5
-3c8
+3cd
 100
 AcDbEntity
   8
@@ -37383,7 +37493,7 @@ AcDbSpline
   0
 LINE
   5
-3c9
+3ce
 100
 AcDbEntity
   8
@@ -37405,7 +37515,7 @@ AcDbLine
   0
 LINE
   5
-3ca
+3cf
 100
 AcDbEntity
   8
@@ -37427,7 +37537,7 @@ AcDbLine
   0
 SPLINE
   5
-3cb
+3d0
 100
 AcDbEntity
   8
@@ -37491,7 +37601,7 @@ AcDbSpline
   0
 SPLINE
   5
-3cc
+3d1
 100
 AcDbEntity
   8
@@ -37555,7 +37665,7 @@ AcDbSpline
   0
 SPLINE
   5
-3cd
+3d2
 100
 AcDbEntity
   8
@@ -37619,7 +37729,7 @@ AcDbSpline
   0
 SPLINE
   5
-3ce
+3d3
 100
 AcDbEntity
   8
@@ -37683,7 +37793,7 @@ AcDbSpline
   0
 LINE
   5
-3cf
+3d4
 100
 AcDbEntity
   8
@@ -37705,7 +37815,7 @@ AcDbLine
   0
 LINE
   5
-3d0
+3d5
 100
 AcDbEntity
   8
@@ -37727,7 +37837,7 @@ AcDbLine
   0
 LINE
   5
-3d1
+3d6
 100
 AcDbEntity
   8
@@ -37749,7 +37859,7 @@ AcDbLine
   0
 SPLINE
   5
-3d2
+3d7
 100
 AcDbEntity
   8
@@ -37813,7 +37923,7 @@ AcDbSpline
   0
 SPLINE
   5
-3d3
+3d8
 100
 AcDbEntity
   8
@@ -37877,7 +37987,7 @@ AcDbSpline
   0
 SPLINE
   5
-3d4
+3d9
 100
 AcDbEntity
   8
@@ -37941,7 +38051,7 @@ AcDbSpline
   0
 SPLINE
   5
-3d5
+3da
 100
 AcDbEntity
   8
@@ -38005,7 +38115,7 @@ AcDbSpline
   0
 LINE
   5
-3d6
+3db
 100
 AcDbEntity
   8
@@ -38027,7 +38137,7 @@ AcDbLine
   0
 SPLINE
   5
-3d7
+3dc
 100
 AcDbEntity
   8
@@ -38091,7 +38201,7 @@ AcDbSpline
   0
 SPLINE
   5
-3d8
+3dd
 100
 AcDbEntity
   8
@@ -38155,7 +38265,7 @@ AcDbSpline
   0
 SPLINE
   5
-3d9
+3de
 100
 AcDbEntity
   8
@@ -38219,7 +38329,7 @@ AcDbSpline
   0
 SPLINE
   5
-3da
+3df
 100
 AcDbEntity
   8
@@ -38283,7 +38393,7 @@ AcDbSpline
   0
 LINE
   5
-3db
+3e0
 100
 AcDbEntity
   8
@@ -38305,7 +38415,7 @@ AcDbLine
   0
 LINE
   5
-3dc
+3e1
 100
 AcDbEntity
   8
@@ -38327,7 +38437,7 @@ AcDbLine
   0
 SPLINE
   5
-3dd
+3e2
 100
 AcDbEntity
   8
@@ -38391,7 +38501,7 @@ AcDbSpline
   0
 SPLINE
   5
-3de
+3e3
 100
 AcDbEntity
   8
@@ -38455,7 +38565,7 @@ AcDbSpline
   0
 SPLINE
   5
-3df
+3e4
 100
 AcDbEntity
   8
@@ -38519,7 +38629,7 @@ AcDbSpline
   0
 LINE
   5
-3e0
+3e5
 100
 AcDbEntity
   8
@@ -38541,7 +38651,7 @@ AcDbLine
   0
 LINE
   5
-3e1
+3e6
 100
 AcDbEntity
   8
@@ -38563,7 +38673,7 @@ AcDbLine
   0
 SPLINE
   5
-3e2
+3e7
 100
 AcDbEntity
   8
@@ -38627,7 +38737,7 @@ AcDbSpline
   0
 SPLINE
   5
-3e3
+3e8
 100
 AcDbEntity
   8
@@ -38691,7 +38801,7 @@ AcDbSpline
   0
 SPLINE
   5
-3e4
+3e9
 100
 AcDbEntity
   8
@@ -38755,7 +38865,7 @@ AcDbSpline
   0
 SPLINE
   5
-3e5
+3ea
 100
 AcDbEntity
   8
@@ -38819,7 +38929,7 @@ AcDbSpline
   0
 LINE
   5
-3e6
+3eb
 100
 AcDbEntity
   8
@@ -38841,7 +38951,7 @@ AcDbLine
   0
 SPLINE
   5
-3e7
+3ec
 100
 AcDbEntity
   8
@@ -38905,7 +39015,7 @@ AcDbSpline
   0
 SPLINE
   5
-3e8
+3ed
 100
 AcDbEntity
   8
@@ -38969,7 +39079,7 @@ AcDbSpline
   0
 SPLINE
   5
-3e9
+3ee
 100
 AcDbEntity
   8
@@ -39033,7 +39143,7 @@ AcDbSpline
   0
 LINE
   5
-3ea
+3ef
 100
 AcDbEntity
   8
@@ -39055,7 +39165,7 @@ AcDbLine
   0
 LINE
   5
-3eb
+3f0
 100
 AcDbEntity
   8
@@ -39077,7 +39187,7 @@ AcDbLine
   0
 SPLINE
   5
-3ec
+3f1
 100
 AcDbEntity
   8
@@ -39141,7 +39251,7 @@ AcDbSpline
   0
 SPLINE
   5
-3ed
+3f2
 100
 AcDbEntity
   8
@@ -39205,7 +39315,7 @@ AcDbSpline
   0
 LINE
   5
-3ee
+3f3
 100
 AcDbEntity
   8
@@ -39227,7 +39337,7 @@ AcDbLine
   0
 LINE
   5
-3ef
+3f4
 100
 AcDbEntity
   8
@@ -39249,7 +39359,7 @@ AcDbLine
   0
 SPLINE
   5
-3f0
+3f5
 100
 AcDbEntity
   8
@@ -39313,7 +39423,7 @@ AcDbSpline
   0
 SPLINE
   5
-3f1
+3f6
 100
 AcDbEntity
   8
@@ -39377,7 +39487,7 @@ AcDbSpline
   0
 SPLINE
   5
-3f2
+3f7
 100
 AcDbEntity
   8
@@ -39441,7 +39551,7 @@ AcDbSpline
   0
 SPLINE
   5
-3f3
+3f8
 100
 AcDbEntity
   8
@@ -39505,7 +39615,7 @@ AcDbSpline
   0
 SPLINE
   5
-3f4
+3f9
 100
 AcDbEntity
   8
@@ -39569,7 +39679,7 @@ AcDbSpline
   0
 SPLINE
   5
-3f5
+3fa
 100
 AcDbEntity
   8
@@ -39633,7 +39743,7 @@ AcDbSpline
   0
 SPLINE
   5
-3f6
+3fb
 100
 AcDbEntity
   8
@@ -39697,7 +39807,7 @@ AcDbSpline
   0
 SPLINE
   5
-3f7
+3fc
 100
 AcDbEntity
   8
@@ -39761,7 +39871,7 @@ AcDbSpline
   0
 SPLINE
   5
-3f8
+3fd
 100
 AcDbEntity
   8
@@ -39825,7 +39935,7 @@ AcDbSpline
   0
 LINE
   5
-3f9
+3fe
 100
 AcDbEntity
   8
@@ -39847,7 +39957,7 @@ AcDbLine
   0
 SPLINE
   5
-3fa
+3ff
 100
 AcDbEntity
   8
@@ -39911,7 +40021,7 @@ AcDbSpline
   0
 SPLINE
   5
-3fb
+400
 100
 AcDbEntity
   8
@@ -39975,7 +40085,7 @@ AcDbSpline
   0
 LINE
   5
-3fc
+401
 100
 AcDbEntity
   8
@@ -39997,7 +40107,7 @@ AcDbLine
   0
 LINE
   5
-3fd
+402
 100
 AcDbEntity
   8
@@ -40019,7 +40129,7 @@ AcDbLine
   0
 SPLINE
   5
-3fe
+403
 100
 AcDbEntity
   8
@@ -40083,7 +40193,7 @@ AcDbSpline
   0
 SPLINE
   5
-3ff
+404
 100
 AcDbEntity
   8
@@ -40147,7 +40257,7 @@ AcDbSpline
   0
 SPLINE
   5
-400
+405
 100
 AcDbEntity
   8
@@ -40211,7 +40321,7 @@ AcDbSpline
   0
 LINE
   5
-401
+406
 100
 AcDbEntity
   8
@@ -40233,7 +40343,7 @@ AcDbLine
   0
 LINE
   5
-402
+407
 100
 AcDbEntity
   8
@@ -40255,7 +40365,7 @@ AcDbLine
   0
 SPLINE
   5
-403
+408
 100
 AcDbEntity
   8
@@ -40319,7 +40429,7 @@ AcDbSpline
   0
 SPLINE
   5
-404
+409
 100
 AcDbEntity
   8
@@ -40383,7 +40493,7 @@ AcDbSpline
   0
 SPLINE
   5
-405
+40a
 100
 AcDbEntity
   8
@@ -40447,7 +40557,7 @@ AcDbSpline
   0
 SPLINE
   5
-406
+40b
 100
 AcDbEntity
   8
@@ -40511,7 +40621,7 @@ AcDbSpline
   0
 LINE
   5
-407
+40c
 100
 AcDbEntity
   8
@@ -40533,7 +40643,7 @@ AcDbLine
   0
 SPLINE
   5
-408
+40d
 100
 AcDbEntity
   8
@@ -40597,7 +40707,7 @@ AcDbSpline
   0
 SPLINE
   5
-409
+40e
 100
 AcDbEntity
   8
@@ -40661,7 +40771,7 @@ AcDbSpline
   0
 SPLINE
   5
-40a
+40f
 100
 AcDbEntity
   8
@@ -40725,7 +40835,7 @@ AcDbSpline
   0
 LINE
   5
-40b
+410
 100
 AcDbEntity
   8
@@ -40747,7 +40857,7 @@ AcDbLine
   0
 LINE
   5
-40c
+411
 100
 AcDbEntity
   8
@@ -40769,7 +40879,7 @@ AcDbLine
   0
 SPLINE
   5
-40d
+412
 100
 AcDbEntity
   8
@@ -40833,7 +40943,7 @@ AcDbSpline
   0
 SPLINE
   5
-40e
+413
 100
 AcDbEntity
   8
@@ -40897,7 +41007,7 @@ AcDbSpline
   0
 LINE
   5
-40f
+414
 100
 AcDbEntity
   8
@@ -40919,7 +41029,7 @@ AcDbLine
   0
 SPLINE
   5
-410
+415
 100
 AcDbEntity
   8
@@ -40983,7 +41093,7 @@ AcDbSpline
   0
 SPLINE
   5
-411
+416
 100
 AcDbEntity
   8
@@ -41047,7 +41157,7 @@ AcDbSpline
   0
 LINE
   5
-412
+417
 100
 AcDbEntity
   8
@@ -41069,7 +41179,7 @@ AcDbLine
   0
 SPLINE
   5
-413
+418
 100
 AcDbEntity
   8
@@ -41133,7 +41243,7 @@ AcDbSpline
   0
 SPLINE
   5
-414
+419
 100
 AcDbEntity
   8
@@ -41197,7 +41307,7 @@ AcDbSpline
   0
 LINE
   5
-415
+41a
 100
 AcDbEntity
   8
@@ -41219,7 +41329,7 @@ AcDbLine
   0
 SPLINE
   5
-416
+41b
 100
 AcDbEntity
   8
@@ -41283,7 +41393,7 @@ AcDbSpline
   0
 SPLINE
   5
-417
+41c
 100
 AcDbEntity
   8
@@ -41347,7 +41457,7 @@ AcDbSpline
   0
 SPLINE
   5
-418
+41d
 100
 AcDbEntity
   8
@@ -41411,7 +41521,7 @@ AcDbSpline
   0
 LINE
   5
-419
+41e
 100
 AcDbEntity
   8
@@ -41433,7 +41543,7 @@ AcDbLine
   0
 LINE
   5
-41a
+41f
 100
 AcDbEntity
   8
@@ -41451,200 +41561,6 @@ AcDbLine
  21
 0.999959
  31
-0.0
-  0
-LINE
-  5
-41b
-100
-AcDbEntity
-  8
-C00-00-00-BLACK
-100
-AcDbLine
- 10
-188
- 20
-0.999959
- 30
-0.0
- 11
-188
- 21
-0.999959
- 31
-0.0
-  0
-SPLINE
-  5
-41c
-100
-AcDbEntity
-  8
-C00-00-00-BLACK
-100
-AcDbSpline
-210
-0.0
-220
-0.0
-230
-1.0
- 70
-     0
- 71
-     3
- 72
-     8
- 73
-4
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
- 10
-188
- 20
-0.999959
- 30
-0.0
- 10
-199.046
- 20
-0.999959
- 30
-0.0
- 10
-208
- 20
-9.9543
- 30
-0.0
- 10
-208
- 20
-21
- 30
-0.0
-  0
-LINE
-  5
-41d
-100
-AcDbEntity
-  8
-C00-00-00-BLACK
-100
-AcDbLine
- 10
-208
- 20
-21
- 30
-0.0
- 11
-208
- 21
-77.0001
- 31
-0.0
-  0
-LINE
-  5
-41e
-100
-AcDbEntity
-  8
-C00-00-00-BLACK
-100
-AcDbLine
- 10
-208
- 20
-77.0001
- 30
-0.0
- 11
-208
- 21
-77.0001
- 31
-0.0
-  0
-SPLINE
-  5
-41f
-100
-AcDbEntity
-  8
-C00-00-00-BLACK
-100
-AcDbSpline
-210
-0.0
-220
-0.0
-230
-1.0
- 70
-     0
- 71
-     3
- 72
-     8
- 73
-4
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
- 10
-208
- 20
-77.0001
- 30
-0.0
- 10
-208
- 20
-88.0456
- 30
-0.0
- 10
-199.046
- 20
-97.0001
- 30
-0.0
- 10
-188
- 20
-97.0001
- 30
 0.0
   0
 LINE
@@ -41659,6 +41575,200 @@ AcDbLine
  10
 188
  20
+0.999959
+ 30
+0.0
+ 11
+188
+ 21
+0.999959
+ 31
+0.0
+  0
+SPLINE
+  5
+421
+100
+AcDbEntity
+  8
+C00-00-00-BLACK
+100
+AcDbSpline
+210
+0.0
+220
+0.0
+230
+1.0
+ 70
+     0
+ 71
+     3
+ 72
+     8
+ 73
+4
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 10
+188
+ 20
+0.999959
+ 30
+0.0
+ 10
+199.046
+ 20
+0.999959
+ 30
+0.0
+ 10
+208
+ 20
+9.9543
+ 30
+0.0
+ 10
+208
+ 20
+21
+ 30
+0.0
+  0
+LINE
+  5
+422
+100
+AcDbEntity
+  8
+C00-00-00-BLACK
+100
+AcDbLine
+ 10
+208
+ 20
+21
+ 30
+0.0
+ 11
+208
+ 21
+77.0001
+ 31
+0.0
+  0
+LINE
+  5
+423
+100
+AcDbEntity
+  8
+C00-00-00-BLACK
+100
+AcDbLine
+ 10
+208
+ 20
+77.0001
+ 30
+0.0
+ 11
+208
+ 21
+77.0001
+ 31
+0.0
+  0
+SPLINE
+  5
+424
+100
+AcDbEntity
+  8
+C00-00-00-BLACK
+100
+AcDbSpline
+210
+0.0
+220
+0.0
+230
+1.0
+ 70
+     0
+ 71
+     3
+ 72
+     8
+ 73
+4
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 10
+208
+ 20
+77.0001
+ 30
+0.0
+ 10
+208
+ 20
+88.0456
+ 30
+0.0
+ 10
+199.046
+ 20
+97.0001
+ 30
+0.0
+ 10
+188
+ 20
+97.0001
+ 30
+0.0
+  0
+LINE
+  5
+425
+100
+AcDbEntity
+  8
+C00-00-00-BLACK
+100
+AcDbLine
+ 10
+188
+ 20
 97.0001
  30
 0.0
@@ -41671,7 +41781,7 @@ AcDbLine
   0
 LINE
   5
-421
+426
 100
 AcDbEntity
   8
@@ -41693,7 +41803,7 @@ AcDbLine
   0
 SPLINE
   5
-422
+427
 100
 AcDbEntity
   8
@@ -41757,7 +41867,7 @@ AcDbSpline
   0
 LINE
   5
-423
+428
 100
 AcDbEntity
   8
@@ -41779,7 +41889,7 @@ AcDbLine
   0
 LINE
   5
-424
+429
 100
 AcDbEntity
   8
@@ -41801,7 +41911,7 @@ AcDbLine
   0
 SPLINE
   5
-425
+42a
 100
 AcDbEntity
   8
@@ -41865,7 +41975,29 @@ AcDbSpline
   0
 LINE
   5
-426
+42b
+100
+AcDbEntity
+  8
+C00-00-00-BLACK
+100
+AcDbLine
+ 10
+125
+ 20
+0.999959
+ 30
+0.0
+ 11
+125
+ 21
+0.999959
+ 31
+0.0
+  0
+LINE
+  5
+42c
 100
 AcDbEntity
   8
@@ -41887,7 +42019,7 @@ AcDbLine
   0
 LINE
   5
-427
+42d
 100
 AcDbEntity
   8
@@ -41909,7 +42041,7 @@ AcDbLine
   0
 SPLINE
   5
-428
+42e
 100
 AcDbEntity
   8
@@ -41973,222 +42105,6 @@ AcDbSpline
   0
 LINE
   5
-429
-100
-AcDbEntity
-  8
-C00-00-00-BLACK
-100
-AcDbLine
- 10
-139
- 20
-11.0001
- 30
-0.0
- 11
-139
- 21
-11.0001
- 31
-0.0
-  0
-LINE
-  5
-42a
-100
-AcDbEntity
-  8
-C00-00-00-BLACK
-100
-AcDbLine
- 10
-139
- 20
-11.0001
- 30
-0.0
- 11
-139
- 21
-11.0001
- 31
-0.0
-  0
-SPLINE
-  5
-42b
-100
-AcDbEntity
-  8
-C00-00-00-BLACK
-100
-AcDbSpline
-210
-0.0
-220
-0.0
-230
-1.0
- 70
-     0
- 71
-     3
- 72
-     8
- 73
-4
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
- 10
-139
- 20
-11.0001
- 30
-0.0
- 10
-139
- 20
-12.3807
- 30
-0.0
- 10
-137.881
- 20
-13.5
- 30
-0.0
- 10
-136.5
- 20
-13.5
- 30
-0.0
-  0
-LINE
-  5
-42c
-100
-AcDbEntity
-  8
-C00-00-00-BLACK
-100
-AcDbLine
- 10
-136.5
- 20
-13.5
- 30
-0.0
- 11
-126.5
- 21
-13.5
- 31
-0.0
-  0
-LINE
-  5
-42d
-100
-AcDbEntity
-  8
-C00-00-00-BLACK
-100
-AcDbLine
- 10
-126.5
- 20
-13.5
- 30
-0.0
- 11
-126.5
- 21
-13.5
- 31
-0.0
-  0
-SPLINE
-  5
-42e
-100
-AcDbEntity
-  8
-C00-00-00-BLACK
-100
-AcDbSpline
-210
-0.0
-220
-0.0
-230
-1.0
- 70
-     0
- 71
-     3
- 72
-     8
- 73
-4
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
- 10
-126.5
- 20
-13.5
- 30
-0.0
- 10
-125.119
- 20
-13.5
- 30
-0.0
- 10
-124
- 20
-12.3807
- 30
-0.0
- 10
-124
- 20
-11.0001
- 30
-0.0
-  0
-LINE
-  5
 42f
 100
 AcDbEntity
@@ -42197,13 +42113,13 @@ C00-00-00-BLACK
 100
 AcDbLine
  10
-124
+139
  20
 11.0001
  30
 0.0
  11
-124
+139
  21
 11.0001
  31
@@ -42219,13 +42135,13 @@ C00-00-00-BLACK
 100
 AcDbLine
  10
-124
+139
  20
 11.0001
  30
 0.0
  11
-124
+139
  21
 11.0001
  31
@@ -42271,27 +42187,27 @@ AcDbSpline
  40
 1.0
  10
-124
+139
  20
 11.0001
  30
 0.0
  10
-124
+139
  20
-9.61944
+12.3807
  30
 0.0
  10
-125.119
+137.881
  20
-8.50007
+13.5
  30
 0.0
  10
-126.5
+136.5
  20
-8.50007
+13.5
  30
 0.0
   0
@@ -42305,15 +42221,15 @@ C00-00-00-BLACK
 100
 AcDbLine
  10
-176.5
+136.5
  20
-8.50007
+13.5
  30
 0.0
  11
-186.5
+126.5
  21
-8.50007
+13.5
  31
 0.0
   0
@@ -42327,15 +42243,15 @@ C00-00-00-BLACK
 100
 AcDbLine
  10
-186.5
+126.5
  20
-8.50007
+13.5
  30
 0.0
  11
-186.5
+126.5
  21
-8.50007
+13.5
  31
 0.0
   0
@@ -42379,25 +42295,25 @@ AcDbSpline
  40
 1.0
  10
-186.5
+126.5
  20
-8.50007
+13.5
  30
 0.0
  10
-187.881
+125.119
  20
-8.50007
+13.5
  30
 0.0
  10
-189
+124
  20
-9.61944
+12.3807
  30
 0.0
  10
-189
+124
  20
 11.0001
  30
@@ -42413,13 +42329,13 @@ C00-00-00-BLACK
 100
 AcDbLine
  10
-189
+124
  20
 11.0001
  30
 0.0
  11
-189
+124
  21
 11.0001
  31
@@ -42435,13 +42351,13 @@ C00-00-00-BLACK
 100
 AcDbLine
  10
-189
+124
  20
 11.0001
  30
 0.0
  11
-189
+124
  21
 11.0001
  31
@@ -42487,6 +42403,244 @@ AcDbSpline
  40
 1.0
  10
+124
+ 20
+11.0001
+ 30
+0.0
+ 10
+124
+ 20
+9.61944
+ 30
+0.0
+ 10
+125.119
+ 20
+8.50007
+ 30
+0.0
+ 10
+126.5
+ 20
+8.50007
+ 30
+0.0
+  0
+LINE
+  5
+438
+100
+AcDbEntity
+  8
+C00-00-00-BLACK
+100
+AcDbLine
+ 10
+126.5
+ 20
+8.50007
+ 30
+0.0
+ 11
+126.5
+ 21
+8.50007
+ 31
+0.0
+  0
+LINE
+  5
+439
+100
+AcDbEntity
+  8
+C00-00-00-BLACK
+100
+AcDbLine
+ 10
+176.5
+ 20
+8.50007
+ 30
+0.0
+ 11
+186.5
+ 21
+8.50007
+ 31
+0.0
+  0
+LINE
+  5
+43a
+100
+AcDbEntity
+  8
+C00-00-00-BLACK
+100
+AcDbLine
+ 10
+186.5
+ 20
+8.50007
+ 30
+0.0
+ 11
+186.5
+ 21
+8.50007
+ 31
+0.0
+  0
+SPLINE
+  5
+43b
+100
+AcDbEntity
+  8
+C00-00-00-BLACK
+100
+AcDbSpline
+210
+0.0
+220
+0.0
+230
+1.0
+ 70
+     0
+ 71
+     3
+ 72
+     8
+ 73
+4
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 10
+186.5
+ 20
+8.50007
+ 30
+0.0
+ 10
+187.881
+ 20
+8.50007
+ 30
+0.0
+ 10
+189
+ 20
+9.61944
+ 30
+0.0
+ 10
+189
+ 20
+11.0001
+ 30
+0.0
+  0
+LINE
+  5
+43c
+100
+AcDbEntity
+  8
+C00-00-00-BLACK
+100
+AcDbLine
+ 10
+189
+ 20
+11.0001
+ 30
+0.0
+ 11
+189
+ 21
+11.0001
+ 31
+0.0
+  0
+LINE
+  5
+43d
+100
+AcDbEntity
+  8
+C00-00-00-BLACK
+100
+AcDbLine
+ 10
+189
+ 20
+11.0001
+ 30
+0.0
+ 11
+189
+ 21
+11.0001
+ 31
+0.0
+  0
+SPLINE
+  5
+43e
+100
+AcDbEntity
+  8
+C00-00-00-BLACK
+100
+AcDbSpline
+210
+0.0
+220
+0.0
+230
+1.0
+ 70
+     0
+ 71
+     3
+ 72
+     8
+ 73
+4
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 10
 189
  20
 11.0001
@@ -42513,7 +42667,7 @@ AcDbSpline
   0
 LINE
   5
-438
+43f
 100
 AcDbEntity
   8
@@ -42535,7 +42689,7 @@ AcDbLine
   0
 LINE
   5
-439
+440
 100
 AcDbEntity
   8
@@ -42557,7 +42711,7 @@ AcDbLine
   0
 SPLINE
   5
-43a
+441
 100
 AcDbEntity
   8
@@ -42621,7 +42775,7 @@ AcDbSpline
   0
 LINE
   5
-43b
+442
 100
 AcDbEntity
   8
@@ -42643,7 +42797,7 @@ AcDbLine
   0
 LINE
   5
-43c
+443
 100
 AcDbEntity
   8
@@ -42665,7 +42819,7 @@ AcDbLine
   0
 SPLINE
   5
-43d
+444
 100
 AcDbEntity
   8
@@ -42729,244 +42883,6 @@ AcDbSpline
   0
 LINE
   5
-43e
-100
-AcDbEntity
-  8
-C00-00-00-BLACK
-100
-AcDbLine
- 10
-126.5
- 20
-84.5002
- 30
-0.0
- 11
-136.5
- 21
-84.5002
- 31
-0.0
-  0
-LINE
-  5
-43f
-100
-AcDbEntity
-  8
-C00-00-00-BLACK
-100
-AcDbLine
- 10
-136.5
- 20
-84.5002
- 30
-0.0
- 11
-136.5
- 21
-84.5002
- 31
-0.0
-  0
-SPLINE
-  5
-440
-100
-AcDbEntity
-  8
-C00-00-00-BLACK
-100
-AcDbSpline
-210
-0.0
-220
-0.0
-230
-1.0
- 70
-     0
- 71
-     3
- 72
-     8
- 73
-4
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
- 10
-136.5
- 20
-84.5002
- 30
-0.0
- 10
-137.881
- 20
-84.5002
- 30
-0.0
- 10
-139
- 20
-85.6192
- 30
-0.0
- 10
-139
- 20
-86.9999
- 30
-0.0
-  0
-LINE
-  5
-441
-100
-AcDbEntity
-  8
-C00-00-00-BLACK
-100
-AcDbLine
- 10
-139
- 20
-86.9999
- 30
-0.0
- 11
-139
- 21
-86.9999
- 31
-0.0
-  0
-LINE
-  5
-442
-100
-AcDbEntity
-  8
-C00-00-00-BLACK
-100
-AcDbLine
- 10
-139
- 20
-86.9999
- 30
-0.0
- 11
-139
- 21
-86.9999
- 31
-0.0
-  0
-SPLINE
-  5
-443
-100
-AcDbEntity
-  8
-C00-00-00-BLACK
-100
-AcDbSpline
-210
-0.0
-220
-0.0
-230
-1.0
- 70
-     0
- 71
-     3
- 72
-     8
- 73
-4
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
- 10
-139
- 20
-86.9999
- 30
-0.0
- 10
-139
- 20
-88.3807
- 30
-0.0
- 10
-137.881
- 20
-89.5001
- 30
-0.0
- 10
-136.5
- 20
-89.5001
- 30
-0.0
-  0
-LINE
-  5
-444
-100
-AcDbEntity
-  8
-C00-00-00-BLACK
-100
-AcDbLine
- 10
-136.5
- 20
-89.5001
- 30
-0.0
- 11
-126.5
- 21
-89.5001
- 31
-0.0
-  0
-LINE
-  5
 445
 100
 AcDbEntity
@@ -42975,19 +42891,19 @@ C00-00-00-BLACK
 100
 AcDbLine
  10
-126.5
+176.5
  20
-89.5001
+8.50007
  30
 0.0
  11
-126.5
+176.5
  21
-89.5001
+8.50007
  31
 0.0
   0
-SPLINE
+LINE
   5
 446
 100
@@ -42995,60 +42911,18 @@ AcDbEntity
   8
 C00-00-00-BLACK
 100
-AcDbSpline
-210
-0.0
-220
-0.0
-230
-1.0
- 70
-     0
- 71
-     3
- 72
-     8
- 73
-4
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
+AcDbLine
  10
 126.5
  20
-89.5001
+84.5002
  30
 0.0
- 10
-125.119
- 20
-89.5001
- 30
-0.0
- 10
-124
- 20
-88.3807
- 30
-0.0
- 10
-124
- 20
-86.9999
- 30
+ 11
+136.5
+ 21
+84.5002
+ 31
 0.0
   0
 LINE
@@ -43061,6 +42935,308 @@ C00-00-00-BLACK
 100
 AcDbLine
  10
+136.5
+ 20
+84.5002
+ 30
+0.0
+ 11
+136.5
+ 21
+84.5002
+ 31
+0.0
+  0
+SPLINE
+  5
+448
+100
+AcDbEntity
+  8
+C00-00-00-BLACK
+100
+AcDbSpline
+210
+0.0
+220
+0.0
+230
+1.0
+ 70
+     0
+ 71
+     3
+ 72
+     8
+ 73
+4
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 10
+136.5
+ 20
+84.5002
+ 30
+0.0
+ 10
+137.881
+ 20
+84.5002
+ 30
+0.0
+ 10
+139
+ 20
+85.6192
+ 30
+0.0
+ 10
+139
+ 20
+86.9999
+ 30
+0.0
+  0
+LINE
+  5
+449
+100
+AcDbEntity
+  8
+C00-00-00-BLACK
+100
+AcDbLine
+ 10
+139
+ 20
+86.9999
+ 30
+0.0
+ 11
+139
+ 21
+86.9999
+ 31
+0.0
+  0
+LINE
+  5
+44a
+100
+AcDbEntity
+  8
+C00-00-00-BLACK
+100
+AcDbLine
+ 10
+139
+ 20
+86.9999
+ 30
+0.0
+ 11
+139
+ 21
+86.9999
+ 31
+0.0
+  0
+SPLINE
+  5
+44b
+100
+AcDbEntity
+  8
+C00-00-00-BLACK
+100
+AcDbSpline
+210
+0.0
+220
+0.0
+230
+1.0
+ 70
+     0
+ 71
+     3
+ 72
+     8
+ 73
+4
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 10
+139
+ 20
+86.9999
+ 30
+0.0
+ 10
+139
+ 20
+88.3807
+ 30
+0.0
+ 10
+137.881
+ 20
+89.5001
+ 30
+0.0
+ 10
+136.5
+ 20
+89.5001
+ 30
+0.0
+  0
+LINE
+  5
+44c
+100
+AcDbEntity
+  8
+C00-00-00-BLACK
+100
+AcDbLine
+ 10
+136.5
+ 20
+89.5001
+ 30
+0.0
+ 11
+126.5
+ 21
+89.5001
+ 31
+0.0
+  0
+LINE
+  5
+44d
+100
+AcDbEntity
+  8
+C00-00-00-BLACK
+100
+AcDbLine
+ 10
+126.5
+ 20
+89.5001
+ 30
+0.0
+ 11
+126.5
+ 21
+89.5001
+ 31
+0.0
+  0
+SPLINE
+  5
+44e
+100
+AcDbEntity
+  8
+C00-00-00-BLACK
+100
+AcDbSpline
+210
+0.0
+220
+0.0
+230
+1.0
+ 70
+     0
+ 71
+     3
+ 72
+     8
+ 73
+4
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 10
+126.5
+ 20
+89.5001
+ 30
+0.0
+ 10
+125.119
+ 20
+89.5001
+ 30
+0.0
+ 10
+124
+ 20
+88.3807
+ 30
+0.0
+ 10
+124
+ 20
+86.9999
+ 30
+0.0
+  0
+LINE
+  5
+44f
+100
+AcDbEntity
+  8
+C00-00-00-BLACK
+100
+AcDbLine
+ 10
 124
  20
 86.9999
@@ -43075,7 +43251,7 @@ AcDbLine
   0
 LINE
   5
-448
+450
 100
 AcDbEntity
   8
@@ -43097,7 +43273,7 @@ AcDbLine
   0
 SPLINE
   5
-449
+451
 100
 AcDbEntity
   8
@@ -43161,326 +43337,24 @@ AcDbSpline
   0
 LINE
   5
-44a
-100
-AcDbEntity
-  8
-C00-00-00-BLACK
-100
-AcDbLine
- 10
-176.5
- 20
-84.5002
- 30
-0.0
- 11
-186.5
- 21
-84.5002
- 31
-0.0
-  0
-LINE
-  5
-44b
-100
-AcDbEntity
-  8
-C00-00-00-BLACK
-100
-AcDbLine
- 10
-186.5
- 20
-84.5002
- 30
-0.0
- 11
-186.5
- 21
-84.5002
- 31
-0.0
-  0
-SPLINE
-  5
-44c
-100
-AcDbEntity
-  8
-C00-00-00-BLACK
-100
-AcDbSpline
-210
-0.0
-220
-0.0
-230
-1.0
- 70
-     0
- 71
-     3
- 72
-     8
- 73
-4
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
- 10
-186.5
- 20
-84.5002
- 30
-0.0
- 10
-187.881
- 20
-84.5002
- 30
-0.0
- 10
-189
- 20
-85.6192
- 30
-0.0
- 10
-189
- 20
-86.9999
- 30
-0.0
-  0
-LINE
-  5
-44d
-100
-AcDbEntity
-  8
-C00-00-00-BLACK
-100
-AcDbLine
- 10
-189
- 20
-86.9999
- 30
-0.0
- 11
-189
- 21
-86.9999
- 31
-0.0
-  0
-LINE
-  5
-44e
-100
-AcDbEntity
-  8
-C00-00-00-BLACK
-100
-AcDbLine
- 10
-189
- 20
-86.9999
- 30
-0.0
- 11
-189
- 21
-86.9999
- 31
-0.0
-  0
-SPLINE
-  5
-44f
-100
-AcDbEntity
-  8
-C00-00-00-BLACK
-100
-AcDbSpline
-210
-0.0
-220
-0.0
-230
-1.0
- 70
-     0
- 71
-     3
- 72
-     8
- 73
-4
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
- 10
-189
- 20
-86.9999
- 30
-0.0
- 10
-189
- 20
-88.3807
- 30
-0.0
- 10
-187.881
- 20
-89.5001
- 30
-0.0
- 10
-186.5
- 20
-89.5001
- 30
-0.0
-  0
-LINE
-  5
-450
-100
-AcDbEntity
-  8
-C00-00-00-BLACK
-100
-AcDbLine
- 10
-186.5
- 20
-89.5001
- 30
-0.0
- 11
-176.5
- 21
-89.5001
- 31
-0.0
-  0
-LINE
-  5
-451
-100
-AcDbEntity
-  8
-C00-00-00-BLACK
-100
-AcDbLine
- 10
-176.5
- 20
-89.5001
- 30
-0.0
- 11
-176.5
- 21
-89.5001
- 31
-0.0
-  0
-SPLINE
-  5
 452
 100
 AcDbEntity
   8
 C00-00-00-BLACK
 100
-AcDbSpline
-210
-0.0
-220
-0.0
-230
-1.0
- 70
-     0
- 71
-     3
- 72
-     8
- 73
-4
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
+AcDbLine
  10
-176.5
+126.5
  20
-89.5001
+84.5002
  30
 0.0
- 10
-175.12
- 20
-89.5001
- 30
-0.0
- 10
-174
- 20
-88.3807
- 30
-0.0
- 10
-174
- 20
-86.9999
- 30
+ 11
+126.5
+ 21
+84.5002
+ 31
 0.0
   0
 LINE
@@ -43493,15 +43367,15 @@ C00-00-00-BLACK
 100
 AcDbLine
  10
-174
+176.5
  20
-86.9999
+84.5002
  30
 0.0
  11
-174
+186.5
  21
-86.9999
+84.5002
  31
 0.0
   0
@@ -43515,15 +43389,15 @@ C00-00-00-BLACK
 100
 AcDbLine
  10
-174
+186.5
  20
-86.9999
+84.5002
  30
 0.0
  11
-174
+186.5
  21
-86.9999
+84.5002
  31
 0.0
   0
@@ -43567,31 +43441,31 @@ AcDbSpline
  40
 1.0
  10
-174
+186.5
  20
-86.9999
+84.5002
  30
 0.0
  10
-174
+187.881
+ 20
+84.5002
+ 30
+0.0
+ 10
+189
  20
 85.6192
  30
 0.0
  10
-175.12
+189
  20
-84.5002
- 30
-0.0
- 10
-176.5
- 20
-84.5002
+86.9999
  30
 0.0
   0
-SPLINE
+LINE
   5
 456
 100
@@ -43599,63 +43473,21 @@ AcDbEntity
   8
 C00-00-00-BLACK
 100
-AcDbSpline
-210
-0.0
-220
-0.0
-230
-1.0
- 70
-     0
- 71
-     3
- 72
-     8
- 73
-4
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
+AcDbLine
  10
-119.1
+189
  20
-24.4999
+86.9999
  30
 0.0
- 10
-119.1
- 20
-25.3835
- 30
-0.0
- 10
-118.383
- 20
-26.1
- 30
-0.0
- 10
-117.5
- 20
-26.1
- 30
+ 11
+189
+ 21
+86.9999
+ 31
 0.0
   0
-SPLINE
+LINE
   5
 457
 100
@@ -43663,60 +43495,18 @@ AcDbEntity
   8
 C00-00-00-BLACK
 100
-AcDbSpline
-210
-0.0
-220
-0.0
-230
-1.0
- 70
-     0
- 71
-     3
- 72
-     8
- 73
-4
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
+AcDbLine
  10
-117.5
+189
  20
-26.1
+86.9999
  30
 0.0
- 10
-116.616
- 20
-26.1
- 30
-0.0
- 10
-115.9
- 20
-25.3835
- 30
-0.0
- 10
-115.9
- 20
-24.4999
- 30
+ 11
+189
+ 21
+86.9999
+ 31
 0.0
   0
 SPLINE
@@ -43759,31 +43549,31 @@ AcDbSpline
  40
 1.0
  10
-115.9
+189
  20
-24.4999
+86.9999
  30
 0.0
  10
-115.9
+189
  20
-23.6164
+88.3807
  30
 0.0
  10
-116.616
+187.881
  20
-22.9
+89.5001
  30
 0.0
  10
-117.5
+186.5
  20
-22.9
+89.5001
  30
 0.0
   0
-SPLINE
+LINE
   5
 459
 100
@@ -43791,63 +43581,21 @@ AcDbEntity
   8
 C00-00-00-BLACK
 100
-AcDbSpline
-210
-0.0
-220
-0.0
-230
-1.0
- 70
-     0
- 71
-     3
- 72
-     8
- 73
-4
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
+AcDbLine
  10
-117.5
+186.5
  20
-22.9
+89.5001
  30
 0.0
- 10
-118.383
- 20
-22.9
- 30
-0.0
- 10
-119.1
- 20
-23.6164
- 30
-0.0
- 10
-119.1
- 20
-24.4999
- 30
+ 11
+176.5
+ 21
+89.5001
+ 31
 0.0
   0
-SPLINE
+LINE
   5
 45a
 100
@@ -43855,60 +43603,18 @@ AcDbEntity
   8
 C00-00-00-BLACK
 100
-AcDbSpline
-210
-0.0
-220
-0.0
-230
-1.0
- 70
-     0
- 71
-     3
- 72
-     8
- 73
-4
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
+AcDbLine
  10
-177.1
+176.5
  20
-24.4999
+89.5001
  30
 0.0
- 10
-177.1
- 20
-25.3835
- 30
-0.0
- 10
-176.384
- 20
-26.1
- 30
-0.0
- 10
-175.5
- 20
-26.1
- 30
+ 11
+176.5
+ 21
+89.5001
+ 31
 0.0
   0
 SPLINE
@@ -43951,31 +43657,31 @@ AcDbSpline
  40
 1.0
  10
-175.5
+176.5
  20
-26.1
+89.5001
  30
 0.0
  10
-174.617
+175.12
  20
-26.1
+89.5001
  30
 0.0
  10
-173.9
+174
  20
-25.3835
+88.3807
  30
 0.0
  10
-173.9
+174
  20
-24.4999
+86.9999
  30
 0.0
   0
-SPLINE
+LINE
   5
 45c
 100
@@ -43983,63 +43689,21 @@ AcDbEntity
   8
 C00-00-00-BLACK
 100
-AcDbSpline
-210
-0.0
-220
-0.0
-230
-1.0
- 70
-     0
- 71
-     3
- 72
-     8
- 73
-4
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
+AcDbLine
  10
-173.9
+174
  20
-24.4999
+86.9999
  30
 0.0
- 10
-173.9
- 20
-23.6164
- 30
-0.0
- 10
-174.617
- 20
-22.9
- 30
-0.0
- 10
-175.5
- 20
-22.9
- 30
+ 11
+174
+ 21
+86.9999
+ 31
 0.0
   0
-SPLINE
+LINE
   5
 45d
 100
@@ -44047,60 +43711,18 @@ AcDbEntity
   8
 C00-00-00-BLACK
 100
-AcDbSpline
-210
-0.0
-220
-0.0
-230
-1.0
- 70
-     0
- 71
-     3
- 72
-     8
- 73
-4
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
+AcDbLine
  10
-175.5
+174
  20
-22.9
+86.9999
  30
 0.0
- 10
-176.384
- 20
-22.9
- 30
-0.0
- 10
-177.1
- 20
-23.6164
- 30
-0.0
- 10
-177.1
- 20
-24.4999
- 30
+ 11
+174
+ 21
+86.9999
+ 31
 0.0
   0
 SPLINE
@@ -44143,31 +43765,31 @@ AcDbSpline
  40
 1.0
  10
-177.1
+174
  20
-73.4998
+86.9999
  30
 0.0
  10
-177.1
+174
  20
-74.3835
+85.6192
  30
 0.0
  10
-176.384
+175.12
  20
-75.1
+84.5002
  30
 0.0
  10
-175.5
+176.5
  20
-75.1
+84.5002
  30
 0.0
   0
-SPLINE
+LINE
   5
 45f
 100
@@ -44175,60 +43797,18 @@ AcDbEntity
   8
 C00-00-00-BLACK
 100
-AcDbSpline
-210
-0.0
-220
-0.0
-230
-1.0
- 70
-     0
- 71
-     3
- 72
-     8
- 73
-4
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
+AcDbLine
  10
-175.5
+176.5
  20
-75.1
+84.5002
  30
 0.0
- 10
-174.617
- 20
-75.1
- 30
-0.0
- 10
-173.9
- 20
-74.3835
- 30
-0.0
- 10
-173.9
- 20
-73.4998
- 30
+ 11
+176.5
+ 21
+84.5002
+ 31
 0.0
   0
 SPLINE
@@ -44271,27 +43851,27 @@ AcDbSpline
  40
 1.0
  10
-173.9
+119.1
  20
-73.4998
+24.4999
  30
 0.0
  10
-173.9
+119.1
  20
-72.6165
+25.3835
  30
 0.0
  10
-174.617
+118.383
  20
-71.9
+26.1
  30
 0.0
  10
-175.5
+117.5
  20
-71.9
+26.1
  30
 0.0
   0
@@ -44335,27 +43915,27 @@ AcDbSpline
  40
 1.0
  10
-175.5
+117.5
  20
-71.9
+26.1
  30
 0.0
  10
-176.384
+116.616
  20
-71.9
+26.1
  30
 0.0
  10
-177.1
+115.9
  20
-72.6165
+25.3835
  30
 0.0
  10
-177.1
+115.9
  20
-73.4998
+24.4999
  30
 0.0
   0
@@ -44399,27 +43979,27 @@ AcDbSpline
  40
 1.0
  10
-119.1
+115.9
  20
-73.4998
+24.4999
  30
 0.0
  10
-119.1
+115.9
  20
-74.3835
+23.6164
  30
 0.0
  10
-118.383
+116.616
  20
-75.1
+22.9
  30
 0.0
  10
 117.5
  20
-75.1
+22.9
  30
 0.0
   0
@@ -44465,6 +44045,646 @@ AcDbSpline
  10
 117.5
  20
+22.9
+ 30
+0.0
+ 10
+118.383
+ 20
+22.9
+ 30
+0.0
+ 10
+119.1
+ 20
+23.6164
+ 30
+0.0
+ 10
+119.1
+ 20
+24.4999
+ 30
+0.0
+  0
+SPLINE
+  5
+464
+100
+AcDbEntity
+  8
+C00-00-00-BLACK
+100
+AcDbSpline
+210
+0.0
+220
+0.0
+230
+1.0
+ 70
+     0
+ 71
+     3
+ 72
+     8
+ 73
+4
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 10
+177.1
+ 20
+24.4999
+ 30
+0.0
+ 10
+177.1
+ 20
+25.3835
+ 30
+0.0
+ 10
+176.384
+ 20
+26.1
+ 30
+0.0
+ 10
+175.5
+ 20
+26.1
+ 30
+0.0
+  0
+SPLINE
+  5
+465
+100
+AcDbEntity
+  8
+C00-00-00-BLACK
+100
+AcDbSpline
+210
+0.0
+220
+0.0
+230
+1.0
+ 70
+     0
+ 71
+     3
+ 72
+     8
+ 73
+4
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 10
+175.5
+ 20
+26.1
+ 30
+0.0
+ 10
+174.617
+ 20
+26.1
+ 30
+0.0
+ 10
+173.9
+ 20
+25.3835
+ 30
+0.0
+ 10
+173.9
+ 20
+24.4999
+ 30
+0.0
+  0
+SPLINE
+  5
+466
+100
+AcDbEntity
+  8
+C00-00-00-BLACK
+100
+AcDbSpline
+210
+0.0
+220
+0.0
+230
+1.0
+ 70
+     0
+ 71
+     3
+ 72
+     8
+ 73
+4
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 10
+173.9
+ 20
+24.4999
+ 30
+0.0
+ 10
+173.9
+ 20
+23.6164
+ 30
+0.0
+ 10
+174.617
+ 20
+22.9
+ 30
+0.0
+ 10
+175.5
+ 20
+22.9
+ 30
+0.0
+  0
+SPLINE
+  5
+467
+100
+AcDbEntity
+  8
+C00-00-00-BLACK
+100
+AcDbSpline
+210
+0.0
+220
+0.0
+230
+1.0
+ 70
+     0
+ 71
+     3
+ 72
+     8
+ 73
+4
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 10
+175.5
+ 20
+22.9
+ 30
+0.0
+ 10
+176.384
+ 20
+22.9
+ 30
+0.0
+ 10
+177.1
+ 20
+23.6164
+ 30
+0.0
+ 10
+177.1
+ 20
+24.4999
+ 30
+0.0
+  0
+SPLINE
+  5
+468
+100
+AcDbEntity
+  8
+C00-00-00-BLACK
+100
+AcDbSpline
+210
+0.0
+220
+0.0
+230
+1.0
+ 70
+     0
+ 71
+     3
+ 72
+     8
+ 73
+4
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 10
+177.1
+ 20
+73.4998
+ 30
+0.0
+ 10
+177.1
+ 20
+74.3835
+ 30
+0.0
+ 10
+176.384
+ 20
+75.1
+ 30
+0.0
+ 10
+175.5
+ 20
+75.1
+ 30
+0.0
+  0
+SPLINE
+  5
+469
+100
+AcDbEntity
+  8
+C00-00-00-BLACK
+100
+AcDbSpline
+210
+0.0
+220
+0.0
+230
+1.0
+ 70
+     0
+ 71
+     3
+ 72
+     8
+ 73
+4
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 10
+175.5
+ 20
+75.1
+ 30
+0.0
+ 10
+174.617
+ 20
+75.1
+ 30
+0.0
+ 10
+173.9
+ 20
+74.3835
+ 30
+0.0
+ 10
+173.9
+ 20
+73.4998
+ 30
+0.0
+  0
+SPLINE
+  5
+46a
+100
+AcDbEntity
+  8
+C00-00-00-BLACK
+100
+AcDbSpline
+210
+0.0
+220
+0.0
+230
+1.0
+ 70
+     0
+ 71
+     3
+ 72
+     8
+ 73
+4
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 10
+173.9
+ 20
+73.4998
+ 30
+0.0
+ 10
+173.9
+ 20
+72.6165
+ 30
+0.0
+ 10
+174.617
+ 20
+71.9
+ 30
+0.0
+ 10
+175.5
+ 20
+71.9
+ 30
+0.0
+  0
+SPLINE
+  5
+46b
+100
+AcDbEntity
+  8
+C00-00-00-BLACK
+100
+AcDbSpline
+210
+0.0
+220
+0.0
+230
+1.0
+ 70
+     0
+ 71
+     3
+ 72
+     8
+ 73
+4
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 10
+175.5
+ 20
+71.9
+ 30
+0.0
+ 10
+176.384
+ 20
+71.9
+ 30
+0.0
+ 10
+177.1
+ 20
+72.6165
+ 30
+0.0
+ 10
+177.1
+ 20
+73.4998
+ 30
+0.0
+  0
+SPLINE
+  5
+46c
+100
+AcDbEntity
+  8
+C00-00-00-BLACK
+100
+AcDbSpline
+210
+0.0
+220
+0.0
+230
+1.0
+ 70
+     0
+ 71
+     3
+ 72
+     8
+ 73
+4
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 10
+119.1
+ 20
+73.4998
+ 30
+0.0
+ 10
+119.1
+ 20
+74.3835
+ 30
+0.0
+ 10
+118.383
+ 20
+75.1
+ 30
+0.0
+ 10
+117.5
+ 20
+75.1
+ 30
+0.0
+  0
+SPLINE
+  5
+46d
+100
+AcDbEntity
+  8
+C00-00-00-BLACK
+100
+AcDbSpline
+210
+0.0
+220
+0.0
+230
+1.0
+ 70
+     0
+ 71
+     3
+ 72
+     8
+ 73
+4
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 10
+117.5
+ 20
 75.1
  30
 0.0
@@ -44489,7 +44709,7 @@ AcDbSpline
   0
 SPLINE
   5
-464
+46e
 100
 AcDbEntity
   8
@@ -44553,7 +44773,7 @@ AcDbSpline
   0
 SPLINE
   5
-465
+46f
 100
 AcDbEntity
   8
@@ -44617,352 +44837,6 @@ AcDbSpline
   0
 LINE
   5
-466
-100
-AcDbEntity
-  8
-C00-00-00-BLACK
-100
-AcDbLine
- 10
-114
- 20
-21
- 30
-0.0
- 11
-199
- 21
-21
- 31
-0.0
-  0
-LINE
-  5
-467
-100
-AcDbEntity
-  8
-C00-00-00-BLACK
-100
-AcDbLine
- 10
-199
- 20
-21
- 30
-0.0
- 11
-199
- 21
-21
- 31
-0.0
-  0
-SPLINE
-  5
-468
-100
-AcDbEntity
-  8
-C00-00-00-BLACK
-100
-AcDbSpline
-210
-0.0
-220
-0.0
-230
-1.0
- 70
-     0
- 71
-     3
- 72
-     8
- 73
-4
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
- 10
-199
- 20
-21
- 30
-0.0
- 10
-200.657
- 20
-21
- 30
-0.0
- 10
-202
- 20
-22.3433
- 30
-0.0
- 10
-202
- 20
-24
- 30
-0.0
-  0
-LINE
-  5
-469
-100
-AcDbEntity
-  8
-C00-00-00-BLACK
-100
-AcDbLine
- 10
-202
- 20
-24
- 30
-0.0
- 11
-202
- 21
-74.0001
- 31
-0.0
-  0
-LINE
-  5
-46a
-100
-AcDbEntity
-  8
-C00-00-00-BLACK
-100
-AcDbLine
- 10
-202
- 20
-74.0001
- 30
-0.0
- 11
-202
- 21
-74.0001
- 31
-0.0
-  0
-SPLINE
-  5
-46b
-100
-AcDbEntity
-  8
-C00-00-00-BLACK
-100
-AcDbSpline
-210
-0.0
-220
-0.0
-230
-1.0
- 70
-     0
- 71
-     3
- 72
-     8
- 73
-4
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
- 10
-202
- 20
-74.0001
- 30
-0.0
- 10
-202
- 20
-75.6567
- 30
-0.0
- 10
-200.657
- 20
-77.0001
- 30
-0.0
- 10
-199
- 20
-77.0001
- 30
-0.0
-  0
-LINE
-  5
-46c
-100
-AcDbEntity
-  8
-C00-00-00-BLACK
-100
-AcDbLine
- 10
-199
- 20
-77.0001
- 30
-0.0
- 11
-114
- 21
-77.0001
- 31
-0.0
-  0
-LINE
-  5
-46d
-100
-AcDbEntity
-  8
-C00-00-00-BLACK
-100
-AcDbLine
- 10
-114
- 20
-77.0001
- 30
-0.0
- 11
-114
- 21
-77.0001
- 31
-0.0
-  0
-SPLINE
-  5
-46e
-100
-AcDbEntity
-  8
-C00-00-00-BLACK
-100
-AcDbSpline
-210
-0.0
-220
-0.0
-230
-1.0
- 70
-     0
- 71
-     3
- 72
-     8
- 73
-4
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-0.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
- 40
-1.0
- 10
-114
- 20
-77.0001
- 30
-0.0
- 10
-112.343
- 20
-77.0001
- 30
-0.0
- 10
-111
- 20
-75.6567
- 30
-0.0
- 10
-111
- 20
-74.0001
- 30
-0.0
-  0
-LINE
-  5
-46f
-100
-AcDbEntity
-  8
-C00-00-00-BLACK
-100
-AcDbLine
- 10
-111
- 20
-74.0001
- 30
-0.0
- 11
-111
- 21
-24
- 31
-0.0
-  0
-LINE
-  5
 470
 100
 AcDbEntity
@@ -44971,6 +44845,352 @@ C00-00-00-BLACK
 100
 AcDbLine
  10
+114
+ 20
+21
+ 30
+0.0
+ 11
+199
+ 21
+21
+ 31
+0.0
+  0
+LINE
+  5
+471
+100
+AcDbEntity
+  8
+C00-00-00-BLACK
+100
+AcDbLine
+ 10
+199
+ 20
+21
+ 30
+0.0
+ 11
+199
+ 21
+21
+ 31
+0.0
+  0
+SPLINE
+  5
+472
+100
+AcDbEntity
+  8
+C00-00-00-BLACK
+100
+AcDbSpline
+210
+0.0
+220
+0.0
+230
+1.0
+ 70
+     0
+ 71
+     3
+ 72
+     8
+ 73
+4
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 10
+199
+ 20
+21
+ 30
+0.0
+ 10
+200.657
+ 20
+21
+ 30
+0.0
+ 10
+202
+ 20
+22.3433
+ 30
+0.0
+ 10
+202
+ 20
+24
+ 30
+0.0
+  0
+LINE
+  5
+473
+100
+AcDbEntity
+  8
+C00-00-00-BLACK
+100
+AcDbLine
+ 10
+202
+ 20
+24
+ 30
+0.0
+ 11
+202
+ 21
+74.0001
+ 31
+0.0
+  0
+LINE
+  5
+474
+100
+AcDbEntity
+  8
+C00-00-00-BLACK
+100
+AcDbLine
+ 10
+202
+ 20
+74.0001
+ 30
+0.0
+ 11
+202
+ 21
+74.0001
+ 31
+0.0
+  0
+SPLINE
+  5
+475
+100
+AcDbEntity
+  8
+C00-00-00-BLACK
+100
+AcDbSpline
+210
+0.0
+220
+0.0
+230
+1.0
+ 70
+     0
+ 71
+     3
+ 72
+     8
+ 73
+4
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 10
+202
+ 20
+74.0001
+ 30
+0.0
+ 10
+202
+ 20
+75.6567
+ 30
+0.0
+ 10
+200.657
+ 20
+77.0001
+ 30
+0.0
+ 10
+199
+ 20
+77.0001
+ 30
+0.0
+  0
+LINE
+  5
+476
+100
+AcDbEntity
+  8
+C00-00-00-BLACK
+100
+AcDbLine
+ 10
+199
+ 20
+77.0001
+ 30
+0.0
+ 11
+114
+ 21
+77.0001
+ 31
+0.0
+  0
+LINE
+  5
+477
+100
+AcDbEntity
+  8
+C00-00-00-BLACK
+100
+AcDbLine
+ 10
+114
+ 20
+77.0001
+ 30
+0.0
+ 11
+114
+ 21
+77.0001
+ 31
+0.0
+  0
+SPLINE
+  5
+478
+100
+AcDbEntity
+  8
+C00-00-00-BLACK
+100
+AcDbSpline
+210
+0.0
+220
+0.0
+230
+1.0
+ 70
+     0
+ 71
+     3
+ 72
+     8
+ 73
+4
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+0.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 40
+1.0
+ 10
+114
+ 20
+77.0001
+ 30
+0.0
+ 10
+112.343
+ 20
+77.0001
+ 30
+0.0
+ 10
+111
+ 20
+75.6567
+ 30
+0.0
+ 10
+111
+ 20
+74.0001
+ 30
+0.0
+  0
+LINE
+  5
+479
+100
+AcDbEntity
+  8
+C00-00-00-BLACK
+100
+AcDbLine
+ 10
+111
+ 20
+74.0001
+ 30
+0.0
+ 11
+111
+ 21
+24
+ 31
+0.0
+  0
+LINE
+  5
+47a
+100
+AcDbEntity
+  8
+C00-00-00-BLACK
+100
+AcDbLine
+ 10
 111
  20
 24
@@ -44985,7 +45205,7 @@ AcDbLine
   0
 SPLINE
   5
-471
+47b
 100
 AcDbEntity
   8
@@ -45045,6 +45265,28 @@ AcDbSpline
  20
 21
  30
+0.0
+  0
+LINE
+  5
+47c
+100
+AcDbEntity
+  8
+C00-00-00-BLACK
+100
+AcDbLine
+ 10
+114
+ 20
+21
+ 30
+0.0
+ 11
+114
+ 21
+21
+ 31
 0.0
   0
 ENDSEC
