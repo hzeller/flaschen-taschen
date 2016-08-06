@@ -19,7 +19,8 @@
 # terminal
 #     Very simple output to current terminal. Requires decent terminal
 #     implementation that understands ANSI color escapes. Known terminals to
-#     work are konsole or xterm works. Gnome terminal does not.
+#     work are konsole or xterm. Newer Gnome terminals as well.
+#     Requires iTerm2 > 3.0 on Mac.
 #
 # rgb-matrix
 #    Output things to a LED matrix
