@@ -19,7 +19,7 @@ make nice pixels.
 
 ![](./img/ft-completed.jpg)
 
-How about watching the [Star Wars](https://youtu.be/OEUFIpM10FE) movie ?
+How about watching [a movie](https://youtu.be/OEUFIpM10FE) ?
 
 The set-up is 9 crates wide and 7 crates high for a total of
 63 [crates (see wiring here)](./doc/wiring.md) with 25 'pixels' each
@@ -113,7 +113,7 @@ bash$ jpegtopnm myimage.jpg | pnmscale -xysize 45 35 > /dev/udp/localhost/1337
 ```
 
 For a tool that decodes images (including animated gifs), go to
-the [clients/](./clients) sub-directory compile `send-image`
+the [client/](./client) sub-directory compile `send-image`
 (`make send-image`, see
 [Send-Image section in client/](./client/README.md#send-image) for needed
 dependencies), then run

@@ -114,6 +114,12 @@ Let's try this with an example image:
 
 ## Send-Video
 
+This utility here is a simple video output without sound.
+
+The upstream VLC [now has FlaschenTaschen support][vlc-commit] natively, so this
+might be the better option these days (currently, you have to compile it
+from source to get this bleeding edge).
+
 ### Compile
 ```bash
 # Need some devel libs
@@ -132,3 +138,6 @@ Options:
 ```
 
 ![](../img/ft-movie-night.jpg)
+
+
+[vlc-commit]: https://git.videolan.org/?p=vlc.git;a=commit;h=cf334f257868d20b6a6ce024994e84ba3e3448c3
