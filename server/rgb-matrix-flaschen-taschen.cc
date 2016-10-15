@@ -17,6 +17,7 @@
 #include "led-matrix.h"
 #include "gpio.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 // We can simulate the spacing between crates by having an extra dark pixel
 // in-between. It is not quite perfect, but the actual spacing on the real
