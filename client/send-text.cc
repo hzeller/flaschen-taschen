@@ -42,7 +42,7 @@ static int usage(const char *progname) {
             "\t-l <layer>      : Layer 0..15. Default 1 (note if also given in -g, then last counts)\n"
             "\t-h <host>       : Flaschen-Taschen display hostname.\n"
             "\t-f <fontfile>   : Path to *.bdf font file\n"
-            "\t-s<ms>          : Scroll milliseconds per pixel (default 60). 0 for no-scroll.\n"
+            "\t-s<ms>          : Scroll milliseconds per pixel (default 60). 0 for no-scroll. Negative for opposite direction.\n"
             "\t-O              : Only run once, don't scroll forever.\n"
             "\t-S<px>          : Letter spacing in pixels (default: 0)\n"
             "\t-c<RRGGBB>      : Text color as hex (default: FFFFFF)\n"
@@ -65,6 +65,7 @@ int main(int argc, char *argv[]) {
     bool run_forever = true;
     bool vertical = false;
     bool with_outline = false;
+    bool reverse = false;
     const char *host = NULL;
 
     Color fg(0xff, 0xff, 0xff);
@@ -105,6 +106,10 @@ int main(int argc, char *argv[]) {
             break;
         case 's':
             scroll_delay_ms = atoi(optarg);
+            if (scroll_delay_ms < 0) {
+                reverse = true;
+                scroll_delay_ms = -scroll_delay_ms;
+            }
             if (scroll_delay_ms > 0 && scroll_delay_ms < 10) {
                 // Don't do crazy packet sending.
                 scroll_delay_ms = 10;
@@ -218,12 +223,14 @@ int main(int argc, char *argv[]) {
                                              letter_spacing);
             do {
                 for (int s = 0; s < total_width + width && !got_ctrl_c; ++s) {
+                    int scroll_pos = width - s;
+                    if (reverse) scroll_pos = -width - scroll_pos;
                     display.Fill(bg);
                     if (outline_font) {
-                        DrawText(&display, *outline_font, width - s, y_pos,
+                        DrawText(&display, *outline_font, scroll_pos, y_pos,
                                  outline, NULL, text, letter_spacing - 2);
                     }
-                    DrawText(&display, text_font, width - s + 1, y_pos,
+                    DrawText(&display, text_font, scroll_pos + 1, y_pos,
                              fg, NULL, text, letter_spacing);
                     display.Send();
                     usleep(scroll_delay_ms * 1000);
@@ -238,14 +245,17 @@ int main(int argc, char *argv[]) {
             do {
                 for (int s = 0; s < total_height + height && !got_ctrl_c; ++s) {
                     display.Fill(bg);
+                    int scroll_pos = reverse
+                        ? (-total_height + measure_font->height() + s)
+                        : (height + measure_font->height() - s);
                     if (outline_font) {
                         VerticalDrawText(&display, *outline_font, x_pos - 1,
-                                         height + measure_font->height() - s,
+                                         scroll_pos,
                                          outline, NULL,
                                          text, letter_spacing - 2);
                     }
                     VerticalDrawText(&display, text_font, x_pos,
-                                     height + measure_font->height() - s,
+                                     scroll_pos,
                                      fg, NULL, text, letter_spacing);
                     display.Send();
                     usleep(scroll_delay_ms * 1000);
