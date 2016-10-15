@@ -223,8 +223,9 @@ int main(int argc, char *argv[]) {
                                              letter_spacing);
             do {
                 for (int s = 0; s < total_width + width && !got_ctrl_c; ++s) {
-                    int scroll_pos = width - s;
-                    if (reverse) scroll_pos = -width - scroll_pos;
+                    const int scroll_pos = reverse
+                        ? -total_width + s
+                        : width - s;
                     display.Fill(bg);
                     if (outline_font) {
                         DrawText(&display, *outline_font, scroll_pos, y_pos,
@@ -245,7 +246,7 @@ int main(int argc, char *argv[]) {
             do {
                 for (int s = 0; s < total_height + height && !got_ctrl_c; ++s) {
                     display.Fill(bg);
-                    int scroll_pos = reverse
+                    const int scroll_pos = reverse
                         ? (-total_height + measure_font->height() + s)
                         : (height + measure_font->height() - s);
                     if (outline_font) {
