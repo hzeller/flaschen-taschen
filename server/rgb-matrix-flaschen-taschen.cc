@@ -22,17 +22,19 @@
 // in-between. It is not quite perfect, but the actual spacing on the real
 // FlaschenTaschen crates is more like 3/4 of a bottle, but probably more
 // 'honest' than ignoring the spacing.
-#define CRATE_SPACING 1
+#define CRATE_SPACING 0
 
 static rgb_matrix::GPIO gpio_s;
 
-RGBMatrixFlaschenTaschen::RGBMatrixFlaschenTaschen(int offset_x, int offset_y,
+RGBMatrixFlaschenTaschen::RGBMatrixFlaschenTaschen(rgb_matrix::RGBMatrix *matrix,
+                                                   int offset_x, int offset_y,
                                                    int width, int height)
-    : off_x_(offset_x), off_y_(offset_y), width_(width), height_(height) {
-    gpio_s.Init();
-    matrix_ = new rgb_matrix::RGBMatrix(NULL, 32, 1, 2);
-    // Initialize all GPIO pins, but don't start thread yet.
-    matrix_->SetGPIO(&gpio_s, false);
+    : matrix_(matrix),
+      off_x_(offset_x), off_y_(offset_y), width_(width), height_(height) {
+    if (matrix_ == NULL) {
+        fprintf(stderr, "Couldn't initialize RGB matrix.\n");
+        exit(1);
+    }
 }
 
 RGBMatrixFlaschenTaschen::~RGBMatrixFlaschenTaschen() {
@@ -45,10 +47,9 @@ void RGBMatrixFlaschenTaschen::SetPixel(int x, int y, const Color &col) {
     x += x / 5;
     y += y / 5;
 #endif
-    //matrix_->SetPixel(x + off_x_, y + off_y_, col.r, col.g, col.b);
-    matrix_->SetPixel(31 - y + off_y_, x + off_x_, col.r, col.g, col.b);
+    matrix_->SetPixel(x + off_x_, y + off_y_, col.r, col.g, col.b);
 }
 
 void RGBMatrixFlaschenTaschen::PostDaemonInit() {
-    matrix_->SetGPIO(&gpio_s, true);  // Start thread.
+    matrix_->StartRefresh();  // Starts thread.
 }

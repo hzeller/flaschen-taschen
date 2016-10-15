@@ -38,6 +38,10 @@
 #  include "led-strip.h"
 #endif
 
+#if FT_BACKEND == 1
+#  include "led-matrix.h"
+#endif
+
 #define DROP_PRIV_USER "daemon"
 #define DROP_PRIV_GROUP "daemon"
 
@@ -82,6 +86,9 @@ static int usage(const char *progname) {
 #endif
             "\t--layer-timeout <sec>: Layer timeout: clearing after non-activity (Default: 15)\n"
             );
+#if FT_BACKEND == 1
+    rgb_matrix::PrintMatrixFlags(stderr);
+#endif
     return 1;
 }
 
@@ -94,6 +101,20 @@ int main(int argc, char *argv[]) {
 #endif
 #if FT_BACKEND == 2
     bool hd_terminal = false;
+#endif
+
+#if FT_BACKEND == 1
+    rgb_matrix::RGBMatrix::Options matrix_options;
+    rgb_matrix::RuntimeOptions runtime_opt;
+    runtime_opt.daemon = -1;   // We deal with this manually belo
+    runtime_opt.drop_privileges = -1;
+
+    // First things first: extract the command line flags that contain
+    // relevant matrix options.
+    if (!rgb_matrix::ParseOptionsFromFlags(&argc, &argv,
+                                           &matrix_options, &runtime_opt)) {
+        return usage(argv[0]);
+    }
 #endif
 
     enum LongOptionsOnly {
@@ -170,7 +191,9 @@ int main(int argc, char *argv[]) {
 #undef MAKE_COLUMN
 #elif FT_BACKEND == 1
     ServerFlaschenTaschen *display
-        = new RGBMatrixFlaschenTaschen(0, 0, width, height);
+        = new RGBMatrixFlaschenTaschen(
+            CreateMatrixFromOptions(matrix_options, runtime_opt),
+            0, 0, width, height);
 #elif FT_BACKEND == 2
     ServerFlaschenTaschen *display =
         hd_terminal

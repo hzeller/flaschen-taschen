@@ -89,7 +89,8 @@ class RGBMatrix;
 
 class RGBMatrixFlaschenTaschen : public ServerFlaschenTaschen {
 public:
-    RGBMatrixFlaschenTaschen(int offset_x, int offset_y,
+    RGBMatrixFlaschenTaschen(rgb_matrix::RGBMatrix *matrix,
+                             int offset_x, int offset_y,
                              int width, int heigh);
     virtual ~RGBMatrixFlaschenTaschen();
 
@@ -102,12 +103,12 @@ public:
     void Send() { /* update directly */ }
 
 private:
+    rgb_matrix::RGBMatrix *const matrix_;
+
     const int off_x_;
     const int off_y_;
     const int width_;
     const int height_;
-
-    rgb_matrix::RGBMatrix *matrix_;
 };
 
 class TerminalFlaschenTaschen : public ServerFlaschenTaschen {

@@ -13,8 +13,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://gnu.org/licenses/gpl-2.0.txt>
 
-#ifndef RPI_THREAD_H
-#define RPI_THREAD_H
+#ifndef FT_THREAD_H
+#define FT_THREAD_H
 
 #include <stdint.h>
 #include <pthread.h>
@@ -82,4 +82,4 @@ private:
 
 }  // end namespace ft
 
-#endif  // RPI_THREAD_H
+#endif  // FT_THREAD_H
