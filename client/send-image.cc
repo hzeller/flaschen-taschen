@@ -68,7 +68,7 @@ public:
                       const UDPFlaschenTaschen &display)
         : content_(display.Clone()) {
         int delay_time = img.animationDelay();  // in 1/100s of a second.
-        if (delay_time < 1) delay_time = 1;
+        if (delay_time < 1) delay_time = 10;
         delay_micros_ = delay_time * 10000;
         CopyImage(img, brightness_factor, content_);
     }
@@ -196,7 +196,7 @@ int main(int argc, char *argv[]) {
     int brighness_percent = 100;
     const char *host = NULL;
     int timeout = 1000000;
-    
+
     int opt;
     while ((opt = getopt(argc, argv, "g:h:s::Cl:b:t:")) != -1) {
         switch (opt) {
