@@ -96,13 +96,16 @@ as Flaschen Taschen backend:
   make FT_BACKEND=rgb-matrix
 ```
 
+Run it and pass the usual [rpi-rgb-led-matrix flags][led-flags]. Here, we have
+a set-up with three parallel chains of 5 32x32 displays each
 ```bash
-  # Then run with
-  sudo ./ft-server -D45x35
+  sudo ./ft-server --led-chain=5 --led-parallel=3 --led-rows=32
 ```
 
+If you pass the option `-d`, it will run as daemon in the background.
+
 [![RGB-MatrixImpl][ft-rgb-vid]](https://www.youtube.com/watch?v=XeJBcNevuJE)
-(this is a larger 160x96 display).
+(this is 160x96 display with the `--led-chain=5 --led-parallel=3`).
 
 This runs on a Raspberry Pi; see the
 [documentation in the RGB-Matrix project][rgb-matrix]
@@ -110,3 +113,4 @@ This runs on a Raspberry Pi; see the
 [rgb-matrix]: https://github.com/hzeller/rpi-rgb-led-matrix
 [ft-rgb-vid]: ../img/rgb-matrix-sample-vid.jpg
 [term-color]: https://gist.github.com/XVilka/8346728
+[led-flags]: https://github.com/hzeller/rpi-rgb-led-matrix#changing-parameters-via-command-line-flags
