@@ -131,10 +131,12 @@ Check out these repositories:
    ([like so](https://www.youtube.com/watch?v=s3pGp_Vf4Pk))
   * A [FlaschenTaschen VLC output](https://git.videolan.org/?p=vlc.git;a=commit;h=cf334f257868d20b6a6ce024994e84ba3e3448c3) by François Revol.
     It is already submitted upstream, but until it hits distributions, you have
-    to [compile VLC from git](https://wiki.videolan.org/UnixCompile/).
-    Then run it like so:
+    to [compile VLC from git](https://wiki.videolan.org/UnixCompile/). That VLC
+    version is >= `3.0.0-git Vetinari`.
+    Then `sudo make install ; sudo ldconfig` and run it like so:
 
    ```
+    # Here, ft.noise is the hostname of the flaschen taschen display:
     $ vlc --vout flaschen --flaschen-display=ft.noise \
           --flaschen-width=45 --flaschen-height=35 \
           <video-filename-or-YouTube-URL>
