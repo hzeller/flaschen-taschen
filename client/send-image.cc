@@ -34,7 +34,7 @@
 #include "udp-flaschen-taschen.h"
 
 volatile bool interrupt_received = false;
-static void InterruptHandler(int signo) {
+static void InterruptHandler(int) {
   interrupt_received = true;
 }
 
@@ -45,16 +45,19 @@ namespace {
                    brightness_factor * ScaleQuantumToChar(c.blueQuantum()));
 }
 
-void CopyImage(const Magick::Image &img, float brightness_factor,
+void CopyImage(const Magick::Image &img, bool do_center, float brightness_factor,
                FlaschenTaschen *result) {
     assert(result->width() >= (int) img.columns()
            && result->height() >= (int) img.rows());
+    const int x_offset = do_center ? (result->width() - img.columns()) / 2 : 0;
+    const int y_offset = do_center ? (result->height() - img.rows()) / 2 : 0;
     for (size_t y = 0; y < img.rows(); ++y) {
         for (size_t x = 0; x < img.columns(); ++x) {
             const Magick::Color &c = img.pixelColor(x, y);
             if (c.alphaQuantum() >= 255)
                 continue;
-            result->SetPixel(x, y, ConvertColor(c, brightness_factor));
+            result->SetPixel(x + x_offset, y + y_offset,
+                             ConvertColor(c, brightness_factor));
         }
     }
 }
@@ -64,13 +67,14 @@ void CopyImage(const Magick::Image &img, float brightness_factor,
 // animation delay.
 class PreprocessedFrame {
 public:
-    PreprocessedFrame(const Magick::Image &img, float brightness_factor,
+    PreprocessedFrame(const Magick::Image &img, bool do_center,
+                      float brightness_factor,
                       const UDPFlaschenTaschen &display)
         : content_(display.Clone()) {
         int delay_time = img.animationDelay();  // in 1/100s of a second.
         if (delay_time < 1) delay_time = 10;
         delay_micros_ = delay_time * 10000;
-        CopyImage(img, brightness_factor, content_);
+        CopyImage(img, do_center, brightness_factor, content_);
     }
     ~PreprocessedFrame() { delete content_; }
 
@@ -123,13 +127,13 @@ static bool LoadImageAndScale(const char *filename,
 }
 
 void DisplayAnimation(const std::vector<Magick::Image> &image_sequence,
-                      float bright, time_t end_time,
+                      float bright, bool do_center, time_t end_time,
                       const UDPFlaschenTaschen &display) {
     std::vector<PreprocessedFrame*> frames;
     // Convert to preprocessed frames.
     for (size_t i = 0; i < image_sequence.size(); ++i) {
-        frames.push_back(new PreprocessedFrame(image_sequence[i], bright,
-                                               display));
+        frames.push_back(new PreprocessedFrame(image_sequence[i], do_center,
+                                               bright, display));
     }
 
     for (unsigned int i = 0; !interrupt_received; ++i) {
@@ -152,7 +156,7 @@ void DisplayScrolling(const Magick::Image &img, int scroll_delay_ms,
                       UDPFlaschenTaschen *display) {
     // Create a copy from which it is faster to extract relevant content.
     UDPFlaschenTaschen copy(-1, img.columns(), img.rows());
-    CopyImage(img, brightness_factor, &copy);
+    CopyImage(img, false, brightness_factor, &copy);
 
     while (!interrupt_received && time(NULL) <= end_time) {
         for (int start = 0; start < copy.width(); ++start) {
@@ -175,9 +179,10 @@ static int usage(const char *progname) {
             "\t-g <width>x<height>[+<off_x>+<off_y>[+<layer>]] : Output geometry. Default 25x20+0+0+0\n"
             "\t-l <layer>      : Layer 0..15. Default 0 (note if also given in -g, then last counts)\n"
             "\t-h <host>       : Flaschen-Taschen display hostname.\n"
+            "\t-c              : Center image in available space.\n"
             "\t-s[<ms>]        : Scroll horizontally (optionally: delay ms; default 60).\n"
             "\t-b<brighness%%>  : Brightness percent (default 100)\n"
-            "\t-t<timeout>     : Only display for this long\n"
+            "\t-t<timeout>     : Only display for this long\n\n"
             "\t-C              : Just clear given area and exit.\n");
     return 1;
 }
@@ -187,6 +192,7 @@ int main(int argc, char *argv[]) {
 
     bool do_scroll = false;
     bool do_clear_screen = false;
+    bool do_center = false;
     int width = 45;
     int height = 35;
     int off_x = 0;
@@ -198,7 +204,7 @@ int main(int argc, char *argv[]) {
     int timeout = 1000000;
 
     int opt;
-    while ((opt = getopt(argc, argv, "g:h:s::Cl:b:t:")) != -1) {
+    while ((opt = getopt(argc, argv, "g:h:s::Cl:b:t:c")) != -1) {
         switch (opt) {
         case 'g':
             if (sscanf(optarg, "%dx%d%d%d%d", &width, &height, &off_x, &off_y, &off_z)
@@ -229,6 +235,9 @@ int main(int argc, char *argv[]) {
             break;
         case 'b':
             brighness_percent = atoi(optarg);
+            break;
+        case 'c':
+            do_center = true;
             break;
         case 'C':
             do_clear_screen = true;
@@ -293,7 +302,7 @@ int main(int argc, char *argv[]) {
     if (do_scroll) {
         DisplayScrolling(frames[0], scroll_delay_ms, bright, end_time, &display);
     } else {
-        DisplayAnimation(frames, bright, end_time, display);
+        DisplayAnimation(frames, bright, do_center, end_time, display);
     }
 
     // Don't let leftovers cover up content.

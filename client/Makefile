@@ -1,6 +1,6 @@
 FLASCHEN_TASCHEN_API_DIR=../api
 
-CXXFLAGS=-Wall -O3 -I$(FLASCHEN_TASCHEN_API_DIR)/include -I.
+CXXFLAGS=-Wall -Wextra -pedantic -O3 -I$(FLASCHEN_TASCHEN_API_DIR)/include -I.
 LDFLAGS=-L$(FLASCHEN_TASCHEN_API_DIR)/lib -lftclient
 FTLIB=$(FLASCHEN_TASCHEN_API_DIR)/lib/libftclient.a
 
@@ -16,8 +16,10 @@ send-text: send-text.cc
 send-image : send-image.cc $(FTLIB)
 	$(CXX) $(CXXFLAGS) $(MAGICK_CXXFLAGS) -o $@ $< $(MAGICK_LDFLAGS) $(LDFLAGS)
 
+# We're using a couple of deprecated functions. Pull request to update this to
+# the latest libraries is welcome.
 send-video: send-video.cc $(FTLIB)
-	$(CXX) $(CXXFLAGS) -o $@ $< $(FFMPEG_LDFLAGS) $(LDFLAGS)
+	$(CXX) $(CXXFLAGS) -Wno-deprecated-declarations -o $@ $< $(FFMPEG_LDFLAGS) $(LDFLAGS)
 
 % : %.cc $(FTLIB)
 	$(CXX) $(CXXFLAGS) -o $@ $< $(LDFLAGS)

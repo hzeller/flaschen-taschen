@@ -31,7 +31,7 @@
 #define WIDEST_GLYPH 'W'
 
 volatile bool got_ctrl_c = false;
-static void InterruptHandler(int signo) {
+static void InterruptHandler(int) {
   got_ctrl_c = true;
 }
 
@@ -71,7 +71,7 @@ int main(int argc, char *argv[]) {
     Color fg(0xff, 0xff, 0xff);
     Color bg(0, 0, 0);
     Color outline(0, 0, 0);
-    int r, g, b;
+    unsigned int r, g, b;
 
     ft::Font text_font;
     int opt;

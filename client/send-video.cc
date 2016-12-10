@@ -24,7 +24,7 @@ extern "C" {
 #include "udp-flaschen-taschen.h"
 
 volatile bool interrupt_received = false;
-static void InterruptHandler(int signo) {
+static void InterruptHandler(int) {
   interrupt_received = true;
 }
 
