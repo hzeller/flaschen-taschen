@@ -90,8 +90,7 @@ class RGBMatrix;
 class RGBMatrixFlaschenTaschen : public ServerFlaschenTaschen {
 public:
     RGBMatrixFlaschenTaschen(rgb_matrix::RGBMatrix *matrix,
-                             int offset_x, int offset_y,
-                             int width, int heigh);
+                             int width, int height);
     virtual ~RGBMatrixFlaschenTaschen();
 
     virtual void PostDaemonInit();  // Starting threads.
@@ -105,10 +104,8 @@ public:
 private:
     rgb_matrix::RGBMatrix *const matrix_;
 
-    const int off_x_;
-    const int off_y_;
-    const int width_;
-    const int height_;
+    int width_;
+    int height_;
 };
 
 class TerminalFlaschenTaschen : public ServerFlaschenTaschen {

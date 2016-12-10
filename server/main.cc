@@ -104,6 +104,8 @@ int main(int argc, char *argv[]) {
 #endif
 
 #if FT_BACKEND == 1
+    width = -1;    // Use size from matrix unless explicitly chosen.
+    height = -1;
     rgb_matrix::RGBMatrix::Options matrix_options;
     rgb_matrix::RuntimeOptions runtime_opt;
     runtime_opt.daemon = -1;   // We deal with this manually belo
@@ -193,7 +195,7 @@ int main(int argc, char *argv[]) {
     ServerFlaschenTaschen *display
         = new RGBMatrixFlaschenTaschen(
             CreateMatrixFromOptions(matrix_options, runtime_opt),
-            0, 0, width, height);
+            width, height);
 #elif FT_BACKEND == 2
     ServerFlaschenTaschen *display =
         hd_terminal
