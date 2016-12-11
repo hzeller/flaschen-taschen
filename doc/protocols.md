@@ -70,7 +70,7 @@ simple as this; you can make use of the convenient pnm-tools:
 
 ```bash
 # This works in the bash shell providing the pseudo-files /dev/udp/host/port
-bash$ jpegtopnm color.jpg | pnmscale -xysize 20 20 > /dev/udp/ft.noise/1337
+bash$ jpegtopnm color.jpg | stdbuf -o64k pnmscale -xysize 20 20 > /dev/udp/ft.noise/1337
 # replace 'ft.noise' with 'localhost' if you have
 # a locally running server, e.g. terminal based
 ```
@@ -78,7 +78,7 @@ bash$ jpegtopnm color.jpg | pnmscale -xysize 20 20 > /dev/udp/ft.noise/1337
 If you're not using `bash`, then the `/dev/udp/...` path won't work, then
 you can use the network-swiss army knife `socat`
 ```
-$ jpegtopnm color.jpg | pnmscale -xysize 20 20 | socat STDIO UDP-SENDTO:ft.noise:1337
+$ jpegtopnm color.jpg | stdbuf -o64k pnmscale -xysize 20 20 | socat -b64000 STDIO UDP-SENDTO:ft.noise:1337
 ```
 
 #### Notes
