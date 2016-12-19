@@ -176,7 +176,7 @@ void DisplayScrolling(const Magick::Image &img, int scroll_delay_ms,
 static int usage(const char *progname) {
     fprintf(stderr, "usage: %s [options] <image>\n", progname);
     fprintf(stderr, "Options:\n"
-            "\t-g <width>x<height>[+<off_x>+<off_y>[+<layer>]] : Output geometry. Default 25x20+0+0+0\n"
+            "\t-g <width>x<height>[+<off_x>+<off_y>[+<layer>]] : Output geometry. Default 45x35+0+0+0\n"
             "\t-l <layer>      : Layer 0..15. Default 0 (note if also given in -g, then last counts)\n"
             "\t-h <host>       : Flaschen-Taschen display hostname.\n"
             "\t-c              : Center image in available space.\n"
