@@ -43,16 +43,28 @@ int OpenFlaschenTaschenSocket(const char *host) {
     if (host == NULL || strlen(host) == 0) {
         host = DEFAULT_FT_DISPLAY_HOST; // Fallback.
     }
+    char *host_copy = NULL;
+    const char *port = "1337";
+    const char *colon_pos;
+    if ((colon_pos = strchr(host, ':')) != NULL) {
+        port = colon_pos + 1;
+        host_copy = strdup(host);
+        host_copy[colon_pos - host] = '\0';
+        host = host_copy;
+    }
     struct addrinfo addr_hints = {0};
     addr_hints.ai_family = AF_INET;
     addr_hints.ai_socktype = SOCK_DGRAM;
 
     struct addrinfo *addr_result = NULL;
     int rc;
-    if ((rc = getaddrinfo(host, "1337", &addr_hints, &addr_result)) != 0) {
-        fprintf(stderr, "Resolving '%s': %s\n", host, gai_strerror(rc));
+    if ((rc = getaddrinfo(host, port, &addr_hints, &addr_result)) != 0) {
+        fprintf(stderr, "Resolving '%s' (port %s): %s\n", host, port,
+                gai_strerror(rc));
+        free(host_copy);
         return -1;
     }
+    free(host_copy);
     if (addr_result == NULL)
         return -1;
     int fd = socket(addr_result->ai_family,
