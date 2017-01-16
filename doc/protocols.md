@@ -8,19 +8,19 @@ dedicated bridge).
 
 ## Flaschen Taschen Protocol
 
-Receives UDP packets with a raw [PPM file][ppm] (`P6`) on port 1337 in a
+Receives **UDP** packets with a raw [PPM file][ppm] (`P6`) on port 1337 in a
 single datagram per image.
 A ppm file has a simple text header followed by the binary RGB image data.
 
-The FlaschenTaschen has a special feature that allows you to offset the image
-in (x,y) direction and as a layer (pictures with higher layers cover up lower
-layers; black is 'transparent').
+FlaschenTaschen has a special feature that allows you to choose the offset the
+image is displayed on the screen in (x,y) direction and as a layer.
 
-To provide this without violating the PPM file standard, there is a special
-comment that you can put in the header (comments are allowed in PPM) that
-describe the offset of the image on the display in X, Y and Z-direction (=layer).
+To provide this additional information without violating the PPM file standard,
+there is a special comment that you can put in the header (because `#`-comments
+are allowed in the PPM header) that describe the offset of the image on the
+display in X, Y and Z-direction (=layer).
 
-The comment must start with exactly `#FT:`. In the following example, a 10x10
+The comment must start with exactly **`#FT:`**. In the following example, a 10x10
 image is sent with the (x,y) offset of (5,8), the layer (z-offset) is 13:
 
 ```
@@ -33,9 +33,10 @@ P6     # Magic number
 
 (the header is followed by the binary image data, three bytes per pixel RGB, so in this case 10x10x3 = 300 bytes)
 
-There is an alternative way to provide the offset by adding it at the _end_ of
+There is an alternative way to provide the offset by appending it at the _end_ of
 the image data in a similar format like the header because that is sometimes
-easier to do. Adding it at the end makes it also backward compatible with
+easier to do depending on your implementation.
+Appending it at the end makes it also backward compatible with
 standard PPM (as PPM just ignores additional data at the end).
 
 Here the same 10x10 image with (header + data + optional footer). The footer is
@@ -58,11 +59,14 @@ The optional offset determines where the image is displayed on the
 Flaschen Taschen display relative to the top left corner (provided in the
 [remote Flaschen Taschen class][cpp-client-api] as a `SetOffset(x, y, z)` method).
 
-The (x,y) offset allows to place an image at an arbitrary position - good
-for animations or having non-overlapping areas on the screen.
+### Offsets, how do they work ?
 
-The z offset represents a layer above the background. Zero is the background
-image, layers above that are overlaying content if there is a color set (black
+The **(x,y) offset** allows to place an image at an arbitrary position on the
+screen - good for animations or having non-overlapping areas on the screen.
+
+The **z offset** represents a **layer** above the background. Zero is the
+background image, layers above that are overlaying content if there is a
+color set (black
 in layers not the background are regarded transparent).
 That way, it is possible to write games simply (consider typical arcade games
 with slow moving background, a little faster moving middelground and a fast
@@ -71,8 +75,14 @@ moving character in the front. This allows for full screen sprites essentially).
 Or you can overlay, say a message over the currently running content.
 The nice thing is is that you don't need to know what the current background
 is - a fully networked compositing display essentially :)
+This allows display access for independent people on the network, right the
+way we use it at Noisebridge.
+
 Note: layers above the background (z=0) will auomatically turn transparent again
-if they stick around for a while without being updated.
+if they stick around for a while without being updated (that is
+the `--layer-timeout` flag to the server).
+
+### Send images right from the command-line
 
 Since the server accepts a standard PPM format, sending an image is as
 simple as this; you can make use of the convenient pnm-tools right from your
