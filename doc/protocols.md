@@ -11,43 +11,52 @@ dedicated bridge).
 Receives UDP packets with a raw [PPM file][ppm] (`P6`) on port 1337 in a
 single datagram per image.
 A ppm file has a simple text header followed by the binary RGB image data.
-We have another feature: 'offset'; since the header is already defined in a
-fixed way, we add a footer after the binary image data to be backward compatible.
 
-A 10x10 image looks like this (header + data + optional footer). End-of-line
-comments in the header are allowed with `#` character:
+The FlaschenTaschen has a special feature that allows you to offset the image
+in (x,y) direction and as a layer (pictures with higher layers cover up lower
+layers; black is 'transparent').
+
+To provide this without violating the PPM file standard, there is a special
+comment that you can put in the header (comments are allowed in PPM) that
+describe the offset of the image on the display in X, Y and Z-direction (=layer).
+
+The comment must start with exactly `#FT:`. In the following example, a 10x10
+image is sent with the (x,y) offset of (5,8), the layer (z-offset) is 13:
+
+```
+P6     # Magic number
+10 10  # width height (decimal, number in ASCII)
+#FT: 5 8 13
+255    # values per color (fixed). After newline, 10 * 10 * 3 bytes RGB data follows
+```
+![](../img/udp.png) (300 bytes RGB data)<br/>
+
+(the header is followed by the binary image data, three bytes per pixel RGB, so in this case 10x10x3 = 300 bytes)
+
+There is an alternative way to provide the offset by adding it at the _end_ of
+the image data in a similar format like the header because that is sometimes
+easier to do. Adding it at the end makes it also backward compatible with
+standard PPM (as PPM just ignores additional data at the end).
+
+Here the same 10x10 image with (header + data + optional footer). The footer is
+similar formatted like the header: decimal numbers, separated by space).
+End-of-line comments in the header/footer are allowed with `#` character:
 
 ```
 P6     # Magic number
 10 10  # width height (decimal, number in ASCII)
 255    # values per color (fixed). After newline, 10 * 10 * 3 bytes RGB data follows
 ```
-![](../img/udp.png)<br/>
+![](../img/udp.png) (300 bytes RGB data)<br/>
 ```
 5      # optional x offset
 8      # optional y offset
-10     # optional z offset.
+13     # optional z offset.
 ```
-
-Upcoming, but not everywhere deployed yet (so: don't use yet unless you're
-at Toorcamp currently talking to the Noisebridge installation), is the ability
-to provide the offsets directly in a specially formatted header comment.
-
-That way, it is possible to use PPM image packages that provide control over
-a comment. The comment must start with exactly `#FT:`. In the following example,
-the (x,y) offset is (5,8), the layer (z-offset) is 10:
-
-```
-P6     # Magic number
-10 10  # width height (decimal, number in ASCII)
-#FT: 5 8 10
-255    # values per color (fixed). After newline, 10 * 10 * 3 bytes RGB data follows
-```
-![](../img/udp.png)<br/>
 
 The optional offset determines where the image is displayed on the
 Flaschen Taschen display relative to the top left corner (provided in the
-[remote Flaschen Taschen class][remote-ft] as a `SetOffset(x, y, z)` method).
+[remote Flaschen Taschen class][cpp-client-api] as a `SetOffset(x, y, z)` method).
 
 The (x,y) offset allows to place an image at an arbitrary position - good
 for animations or having non-overlapping areas on the screen.
@@ -61,12 +70,13 @@ moving character in the front. This allows for full screen sprites essentially).
 
 Or you can overlay, say a message over the currently running content.
 The nice thing is is that you don't need to know what the current background
-is - a fully networked composite display essentially :)
+is - a fully networked compositing display essentially :)
 Note: layers above the background (z=0) will auomatically turn transparent again
 if they stick around for a while without being updated.
 
 Since the server accepts a standard PPM format, sending an image is as
-simple as this; you can make use of the convenient pnm-tools:
+simple as this; you can make use of the convenient pnm-tools right from your
+command line, how cool is that ?
 
 ```bash
 # This works in the bash shell providing the pseudo-files /dev/udp/host/port
@@ -81,24 +91,17 @@ you can use the network-swiss army knife `socat`
 $ jpegtopnm color.jpg | stdbuf -o64k pnmscale -xysize 20 20 | socat -b64000 STDIO UDP-SENDTO:ft.noise:1337
 ```
 
-#### Notes
-For huge displays (more than 21k pixels) we run into UDP packet size limit of
-roughly 64k. In that case, you need to send several tiles of the image and use
-the offset feature to place them on the screen.
-(We might consider adding a TCP protocol for these cases).
-
-Note, this is _not_ an issue with the large FlaschenTaschen installation at
-Noisebridge (1575 pixels) as it requires less than 8% of the UDP limit. But it
-could be an issue with huge assemblies using an
-[RGB Matrix](../server#rgb-matrix-panel-display) with many small LEDs.
-
 #### Implementations
-You find more in the [client directory](../client) to directly send
-content to the server, including a [convenient class][remote-ft] that provides
-an implementation on the client side.
+You find some tools in the [`client/` directory](../client) to directly send
+content to the server.
 
-There is a [C++ API](../client/udp-flaschen-taschen.h) and
-a [Python API](../client/flaschen.py) in that directory.
+For the API level, there are a couple APIs provided in the [`api/`](../api)
+directory, that let's you get right into it:
+
+ * [C++ API][cpp-client-api]
+ * [Python API][py-client-api]
+
+For instance, the [FlaschenTaschen demos] by Carl are using the C++ API.
 
 There is a [FlaschenTaschen VNC implementation](https://github.com/scottyallen/flaschenvnc) by Scotty. Scotty also wrote a server implementation for the ESP8266
 that runs LED strips in the [Noise Square Table] and the Noisebridge library
@@ -114,6 +117,19 @@ Then there are pixel strip implementations for
 the bookshelves with hostname `bookcase.noise` and
 the [Noise Square Table], hostname `square.noise`.
 
+#### Notes
+For huge displays (more than 21k pixels) we run into UDP packet size limit of
+roughly 64k. In that case, you need to send several tiles of the image and use
+the offset feature to place them on the screen.
+(We might consider adding a TCP protocol for these cases).
+
+Note, this is _not_ an issue with the large FlaschenTaschen installation at
+Noisebridge (1575 pixels) as it requires less than 8% of the UDP limit. But it
+could be an issue with huge assemblies using an
+[RGB Matrix](../server#rgb-matrix-panel-display) with many small LEDs.
+
 [ppm]: http://netpbm.sourceforge.net/doc/ppm.html
-[remote-ft]: ../client/udp-flaschen-taschen.h
+[cpp-client-api]: ../api/include/udp-flaschen-taschen.h
+[py-client-api]: ../api/python/flaschen.py
 [Noise Square Table]: https://noisebridge.net/wiki/Noise_Square_Table
+[FlaschenTaschen demos]: https://github.com/cgorringe/ft-demos

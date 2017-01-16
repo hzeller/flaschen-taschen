@@ -1,7 +1,7 @@
 API
 ===
 
-The FlaschenTaschen have a fairly simple [network protocol](../protocols.md),
+The FlaschenTaschen have a fairly simple [network protocol](../doc/protocols.md),
 which you can implement in any programming language easily.
 To make life simple, these are ready client APIs that you can use to get
 started quickly.
