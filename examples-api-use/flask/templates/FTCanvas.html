@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html >
+<head>
+
+<title>Simple Flaschen-Taschen web interface</title>
+<head>
+
+  <style>
+  </style>
+
+<body>
+
+<h2> Connected to Flaschen-Taschen on {{host}}:{{port}} </h2>
+<button type="button" id="update">Start Updating Flaschen Taschen</button>
+<div >
+	<div id="canvasDiv"><canvas width="{{ display_width }}" height="{{ display_height }}" id="ftCanvas"></canvas></div>
+</div>
+
+
+    <script src="data/js/ft-flask.js"></script>
+    <script src="data/js/canvas-func.js"></script>
+    <script >
+        init_ft({{display_width}},{{display_height}})
+        init_canvas({{display_width}},{{display_height}})
+    </script>
+
+</body></html>
