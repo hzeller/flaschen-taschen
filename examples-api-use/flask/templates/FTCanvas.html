@@ -15,13 +15,14 @@
 <div >
 	<div id="canvasDiv"><canvas width="{{ display_width }}" height="{{ display_height }}" id="ftCanvas"></canvas></div>
 </div>
+    <div id="errMsg"> </div>
+        <textarea cols="150" rows="30" id="updateFunc"></textarea>
 
-
-    <script src="data/js/ft-flask.js"></script>
-    <script src="data/js/canvas-func.js"></script>
-    <script >
-        init_ft({{display_width}},{{display_height}})
-        init_canvas({{display_width}},{{display_height}})
-    </script>
+        <script src="data/js/ft-flask.js"></script>
+        <script src="data/js/canvas-func.js"></script>
+        <script>
+            init_ft({{display_width}},{{display_height}})
+            init_canvas({{display_width}},{{display_height}})
+        </script>
 
 </body></html>
