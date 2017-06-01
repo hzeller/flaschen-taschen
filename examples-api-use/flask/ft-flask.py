@@ -1,5 +1,6 @@
 import os
 import png
+import base64
 
 from flask import *
 from flaschen import *
@@ -10,7 +11,7 @@ port = int(os.getenv("FT_PORT","1337"))
 display_width = int(os.getenv("FT_WIDTH","45"))
 display_height = int(os.getenv("FT_HEIGHT","35"))
 
-flaschen_conn = Flaschen(host,port,display_width,display_height)
+flaschen_conn = Flaschen(host,port,display_width,display_height, layer=15)
 
 @app.route('/data/<path:path>')
 def static_file(path):
@@ -23,7 +24,6 @@ def process_canvas_data():
     pngReader = png.Reader(bytes=datablob)
     (w,h,pixels,info) = pngReader.read()
     pixelLines = list(pixels)
-    print(len(pixelLines[0]))
 
     for row in range(0,h):
         for col in range(0,w):

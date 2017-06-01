@@ -6,6 +6,8 @@ function init_ft(w,h)
     var intervalID = null
 
     var updateButton = document.getElementById("update")
+    var formData = new FormData();
+    var oReq = new XMLHttpRequest();
 
     updateButton.addEventListener("click", function () {
         if(intervalID)
@@ -24,10 +26,8 @@ function init_ft(w,h)
 
                 canvas.toBlob(function (blob) {
 
-                    var formData = new FormData();
                     var uploadURL = "ProcessCanvasData";
-                    formData.append("data", blob);
-                    var oReq = new XMLHttpRequest();
+                    formData.set("data", blob);
                     oReq.open("POST", uploadURL);
                     var d = new Date();
                     var t1 = d.getTime();
@@ -43,7 +43,7 @@ function init_ft(w,h)
 
                     oReq.send(formData);
                 }, "image/png", 0);
-            }, 250);
+            }, 50);
         }
 
     });
