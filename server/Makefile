@@ -81,10 +81,10 @@ ft-server: main.o $(OBJECTS) $(STATIC_LIBS)
 %.o : %.c .compiler-flags
 	$(CC) $(CXXFLAGS) -c -o $@ $<
 
-$(RGB_LIBRARY):
+$(RGB_LIBRARY): FORCE
 	$(MAKE) -C $(RGB_LIBDIR)
 
-$(SPIXELS_LIBRARY):
+$(SPIXELS_LIBRARY): FORCE
 	$(MAKE) -C $(SPIXELS_LIBDIR)
 
 # Make sure to re-compile when the compiler flags change.
