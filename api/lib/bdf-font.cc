@@ -19,19 +19,20 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <inttypes.h>
 
 // The little question-mark box "�" for unknown code.
 static const uint32_t kUnicodeReplacementCodepoint = 0xFFFD;
 
 // Bitmap for one row. This limits the number of available columns.
 // Make wider if running into trouble.
-typedef uint32_t rowbitmap_t;
+typedef uint64_t rowbitmap_t;
 
 namespace ft {
 struct Font::Glyph {
+    int device_width, device_height;
     int width, height;
-    int bbx_w, bbx_h;  // bounding box width/height.
-    int y_offset;
+    int x_offset, y_offset;
     rowbitmap_t bitmap[0];  // contains 'height' elements. Allocated.
 };
 
@@ -55,7 +56,6 @@ bool Font::LoadFont(const char *path) {
     Glyph tmp;
     Glyph *current_glyph = NULL;
     int row = 0;
-    int x_offset = 0;
     int bitmap_shift = 0;
     while (fgets(buffer, sizeof(buffer), f)) {
         if (sscanf(buffer, "FONTBOUNDINGBOX %d %d %d %d",
@@ -66,25 +66,27 @@ bool Font::LoadFont(const char *path) {
         else if (sscanf(buffer, "ENCODING %ud", &codepoint) == 1) {
             // parsed.
         }
-        else if (sscanf(buffer, "DWIDTH %d", &tmp.width) == 1) {
+        else if (sscanf(buffer, "DWIDTH %d %d",
+                        &tmp.device_width, &tmp.device_height) == 2) {
             // parsed.
         }
-        else if (sscanf(buffer, "BBX %d %d %d %d", &tmp.bbx_w, &tmp.bbx_h,
-                        &x_offset, &tmp.y_offset) == 4) {
-            size_t alloc_size = sizeof(Glyph) + tmp.height * sizeof(rowbitmap_t);
-            current_glyph = (Glyph*) calloc(1, alloc_size);
+        else if (sscanf(buffer, "BBX %d %d %d %d", &tmp.width, &tmp.height,
+                        &tmp.x_offset, &tmp.y_offset) == 4) {
+            current_glyph = (Glyph*) malloc(sizeof(Glyph)
+                                            + tmp.height * sizeof(rowbitmap_t));
             *current_glyph = tmp;
-            // We only get number of bytes large enough holding our width.
-            // We want it always left-aligned.
+            // We only get number of bytes large enough holding our width. We
+            // want it always left-aligned.
             bitmap_shift =
-                8 * (sizeof(rowbitmap_t) - ((tmp.bbx_w + 7) / 8)) + x_offset;
+                8 * (sizeof(rowbitmap_t) - ((current_glyph->width + 7) / 8)) -
+                current_glyph->x_offset;
             row = -1;  // let's not start yet, wait for BITMAP
         }
         else if (strncmp(buffer, "BITMAP", strlen("BITMAP")) == 0) {
             row = 0;
         }
         else if (current_glyph && row >= 0 && row < current_glyph->height
-                 && (sscanf(buffer, "%x", &current_glyph->bitmap[row]) == 1)) {
+                 && (sscanf(buffer, "%" PRIx64, &current_glyph->bitmap[row]) == 1)) {
             current_glyph->bitmap[row] <<= bitmap_shift;
             row++;
         }
@@ -117,6 +119,8 @@ Font *Font::CreateOutlineFont() const {
         Glyph *const tmp_glyph = (Glyph*) calloc(1, alloc_size);
         tmp_glyph->width  = orig->width  + 2*kBorder;
         tmp_glyph->height = height;
+        tmp_glyph->device_width  = orig->device_width + 2*kBorder;
+        tmp_glyph->device_height = height;
         tmp_glyph->y_offset = orig->y_offset - kBorder;
         // TODO: we don't really need bounding box, right ?
         const rowbitmap_t fill_pattern = 0b111;
@@ -161,21 +165,19 @@ int Font::DrawGlyph(FlaschenTaschen *c, int x_pos, int y_pos,
     const Glyph *g = FindGlyph(unicode_codepoint);
     if (g == NULL) g = FindGlyph(kUnicodeReplacementCodepoint);
     if (g == NULL) return 0;
-    if (x_pos > 0 - g->width && x_pos < c->width()) { // clip.
-        y_pos = y_pos - g->height - g->y_offset; // TODO: fix baseline use.
-        for (int y = 0; y < g->height; ++y) {
-            const rowbitmap_t row = g->bitmap[y];
-            rowbitmap_t x_mask = 0x80000000;
-            for (int x = 0; x < g->width; ++x, x_mask >>= 1) {
-                if (row & x_mask) {
-                    c->SetPixel(x_pos + x, y_pos + y, color);
-                } else if (bgcolor) {
-                    c->SetPixel(x_pos + x, y_pos + y, *bgcolor);
-                }
+    y_pos = y_pos - g->height - g->y_offset;
+    for (int y = 0; y < g->height; ++y) {
+        const rowbitmap_t row = g->bitmap[y];
+        rowbitmap_t x_mask = (1LL<<63);
+        for (int x = 0; x < g->device_width; ++x, x_mask >>= 1) {
+            if (row & x_mask) {
+                c->SetPixel(x_pos + x, y_pos + y, color);
+            } else if (bgcolor) {
+                c->SetPixel(x_pos + x, y_pos + y, *bgcolor);
             }
         }
     }
-    return g->width;
+    return g->device_width;
 }
 
 int DrawText(FlaschenTaschen *c, const Font &font,
