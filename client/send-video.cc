@@ -122,6 +122,7 @@ int main(int argc, char *argv[]) {
 
     // Register all formats and codecs
     av_register_all();
+    avformat_network_init();
 
     // Open video file
     if(avformat_open_input(&pFormatCtx, movie_file, NULL, NULL)!=0)
