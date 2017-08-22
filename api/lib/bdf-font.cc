@@ -13,14 +13,20 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://gnu.org/licenses/gpl-2.0.txt>
 
+/* inttypes is messy around various old and new compilers */
+#if __cplusplus <= 201103L
+#  define __STDC_FORMAT_MACROS
+#  include <inttypes.h>
+#else
+#  include <cinttypes>
+#endif
+
 #include "bdf-font.h"
 #include "utf8-internal.h"
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-
-#include <cinttypes>
 
 // The little question-mark box "�" for unknown code.
 static const uint32_t kUnicodeReplacementCodepoint = 0xFFFD;
