@@ -13,13 +13,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://gnu.org/licenses/gpl-2.0.txt>
 
-/* inttypes is messy around various old and new compilers */
-#if __cplusplus <= 201103L
+// Some old g++ installations need this macro to be defined for PRIx64.
+#ifndef __STDC_FORMAT_MACROS
 #  define __STDC_FORMAT_MACROS
-#  include <inttypes.h>
-#else
-#  include <cinttypes>
 #endif
+#include <inttypes.h>
 
 #include "bdf-font.h"
 #include "utf8-internal.h"
