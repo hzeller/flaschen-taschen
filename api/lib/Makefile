@@ -1,4 +1,4 @@
-CXXFLAGS=-Wall -O3 -I../include -I.
+CXXFLAGS=-Wall -Wextra -O3 -I../include -I. -std=c++03
 LIB_OBJECTS=udp-flaschen-taschen.o bdf-font.o graphics.o
 LIB_CXXFLAGS=$(CXXFLAGS) -fPIC
 

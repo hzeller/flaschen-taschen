@@ -52,7 +52,7 @@ int OpenFlaschenTaschenSocket(const char *host) {
         host_copy[colon_pos - host] = '\0';
         host = host_copy;
     }
-    struct addrinfo addr_hints = {0};
+    struct addrinfo addr_hints = {};
     addr_hints.ai_family = AF_INET;
     addr_hints.ai_socktype = SOCK_DGRAM;
 

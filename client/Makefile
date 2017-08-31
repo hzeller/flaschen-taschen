@@ -1,6 +1,6 @@
 FLASCHEN_TASCHEN_API_DIR=../api
 
-CXXFLAGS=-Wall -Wextra -pedantic -O3 -I$(FLASCHEN_TASCHEN_API_DIR)/include -I.
+CXXFLAGS=-Wall -Wextra -pedantic -O3 -I$(FLASCHEN_TASCHEN_API_DIR)/include -I. -std=c++03
 LDFLAGS=-L$(FLASCHEN_TASCHEN_API_DIR)/lib -lftclient
 FTLIB=$(FLASCHEN_TASCHEN_API_DIR)/lib/libftclient.a
 
