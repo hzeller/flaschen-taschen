@@ -43,7 +43,7 @@ static void InterruptHandler(int) {
 #  define av_frame_free avcodec_free_frame
 #endif
 
-bool PlayVideo(const char *filename, UDPFlaschenTaschen& display, bool verbose, float repeats);
+bool PlayVideo(const char *filename, UDPFlaschenTaschen& display, int verbose, float repeatTimeout);
 
 void SendFrame(AVFrame *pFrame, UDPFlaschenTaschen *display) {
     // Write pixel data
@@ -63,6 +63,7 @@ static int usage(const char *progname) {
             "\t-h <host>          : Flaschen-Taschen display hostname.\n"
             "\t-l <layer>         : Layer 0..15. Default 0 (note if also given in -g, then last counts)\n"
             "\t-t <repeat-secs>   : Repeat for at least n seconds\n"
+            "\t-c                 : clear display/layer before close\n"
             "\t-v                 : verbose.\n");
     return 1;
 }
@@ -73,12 +74,13 @@ int main(int argc, char *argv[]) {
     int off_x = 0;
     int off_y = 0;
     int off_z = 0;
-    float repeatSeconds = 0;
-    bool verbose = false;
+    float repeatTimeout = 0;
+    int verbose = 0;
+    bool clear_after = false;
     const char *ft_host = NULL;
 
     int opt;
-    while ((opt = getopt(argc, argv, "g:h:t:vl:")) != -1) {
+    while ((opt = getopt(argc, argv, "g:h:t:cvl:")) != -1) {
         switch (opt) {
         case 'g':
             if (sscanf(optarg, "%dx%d%d%d%d",
@@ -97,15 +99,19 @@ int main(int argc, char *argv[]) {
             }
             break;
         case 't':
-            repeatSeconds = atof(optarg);
+            repeatTimeout = atof(optarg);
+            break;
+        case 'c':
+            clear_after = true;
             break;
         case 'v':
-            verbose = true;
+            verbose++;
             break;
         default:
             return usage(argv[0]);
         }
     }
+
 
     if (optind >= argc) {
         fprintf(stderr, "Expected image filename.\n");
@@ -127,53 +133,58 @@ int main(int argc, char *argv[]) {
     signal(SIGTERM, InterruptHandler);
     signal(SIGINT, InterruptHandler);
 
+    int numberPlayed = 0;
     for (int imgarg = optind; imgarg < argc && !interrupt_received; ++imgarg) {
         const char *movie_file = argv[imgarg];
 
-        PlayVideo(movie_file, display, verbose, repeatSeconds);
+        bool playresult = PlayVideo(movie_file, display, verbose, repeatTimeout);
+        if (playresult)
+            numberPlayed++;
 
         if (interrupt_received) {
             // Feedback for Ctrl-C, but most importantly, force a newline
             // at the output, so that commandline-shell editing is not messed up.
             fprintf(stderr, "Got interrupt. Exiting\n");
-            return 1;
+            break;
         }
     }
-
-    display.Clear();
-    display.Send();
-    return 0;
+    if (off_z > 0 || clear_after) {
+        display.Clear();
+        display.Send();
+    }
+    return !numberPlayed;
 }
 
-bool PlayVideo(const char *filename, UDPFlaschenTaschen& display, bool verbose, float repeats) {
+/// @returns true on video successfully played-through
+bool PlayVideo(const char *filename, UDPFlaschenTaschen& display, int verbose, float repeatTimeout) {
     // Open video file
     AVFormatContext* pFormatCtx = NULL;
-    if(avformat_open_input(&pFormatCtx, filename, NULL, NULL) != 0) {
-      fprintf(stderr, "Can't open file %s\n", filename);
-      return false;
+    if (avformat_open_input(&pFormatCtx, filename, NULL, NULL) != 0) {
+        fprintf(stderr, "Can't open file %s\n", filename);
+        return false;
     }
     fprintf(stderr, "Playing %s\n", filename);
 
     // Retrieve stream information
-    if(avformat_find_stream_info(pFormatCtx, NULL)<0) {
+    if (avformat_find_stream_info(pFormatCtx, NULL) < 0) {
         fprintf(stderr, "Can't open stream for %s\n", filename);
         return false;
     }
 
     // Dump information about file onto standard error
-    if (verbose) {
+    if (verbose > 1) {
         av_dump_format(pFormatCtx, 0, filename, 0);
     }
 
     // Find the first video stream
     int videoStream = -1;
-    for(int i=0; i < (int)pFormatCtx->nb_streams; ++i) {
+    for (int i=0; i < (int)pFormatCtx->nb_streams; ++i) {
         if (pFormatCtx->streams[i]->codec->codec_type == AVMEDIA_TYPE_VIDEO) {
             videoStream=i;
             break;
         }
     }
-    if(videoStream==-1){
+    if (videoStream==-1){
         fprintf(stderr, "Can't open stream for %s\n", filename);
         return false;
     }
@@ -184,7 +195,7 @@ bool PlayVideo(const char *filename, UDPFlaschenTaschen& display, bool verbose, 
     if (fps < 0) {
         fps = 1.0 / av_q2d(pFormatCtx->streams[videoStream]->codec->time_base);
     }
-    if (verbose) fprintf(stderr, "FPS: %f\n", fps);
+    if (verbose > 1) fprintf(stderr, "FPS: %f\n", fps);
 
     // Find the decoder for the video stream
     AVCodec* pCodec = avcodec_find_decoder(pCodecCtxOrig->codec_id);
@@ -200,7 +211,7 @@ bool PlayVideo(const char *filename, UDPFlaschenTaschen& display, bool verbose, 
     }
 
     // Open codec
-    if(avcodec_open2(pCodecCtx, pCodec, NULL)<0)
+    if (avcodec_open2(pCodecCtx, pCodec, NULL) < 0)
         return false; // Could not open codec
 
     // Allocate video frame
@@ -237,9 +248,8 @@ bool PlayVideo(const char *filename, UDPFlaschenTaschen& display, bool verbose, 
     // Read frames and send to FlaschenTaschen.
     const int frame_wait_micros = 1e6 / fps;
     const tmillis_t  startTime = GetTimeInMillis();
-    const tmillis_t finishTime = startTime + repeats * 1000;
     long frame_count = 0, repeated_count = 0;
-    do {
+    while (!interrupt_received) {
         frame_count = 0;
         AVPacket packet;
         while (!interrupt_received && av_read_frame(pFormatCtx, &packet) >= 0) {
@@ -266,15 +276,15 @@ bool PlayVideo(const char *filename, UDPFlaschenTaschen& display, bool verbose, 
             // Free the packet that was allocated by av_read_frame
             av_free_packet(&packet);
         }
-        if ((GetTimeInMillis() <= finishTime) && !av_seek_frame(pFormatCtx, -1, 1, AVSEEK_FLAG_FRAME)) {
-            repeated_count++;
-            continue; //keep playing
-        } else break;
-    } while (!interrupt_received);
+        repeated_count++; //if time allows- keep playing
 
-    if (interrupt_received) {
-        fprintf(stderr, "Got interrupt. Exiting\n");
-        return true;
+        const tmillis_t elapsed = GetTimeInMillis() - startTime;
+        if (elapsed >= repeatTimeout * 1000)
+            break;
+
+        av_seek_frame(pFormatCtx, -1, 1, AVSEEK_FLAG_FRAME); //start playing from the beginning
+        if (verbose > 1)
+            fprintf(stderr, "loop %ld done after %0.1fs (%ld frames)\n", repeated_count, elapsed / 1000.0, frame_count);
     }
 
     // Free the RGB image
@@ -290,6 +300,7 @@ bool PlayVideo(const char *filename, UDPFlaschenTaschen& display, bool verbose, 
 
     // Close the video file
     avformat_close_input(&pFormatCtx);
-    fprintf(stderr, "Finished playing %s - %ld frames %ld times for %0.1fs\n", filename, frame_count, repeated_count + 1, (GetTimeInMillis() - startTime) / 1000.);
-    return false;
+    if (verbose)
+        fprintf(stderr, "Finished playing %ld frames %ld times for %0.1fs total\n", frame_count, repeated_count, (GetTimeInMillis() - startTime) / 1000.);
+    return !interrupt_received;
 }
