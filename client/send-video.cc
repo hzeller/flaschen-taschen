@@ -20,8 +20,17 @@ extern "C" {
 #include <unistd.h>
 #include <getopt.h>
 #include <signal.h>
+#include <sys/time.h>
 
 #include "udp-flaschen-taschen.h"
+
+typedef int64_t tmillis_t;
+
+static tmillis_t GetTimeInMillis() {
+    struct timeval tp;
+    gettimeofday(&tp, NULL);
+    return tp.tv_sec * 1000 + tp.tv_usec / 1000;
+}
 
 volatile bool interrupt_received = false;
 static void InterruptHandler(int) {
@@ -33,6 +42,8 @@ static void InterruptHandler(int) {
 #  define av_frame_alloc avcodec_alloc_frame
 #  define av_frame_free avcodec_free_frame
 #endif
+
+bool PlayVideo(const char *filename, UDPFlaschenTaschen& display, int verbose, float repeatTimeout);
 
 void SendFrame(AVFrame *pFrame, UDPFlaschenTaschen *display) {
     // Write pixel data
@@ -51,6 +62,8 @@ static int usage(const char *progname) {
             "\t-g <width>x<height>[+<off_x>+<off_y>[+<layer>]] : Output geometry. Default 20x20+0+0\n"
             "\t-h <host>          : Flaschen-Taschen display hostname.\n"
             "\t-l <layer>         : Layer 0..15. Default 0 (note if also given in -g, then last counts)\n"
+            "\t-t <repeat-secs>   : Repeat for at least n seconds\n"
+            "\t-c                 : clear display/layer before close\n"
             "\t-v                 : verbose.\n");
     return 1;
 }
@@ -61,11 +74,13 @@ int main(int argc, char *argv[]) {
     int off_x = 0;
     int off_y = 0;
     int off_z = 0;
-    bool verbose = false;
+    float repeatTimeout = 0;
+    int verbose = 0;
+    bool clear_after = false;
     const char *ft_host = NULL;
 
     int opt;
-    while ((opt = getopt(argc, argv, "g:h:vl:")) != -1) {
+    while ((opt = getopt(argc, argv, "g:h:t:cvl:")) != -1) {
         switch (opt) {
         case 'g':
             if (sscanf(optarg, "%dx%d%d%d%d",
@@ -83,13 +98,20 @@ int main(int argc, char *argv[]) {
                 return usage(argv[0]);
             }
             break;
+        case 't':
+            repeatTimeout = atof(optarg);
+            break;
+        case 'c':
+            clear_after = true;
+            break;
         case 'v':
-            verbose = true;
+            verbose++;
             break;
         default:
             return usage(argv[0]);
         }
     }
+
 
     if (optind >= argc) {
         fprintf(stderr, "Expected image filename.\n");
@@ -104,86 +126,105 @@ int main(int argc, char *argv[]) {
     UDPFlaschenTaschen display(ft_socket, display_width, display_height);
     display.SetOffset(off_x, off_y, off_z);
 
-    // Initalizing these to NULL prevents segfaults!
-    AVFormatContext   *pFormatCtx = NULL;
-    int               i, videoStream;
-    AVCodecContext    *pCodecCtxOrig = NULL;
-    AVCodecContext    *pCodecCtx = NULL;
-    AVCodec           *pCodec = NULL;
-    AVFrame           *pFrame = NULL;
-    AVFrame           *pFrameRGB = NULL;
-    AVPacket          packet;
-    int               frameFinished;
-    int               numBytes;
-    uint8_t           *buffer = NULL;
-    struct SwsContext *sws_ctx = NULL;
-
-    const char *movie_file = argv[optind];
-
     // Register all formats and codecs
     av_register_all();
     avformat_network_init();
 
+    signal(SIGTERM, InterruptHandler);
+    signal(SIGINT, InterruptHandler);
+
+    int numberPlayed = 0;
+    for (int imgarg = optind; imgarg < argc && !interrupt_received; ++imgarg) {
+        const char *movie_file = argv[imgarg];
+
+        bool playresult = PlayVideo(movie_file, display, verbose, repeatTimeout);
+        if (playresult)
+            numberPlayed++;
+
+        if (interrupt_received) {
+            // Feedback for Ctrl-C, but most importantly, force a newline
+            // at the output, so that commandline-shell editing is not messed up.
+            fprintf(stderr, "Got interrupt. Exiting\n");
+            break;
+        }
+    }
+    if (off_z > 0 || clear_after) {
+        display.Clear();
+        display.Send();
+    }
+    return !numberPlayed;
+}
+
+/// @returns true on video successfully played-through
+bool PlayVideo(const char *filename, UDPFlaschenTaschen& display, int verbose, float repeatTimeout) {
     // Open video file
-    if(avformat_open_input(&pFormatCtx, movie_file, NULL, NULL)!=0)
-        return -1; // Couldn't open file
+    AVFormatContext* pFormatCtx = NULL;
+    if (avformat_open_input(&pFormatCtx, filename, NULL, NULL) != 0) {
+        fprintf(stderr, "Can't open file %s\n", filename);
+        return false;
+    }
+    fprintf(stderr, "Playing %s\n", filename);
 
     // Retrieve stream information
-    if(avformat_find_stream_info(pFormatCtx, NULL)<0)
-        return -1; // Couldn't find stream information
+    if (avformat_find_stream_info(pFormatCtx, NULL) < 0) {
+        fprintf(stderr, "Can't open stream for %s\n", filename);
+        return false;
+    }
 
     // Dump information about file onto standard error
-    if (verbose) {
-        av_dump_format(pFormatCtx, 0, movie_file, 0);
+    if (verbose > 1) {
+        av_dump_format(pFormatCtx, 0, filename, 0);
     }
 
     // Find the first video stream
-    videoStream=-1;
-    for(i=0; i < (int)pFormatCtx->nb_streams; ++i)
-        if (pFormatCtx->streams[i]->codec->codec_type==AVMEDIA_TYPE_VIDEO) {
+    int videoStream = -1;
+    for (int i=0; i < (int)pFormatCtx->nb_streams; ++i) {
+        if (pFormatCtx->streams[i]->codec->codec_type == AVMEDIA_TYPE_VIDEO) {
             videoStream=i;
             break;
         }
-    if(videoStream==-1)
-        return -1; // Didn't find a video stream
+    }
+    if (videoStream==-1){
+        fprintf(stderr, "Can't open stream for %s\n", filename);
+        return false;
+    }
 
     // Get a pointer to the codec context for the video stream
-    pCodecCtxOrig = pFormatCtx->streams[videoStream]->codec;
+    AVCodecContext* pCodecCtxOrig = pFormatCtx->streams[videoStream]->codec;
     double fps = av_q2d(pFormatCtx->streams[videoStream]->avg_frame_rate);
     if (fps < 0) {
         fps = 1.0 / av_q2d(pFormatCtx->streams[videoStream]->codec->time_base);
     }
-    if (verbose) fprintf(stderr, "FPS: %f\n", fps);
+    if (verbose > 1) fprintf(stderr, "FPS: %f\n", fps);
 
     // Find the decoder for the video stream
-    pCodec=avcodec_find_decoder(pCodecCtxOrig->codec_id);
-    if(pCodec==NULL) {
+    AVCodec* pCodec = avcodec_find_decoder(pCodecCtxOrig->codec_id);
+    if (pCodec == NULL) {
         fprintf(stderr, "Unsupported codec!\n");
-        return -1; // Codec not found
+        return false; // Codec not found
     }
     // Copy context
-    pCodecCtx = avcodec_alloc_context3(pCodec);
-    if(avcodec_copy_context(pCodecCtx, pCodecCtxOrig) != 0) {
+    AVCodecContext* pCodecCtx = avcodec_alloc_context3(pCodec);
+    if (avcodec_copy_context(pCodecCtx, pCodecCtxOrig) != 0) {
         fprintf(stderr, "Couldn't copy codec context");
-        return -1; // Error copying codec context
+        return false; // Error copying codec context
     }
 
     // Open codec
-    if(avcodec_open2(pCodecCtx, pCodec, NULL)<0)
-        return -1; // Could not open codec
+    if (avcodec_open2(pCodecCtx, pCodec, NULL) < 0)
+        return false; // Could not open codec
 
     // Allocate video frame
-    pFrame=av_frame_alloc();
+    AVFrame* pFrame = av_frame_alloc();
 
     // Allocate an AVFrame structure
-    pFrameRGB=av_frame_alloc();
-    if(pFrameRGB==NULL)
-        return -1;
+    AVFrame* pFrameRGB = av_frame_alloc();
+    if (pFrameRGB == NULL)
+        return false;
 
     // Determine required buffer size and allocate buffer
-    numBytes=avpicture_get_size(AV_PIX_FMT_RGB24, pCodecCtx->width,
-                                pCodecCtx->height);
-    buffer=(uint8_t *)av_malloc(numBytes*sizeof(uint8_t));
+    int numBytes = avpicture_get_size(AV_PIX_FMT_RGB24, pCodecCtx->width, pCodecCtx->height);
+    uint8_t* buffer = (uint8_t *)av_malloc(numBytes*sizeof(uint8_t));
 
     // Assign appropriate parts of buffer to image planes in pFrameRGB
     // Note that pFrameRGB is an AVFrame, but AVFrame is a superset
@@ -192,59 +233,58 @@ int main(int argc, char *argv[]) {
                    pCodecCtx->width, pCodecCtx->height);
 
     // initialize SWS context for software scaling
-    sws_ctx = sws_getContext(pCodecCtx->width,
-                             pCodecCtx->height,
-                             pCodecCtx->pix_fmt,
-                             display.width(), display.height(),
-                             AV_PIX_FMT_RGB24,
-                             SWS_BILINEAR,
-                             NULL,
-                             NULL,
-                             NULL
-                             );
+    struct SwsContext* sws_ctx = sws_getContext(pCodecCtx->width,
+                                                pCodecCtx->height,
+                                                pCodecCtx->pix_fmt,
+                                                display.width(), display.height(),
+                                                AV_PIX_FMT_RGB24,
+                                                SWS_BILINEAR,
+                                                NULL, NULL, NULL );
     if (sws_ctx == 0) {
-        fprintf(stderr, "Trouble doing scaling to %dx%d :(\n",
-                display.width(), display.height());
-        return 1;
+        fprintf(stderr, "Trouble doing scaling to %dx%d :(\n", display.width(), display.height());
+        return false;
     }
-
-    signal(SIGTERM, InterruptHandler);
-    signal(SIGINT, InterruptHandler);
 
     // Read frames and send to FlaschenTaschen.
     const int frame_wait_micros = 1e6 / fps;
-    while (!interrupt_received && av_read_frame(pFormatCtx, &packet) >= 0) {
-        // Is this a packet from the video stream?
-        if (packet.stream_index==videoStream) {
-            // Decode video frame
-            avcodec_decode_video2(pCodecCtx, pFrame, &frameFinished, &packet);
+    const tmillis_t  startTime = GetTimeInMillis();
+    long frame_count = 0, repeated_count = 0;
+    while (!interrupt_received) {
+        frame_count = 0;
+        AVPacket packet;
+        while (!interrupt_received && av_read_frame(pFormatCtx, &packet) >= 0) {
+            // Is this a packet from the video stream?
+            if (packet.stream_index == videoStream) {
+                int frameFinished = 0;
+                // Decode video frame
+                avcodec_decode_video2(pCodecCtx, pFrame, &frameFinished, &packet);
 
-            // Did we get a video frame?
-            if (frameFinished) {
-                // Convert the image from its native format to RGB
-                sws_scale(sws_ctx, (uint8_t const * const *)pFrame->data,
-                          pFrame->linesize, 0, pCodecCtx->height,
-                          pFrameRGB->data, pFrameRGB->linesize);
+                // Did we get a video frame?
+                if (frameFinished) {
+                    // Convert the image from its native format to RGB
+                    sws_scale(sws_ctx, (uint8_t const * const *)pFrame->data,
+                              pFrame->linesize, 0, pCodecCtx->height,
+                              pFrameRGB->data, pFrameRGB->linesize);
 
-                // Save the frame to disk
-                SendFrame(pFrameRGB, &display);
+                    // Save the frame to disk
+                    SendFrame(pFrameRGB, &display);
+                    frame_count++;
+                }
+                usleep(frame_wait_micros);
             }
-            usleep(frame_wait_micros);
+
+            // Free the packet that was allocated by av_read_frame
+            av_free_packet(&packet);
         }
+        repeated_count++; //if time allows- keep playing
 
-        // Free the packet that was allocated by av_read_frame
-        av_free_packet(&packet);
-    }
+        const tmillis_t elapsed = GetTimeInMillis() - startTime;
+        if (elapsed >= repeatTimeout * 1000)
+            break;
 
-    if (interrupt_received) {
-        // Feedback for Ctrl-C, but most importantly, force a newline
-        // at the output, so that commandline-shell editing is not messed up.
-        fprintf(stderr, "Got interrupt. Exiting\n");
-    }
-
-    if (off_z > 0) {
-        display.Clear();
-        display.Send();
+        av_seek_frame(pFormatCtx, -1, 1, AVSEEK_FLAG_FRAME); //start playing from the beginning
+        if (verbose > 1)
+            fprintf(stderr, "loop %ld done after %0.1fs (%ld frames)\n", repeated_count, elapsed / 1000.0, frame_count);
     }
 
     // Free the RGB image
@@ -260,6 +300,7 @@ int main(int argc, char *argv[]) {
 
     // Close the video file
     avformat_close_input(&pFormatCtx);
-
-    return 0;
+    if (verbose)
+        fprintf(stderr, "Finished playing %ld frames %ld times for %0.1fs total\n", frame_count, repeated_count, (GetTimeInMillis() - startTime) / 1000.);
+    return !interrupt_received;
 }
