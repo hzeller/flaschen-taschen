@@ -17,7 +17,7 @@ import socket
 class Flaschen(object):
   '''A Framebuffer display interface that sends a frame via UDP.'''
 
-  def __init__(self, host, port, width, height, layer=0, transparent=False):
+  def __init__(self, host, port, width, height, layer=5, transparent=False):
     '''
 
     Args:
