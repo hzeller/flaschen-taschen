@@ -80,34 +80,64 @@ static int readNextNumber(const char **start, const char *end,
 
 const char *ReadImageData(const char *in_buffer, size_t buf_len,
                           struct ImageMetaInfo *info) {
-    if (in_buffer[0] != 'P' || in_buffer[1] != '6' ||
-        (!isspace(in_buffer[2]) && in_buffer[2] != '#')) {
-        return in_buffer;  // raw image. No P6 magic header.
+    if (in_buffer[0] == 'P' && in_buffer[1] == '6' &&
+        (isspace(in_buffer[2]) || in_buffer[2] == '#')) {
+        const char *const end = in_buffer + buf_len;
+        const char *parse_buffer = in_buffer + 2;
+        const int width = readNextNumber(&parse_buffer, end, info);
+        if (parse_buffer == NULL) return in_buffer;
+        const int height = readNextNumber(&parse_buffer, end, info);
+        if (parse_buffer == NULL) return in_buffer;
+        const int range = readNextNumber(&parse_buffer, end, info);
+        if (parse_buffer == NULL) return in_buffer;
+        if (!isspace(*parse_buffer++)) return in_buffer;   // last char before data
+        // Now make sure that the rest of the buffer still makes sense
+        const size_t expected_image_data = width * height * 3;
+        const size_t actual_data = end - parse_buffer;
+        if (actual_data < expected_image_data)
+            return in_buffer;   // Uh, not enough data.
+        if (actual_data > expected_image_data) {
+            // Our extension: at the end of the binary data, we provide an optional
+            // offset. We can't store it in the header, as it is fixed in number
+            // of fields. But nobody cares what is at the end of the buffer.
+            // Note, this also can be supplied in the specially formatted comment
+            // in the header.
+            parseOffsets(parse_buffer + expected_image_data, end, info);
+        }
+        info->width = width;
+        info->height = height;
+        info->range = range;
+        info->type = ImageType::P6;
+        return parse_buffer;
     }
-    const char *const end = in_buffer + buf_len;
-    const char *parse_buffer = in_buffer + 2;
-    const int width = readNextNumber(&parse_buffer, end, info);
-    if (parse_buffer == NULL) return in_buffer;
-    const int height = readNextNumber(&parse_buffer, end, info);
-    if (parse_buffer == NULL) return in_buffer;
-    const int range = readNextNumber(&parse_buffer, end, info);
-    if (parse_buffer == NULL) return in_buffer;
-    if (!isspace(*parse_buffer++)) return in_buffer;   // last char before data
-    // Now make sure that the rest of the buffer still makes sense
-    const size_t expected_image_data = width * height * 3;
-    const size_t actual_data = end - parse_buffer;
-    if (actual_data < expected_image_data)
-        return in_buffer;   // Uh, not enough data.
-    if (actual_data > expected_image_data) {
-        // Our extension: at the end of the binary data, we provide an optional
-        // offset. We can't store it in the header, as it is fixed in number
-        // of fields. But nobody cares what is at the end of the buffer.
-        // Note, this also can be supplied in the specially formatted comment
-        // in the header.
-        parseOffsets(parse_buffer + expected_image_data, end, info);
+    else if (in_buffer[0] == 'Q' && in_buffer[1] == '7' &&
+            (isspace(in_buffer[2]) || in_buffer[2] == '#')) {
+        const char *const end = in_buffer + buf_len;
+        const char *parse_buffer = in_buffer + 2;
+        const int width = readNextNumber(&parse_buffer, end, info);
+        if (parse_buffer == NULL) return in_buffer;
+        const int height = readNextNumber(&parse_buffer, end, info);
+        if (parse_buffer == NULL) return in_buffer;
+        const int range = readNextNumber(&parse_buffer, end, info);
+        if (parse_buffer == NULL) return in_buffer;
+        const int xoffset = readNextNumber(&parse_buffer, end, info);
+        if (parse_buffer == NULL) return in_buffer;
+        const int yoffset = readNextNumber(&parse_buffer, end, info);
+        if (parse_buffer == NULL) return in_buffer;
+        const int layer = readNextNumber(&parse_buffer, end, info);
+        if (parse_buffer == NULL) return in_buffer;
+        if (!isspace(*parse_buffer++)) return in_buffer; // last char before data
+        // doesn't check if the rest of the data makes sense..
+        info->width = width;
+        info->height = height;
+        info->range = range;
+        info->offset_x = xoffset;
+        info->offset_y = yoffset;
+        info->layer = layer;
+        info->type = ImageType::Q7;
+        return parse_buffer;
     }
-    info->width = width;
-    info->height = height;
-    info->range = range;
-    return parse_buffer;
+    else {
+        return in_buffer;  // raw image.
+    }
 }

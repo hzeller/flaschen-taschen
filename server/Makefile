@@ -70,10 +70,14 @@ CFLAGS=-Wall -O3 $(INCLUDES) $(DEFINES)
 CXXFLAGS=$(CFLAGS)
 LDFLAGS+=-lpthread
 
+PKG_CPPFLAGS = `Magick++-config --cppflags`
+PKG_CXXFLAGS = `Magick++-config --cxxflags`
+PKG_LIBS = `Magick++-config --ldflags --libs`
+
 all : ft-server
 
 ft-server: main.o $(OBJECTS) $(STATIC_LIBS)
-	$(CXX) -o $@ $^ $(LDFLAGS)
+	$(CXX) -o $@ $^ $(LDFLAGS) $(PKG_CPPFLAGS) $(PKG_CXXFLAGS) $(PKG_LIBS)
 
 %.o : %.cc .compiler-flags
 	$(CXX) $(CXXFLAGS) -c -o $@ $<

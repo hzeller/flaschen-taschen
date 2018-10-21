@@ -18,15 +18,22 @@
 
 #include <stdlib.h>
 
+enum ImageType {
+    RAWBMP = 0,         // raw bmp
+    P6 = 1,             // P6 Header + Footer, only bmp
+    Q7 = 2              // Q7 Header, any format (tested with png, bmp and gif)
+};
+
 struct ImageMetaInfo {
-    int width;
-    int height;
-    int range;      // Range of gray-levels. We only handle 255 correctly(=1byte)
+    unsigned int width;
+    unsigned int height;
+    unsigned int range;      // Range of gray-levels. We only handle 255 correctly(=1byte)
+    ImageType type;
 
     // FlaschenTaschen extensions
-    int offset_x;   // display image at this x-offset
-    int offset_y;   // .. y-offset
-    int layer;      // stacked layer
+    unsigned int offset_x;   // display image at this x-offset
+    unsigned int offset_y;   // .. y-offset
+    unsigned int layer;      // stacked layer
 };
 
 // Given an input buffer + size with a PPM file, extract the image

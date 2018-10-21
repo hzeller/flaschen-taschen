@@ -31,6 +31,8 @@
 #include "servers.h"
 #include "ppm-reader.h"
 
+#include <Magick++.h>
+
 volatile bool interrupt_received = false;
 static void InterruptHandler(int signo) {
   interrupt_received = true;
@@ -70,6 +72,9 @@ void udp_server_run_blocking(CompositeFlaschenTaschen *display,
     sigaction(SIGTERM, &sa, NULL);
     sigaction(SIGINT, &sa, NULL);
 
+    // Initialise ImageMagick library
+    Magick::InitializeMagick("");
+
     for (;;) {
         // TODO: also store src-address in case we want to do rate-limiting
         // per source-address.
@@ -91,12 +96,31 @@ void udp_server_run_blocking(CompositeFlaschenTaschen *display,
         img_info.width = display->width();  // defaults.
         img_info.height = display->height();
 
+        // Create Image object and read in from pixel data above
         const char *pixel_pos = ReadImageData(packet_buffer, received_bytes,
-                                              &img_info);
+                                           &img_info);
+
+        if (img_info.type == ImageType::Q7) {
+            // convert to bmp with GraphicsMagick Lib
+            Magick::Blob inblob((void*)pixel_pos, received_bytes);
+            Magick::Image image(inblob);
+
+            if (img_info.width != image.columns() || img_info.height != image.rows()){
+                // automatic resize image if image size differs from size declared in header
+                Magick::Geometry geo = Magick::Geometry(img_info.width, img_info.height);
+                geo.aspect(true); //ignore aspect ratio
+                image.scale(geo);
+            }
+
+            void* ptr = (void*)new char[3 * img_info.width * img_info.height];
+            image.write(0, 0, img_info.width, img_info.height, "RGB", Magick::CharPixel, ptr);
+            pixel_pos = (char*)ptr;
+        }
+
         mutex->Lock();
         display->SetLayer(img_info.layer);
-        for (int y = 0; y < img_info.height; ++y) {
-            for (int x = 0; x < img_info.width; ++x) {
+        for (unsigned int y = 0; y < img_info.height; y++) {
+            for (unsigned int x = 0; x < img_info.width; x++) {
                 Color c;
                 c.r = *pixel_pos++;
                 c.g = *pixel_pos++;
