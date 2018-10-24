@@ -100,10 +100,12 @@ void udp_server_run_blocking(CompositeFlaschenTaschen *display,
         const char *pixel_pos = ReadImageData(packet_buffer, received_bytes,
                                            &img_info);
 
-        // Initialization of image array for image magick.
-        char* magick_ptr = new char[3 * img_info.width * img_info.height];
+        // pointer needed for image magick
+        char* magick_ptr = NULL;
 
         if (img_info.type == ImageType::Q7) {
+            magick_ptr = new char[3 * img_info.width * img_info.height];
+
             // convert to bmp with GraphicsMagick Lib
             Magick::Blob inblob((void*)pixel_pos, received_bytes);
             Magick::Image image(inblob);
