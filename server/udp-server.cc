@@ -100,27 +100,22 @@ void udp_server_run_blocking(CompositeFlaschenTaschen *display,
         const char *pixel_pos = ReadImageData(packet_buffer, received_bytes,
                                            &img_info);
 
+        // Initialization of image array for image magick.
+        char* magick_ptr = new char[3 * img_info.width * img_info.height];
+
         if (img_info.type == ImageType::Q7) {
             // convert to bmp with GraphicsMagick Lib
             Magick::Blob inblob((void*)pixel_pos, received_bytes);
             Magick::Image image(inblob);
 
-            if (img_info.width != image.columns() || img_info.height != image.rows()){
-                // automatic resize image if image size differs from size declared in header
-                Magick::Geometry geo = Magick::Geometry(img_info.width, img_info.height);
-                geo.aspect(true); //ignore aspect ratio
-                image.scale(geo);
-            }
-
-            void* ptr = (void*)new char[3 * img_info.width * img_info.height];
-            image.write(0, 0, img_info.width, img_info.height, "RGB", Magick::CharPixel, ptr);
-            pixel_pos = (char*)ptr;
+            image.write(0, 0, img_info.width, img_info.height, "RGB", Magick::CharPixel, (void*)magick_ptr);
+            pixel_pos = magick_ptr;
         }
 
         mutex->Lock();
         display->SetLayer(img_info.layer);
-        for (unsigned int y = 0; y < img_info.height; y++) {
-            for (unsigned int x = 0; x < img_info.width; x++) {
+        for (int y = 0; y < img_info.height; ++y) {
+            for (int x = 0; x < img_info.width; ++x) {
                 Color c;
                 c.r = *pixel_pos++;
                 c.g = *pixel_pos++;
@@ -133,6 +128,8 @@ void udp_server_run_blocking(CompositeFlaschenTaschen *display,
         display->Send();
         display->SetLayer(0);  // Back to sane default.
         mutex->Unlock();
+
+        delete [] magick_ptr;
     }
     delete [] packet_buffer;
 }

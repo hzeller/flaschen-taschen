@@ -25,15 +25,15 @@ enum ImageType {
 };
 
 struct ImageMetaInfo {
-    unsigned int width;
-    unsigned int height;
-    unsigned int range;      // Range of gray-levels. We only handle 255 correctly(=1byte)
+    int width;
+    int height;
+    int range;      // Range of gray-levels. We only handle 255 correctly(=1byte)
     ImageType type;
 
     // FlaschenTaschen extensions
-    unsigned int offset_x;   // display image at this x-offset
-    unsigned int offset_y;   // .. y-offset
-    unsigned int layer;      // stacked layer
+    int offset_x;   // display image at this x-offset
+    int offset_y;   // .. y-offset
+    int layer;      // stacked layer
 };
 
 // Given an input buffer + size with a PPM file, extract the image
