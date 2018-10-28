@@ -19,7 +19,7 @@ import _thread
 from PIL import Image
 
 
-class Flaschen(object):
+class FlaschenQ7Client(object):
     """ A Framebuffer display interface that sends a frame via UDP."""
 
     def __init__(self, host, port):
@@ -56,6 +56,7 @@ class Flaschen(object):
         header = ("Q7\n%d %d\n255\n" % (width, height)).encode()
         header += ("%d\n %d\n %d\n" % (xoffset, yoffset, layer)).encode()
         self._stop = False
+        self._nr_threads += 1
 
         self._thread.start_new_thread(self._send_loop, (image, header, timeout, ms_between_frames))
 
@@ -70,7 +71,6 @@ class Flaschen(object):
         return bool(self._nr_threads > 0)
 
     def _send_loop(self, image, header, timeout=0, ms_between_frames=0):
-        self._nr_threads += 1
         total_time_passed = 0
         start = time.time()
         is_animated = False
