@@ -23,10 +23,59 @@ namespace ft {
 class Mutex;
 }
 
-// Our main service that we always support.
-bool udp_server_init(int port);
-void udp_server_run_blocking(CompositeFlaschenTaschen *display,
-                             ft::Mutex *mutex);
+#ifndef CONSTANT_FPS
+static const float fps = 0;
+#else
+static const float fps = CONSTANT_FPS;
+#endif
+
+struct arg_struct {
+    CompositeFlaschenTaschen* display;
+    ft::Mutex* mutex;
+    int socket;
+
+    arg_struct(int sock, CompositeFlaschenTaschen* disp, ft::Mutex* mut){
+        socket = sock;
+        display = disp;
+        mutex = mut;
+    }
+    arg_struct(){}
+};
+
+class Server {
+public:
+    Server();
+    virtual ~Server() = 0;
+
+    virtual bool init_server(int port) = 0;
+    virtual void run_thread(CompositeFlaschenTaschen *display,
+                            ft::Mutex *mutex) = 0;
+
+    static void* periodically_send_to_display(void* ptr);
+    static void* receive_data_and_set_display_pixel(void* ptr);
+
+    static void InterruptHandler(int);
+    static bool interrupt_received;
+    static bool use_constant_async_fps;
+};
+
+class TCPServer: public Server {
+public:
+    TCPServer():Server(){}
+    ~TCPServer(){}
+    bool init_server(int port);
+    void run_thread(CompositeFlaschenTaschen *display,
+                    ft::Mutex *mutex);
+};
+
+class UDPServer: public Server {
+public:
+    UDPServer():Server(){}
+    ~UDPServer(){}
+    bool init_server(int port);
+    void run_thread(CompositeFlaschenTaschen *display,
+                    ft::Mutex *mutex);
+};
 
 // Optional services, currently disabled.
 // These should probably be moved out of this project and implemented
