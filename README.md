@@ -16,7 +16,10 @@ The main differencs to the original project are:
 
 For more information see the Makefile in the server folder.
 
-Thanks alot for your work <a href="https://github.com/hzeller">hzeller</a>!
+For the future I like to switch from the Magick++ to libpng and also to use the "old" P6 header for compatibility reasons.
+So hopefully this fork can be merged.
+
+Thanks a lot for your work <a href="https://github.com/hzeller">hzeller</a>!
 
 see below for original readme file.
 _________________________________
