@@ -1,3 +1,4 @@
+
 # -*- mode: python; c-basic-offset: 2; indent-tabs-mode: nil; -*-
 #
 # This program is free software; you can redistribute it and/or modify
@@ -17,7 +18,7 @@ import socket
 class Flaschen(object):
   '''A Framebuffer display interface that sends a frame via UDP.'''
 
-  def __init__(self, host, port, width, height, xoffset=0, yoffset=0, layer=0, transparent=False):
+  def __init__(self, host, port, width, height, layer=5, transparent=False):
     '''
     Args:
       host: The flaschen taschen server hostname or ip address.
@@ -30,23 +31,22 @@ class Flaschen(object):
     self.width = width
     self.height = height
     self.layer = layer
-    self.xoffset = xoffset
-    self.yoffset = yoffset
     self.transparent = transparent
     self._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     self._sock.connect((host, port))
     header = ''.join(["P6\n",
                       "%d %d\n" % (self.width, self.height),
                       "255\n"]).encode('utf-8')
-    footer = ''.join(["%d\n %d\n %d\n" % (self.xoffset, self.yoffset, self.layer)]).encode('utf-8')
-    self._data = bytearray(int(width * height * 3 + len(header) + len(footer)))
+    footer = ''.join(["0\n",
+                      "0\n",
+                      "%d\n" % self.layer]).encode('utf-8')
+    self._data = bytearray(width * height * 3 + len(header) + len(footer))
     self._data[0:len(header)] = header
     self._data[-1 * len(footer):] = footer
     self._header_len = len(header)
 
   def set(self, x, y, color):
     '''Set the pixel at the given coordinates to the specified color.
-
     Args:
       x: x offset of the pixel to set
       y: y offset of the piyel to set
@@ -57,11 +57,11 @@ class Flaschen(object):
     if color == (0, 0, 0) and not self.transparent:
       color = (1, 1, 1)
 
-    offset = int((x + y * self.width) * 3 + self._header_len)
-    self._data[offset] = int(color[0])
-    self._data[offset + 1] = int(color[1])
-    self._data[offset + 2] = int(color[2])
+    offset = (x + y * self.width) * 3 + self._header_len
+    self._data[offset] = color[0]
+    self._data[offset + 1] = color[1]
+    self._data[offset + 2] = color[2]
   
   def send(self):
     '''Send the updated pixels to the display.'''
-    self._sock.send(self._data)
+self._sock.send(self._data)
