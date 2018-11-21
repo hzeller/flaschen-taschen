@@ -16,18 +16,15 @@
 #include <chrono>
 #include <sys/socket.h>
 #include <string.h>
+#include <cerrno>
+#include <stdio.h>
 
 #include "servers.h"
 #include "composite-flaschen-taschen.h"
 #include "ft-thread.h"
-#include "ppm-reader.h"
+#include "image-reader.h"
 
-#include <Magick++.h>
-
-Server::Server(){
-    // Initialise ImageMagick library
-    Magick::InitializeMagick("");
-}
+Server::Server(){}
 
 void Server::InterruptHandler(int) {
   interrupt_received = true;
@@ -106,19 +103,7 @@ void* Server::receive_data_and_set_display_pixel(void* ptr) {
         const char *pixel_pos = ReadImageData(packet_buffer, received_bytes,
                                            &img_info);
 
-        // pointer needed for image magick
-        char* magick_ptr = NULL;
-
-        if (img_info.type == ImageType::Q7) {
-            magick_ptr = new char[3 * img_info.width * img_info.height];
-
-            // convert to bmp with GraphicsMagick Lib
-            Magick::Blob inblob((void*)pixel_pos, received_bytes);
-            Magick::Image image(inblob);
-
-            image.write(0, 0, img_info.width, img_info.height, "RGB", Magick::CharPixel, (void*)magick_ptr);
-            pixel_pos = magick_ptr;
-        }
+        char* start_pixel = (char*)pixel_pos; // todo: find other way
 
         mutex->Lock();
         display->SetLayer(img_info.layer);
@@ -140,7 +125,8 @@ void* Server::receive_data_and_set_display_pixel(void* ptr) {
         display->SetLayer(0);  // Back to sane default.
         mutex->Unlock();
 
-        delete [] magick_ptr;
+        if(img_info.type==ImageType::PNG)
+            free(start_pixel);// todo: find other way
     }
     delete [] packet_buffer;
     close (new_socket);

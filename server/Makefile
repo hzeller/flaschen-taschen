@@ -52,7 +52,7 @@ RGB_LIBRARY=$(RGB_LIBDIR)/lib$(RGB_LIBRARY_NAME).a
 RGB_LDFLAGS=-lrt -lm -lpthread
 
 INCLUDES=-I../api/include
-OBJECTS=ft-thread.o composite-flaschen-taschen.o ppm-reader.o servers.o
+OBJECTS=ft-thread.o composite-flaschen-taschen.o image-reader.o servers.o ppm-reader.o png-reader.o
 
 # Nested if/else are very awkward, so we just compare each possible outcome
 ifeq ($(FT_BACKEND), ft)
@@ -89,10 +89,6 @@ CFLAGS=-Wall -O3 $(INCLUDES) $(DEFINES)
 CXXFLAGS=$(CFLAGS)
 LDFLAGS+=-lpthread
 DEFINES+=-DCONSTANT_FPS=$(CONSTANT_FPS)
-
-PKG_CPPFLAGS = `Magick++-config --cppflags`
-PKG_CXXFLAGS = `Magick++-config --cxxflags`
-PKG_LIBS = `Magick++-config --ldflags --libs`
 
 debug: CXXFLAGS += -DDEBUG -g -O0
 debug: CCFLAGS += -DDEBUG -g -O0
