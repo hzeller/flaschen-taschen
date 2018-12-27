@@ -87,7 +87,7 @@ endif
 
 CFLAGS=-Wall -O3 $(INCLUDES) $(DEFINES)
 CXXFLAGS=$(CFLAGS)
-LDFLAGS+=-lpthread
+LDFLAGS+=-lpthread -lpng
 DEFINES+=-DCONSTANT_FPS=$(CONSTANT_FPS)
 
 debug: CXXFLAGS += -DDEBUG -g -O0
