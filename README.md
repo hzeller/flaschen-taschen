@@ -4,7 +4,7 @@ Noisebridge Flaschen Taschen Project FORK
 The original Flaschen Taschen Project was mainly forked because the LED display 
 I used was too large for the maximum UDP Packet size. To lower the image size a 
 conversion to png was implemented. On client site this was done with the python 
-library Pillow and on server side with the C++ library Magick++.
+library Pillow and on server side with the C++ library libpng.
 
 I also added some animation functionality. The client can be found here: https://github.com/werling/flaschenQ7client
 
@@ -15,9 +15,6 @@ The main differencs to the original project are:
   all at once images to the server)
 
 For more information see the Makefile in the server folder.
-
-For the future I like to switch from the Magick++ to libpng and also to use the "old" P6 header for compatibility reasons.
-So hopefully this fork can be merged.
 
 Thanks a lot for your work <a href="https://github.com/hzeller">hzeller</a>!
 
