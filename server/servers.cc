@@ -70,13 +70,13 @@ void* Server::receive_data_and_set_display_pixel(void* ptr) {
 
     const int kBufferSize = 65535;  // maximum UDP or TCP has to offer.
     char *packet_buffer = new char[kBufferSize];
-    bzero(packet_buffer, kBufferSize);
 
     for(;;){
         if (Server::interrupt_received){
             break;
         }
 
+        bzero(packet_buffer, kBufferSize); // important to clear the buffer every loop!
         ssize_t received_bytes = recv(new_socket,
                                           packet_buffer, kBufferSize,
                                           0);

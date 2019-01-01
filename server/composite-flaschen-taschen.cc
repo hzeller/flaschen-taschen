@@ -132,10 +132,9 @@ void CompositeFlaschenTaschen::SetPixelAtLayer(int x, int y, int layer,
     screens_[layer]->At(x, y) = col;
     if (layer >= z_buffer_->At(x, y)) {
         any_visible_pixel_drawn_ = true;
-        if (col.is_black()) {
+        if (col.is_black() && layer> 0) {
             // Transparent pixel. Find closest stacked below us that is not.
-            if(layer>0){--layer;}
-            for (/**/; layer > 0; --layer) {
+            for (--layer; layer > 0; --layer) {
                 if (!screens_[layer]->At(x, y).is_black())
                     break;
             }
