@@ -4,6 +4,4 @@ set -euo pipefail
 
 make clean
 sudo apt-get install -y graphicsmagick-libmagick-dev-compat libavcodec-dev libavformat-dev libswscale-dev
-make send-text
-make send-image
-make send-video
+make -k send-text send-image send-video
