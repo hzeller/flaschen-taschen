@@ -17,11 +17,14 @@
 
 #include "bdf-font.h"
 
+#include <fcntl.h>
 #include <getopt.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include <unistd.h>
 
 #include <string>
@@ -36,12 +39,13 @@ static void InterruptHandler(int) {
 }
 
 static int usage(const char *progname) {
-    fprintf(stderr, "usage: %s [options] <TEXT>\n", progname);
+    fprintf(stderr, "usage: %s [options] [<TEXT>|-i <textfile>]\n", progname);
     fprintf(stderr, "Options:\n"
             "\t-g <width>x<height>[+<off_x>+<off_y>[+<layer>]] : Output geometry. Default 45x<font-height>+0+0+1\n"
             "\t-l <layer>      : Layer 0..15. Default 1 (note if also given in -g, then last counts)\n"
             "\t-h <host>       : Flaschen-Taschen display hostname.\n"
             "\t-f <fontfile>   : Path to *.bdf font file\n"
+            "\t-i <textfile>   : Optional: read text from file. '-' for stdin.\n"
             "\t-s<ms>          : Scroll milliseconds per pixel (default 60). 0 for no-scroll. Negative for opposite direction.\n"
             "\t-O              : Only run once, don't scroll forever.\n"
             "\t-S<px>          : Letter spacing in pixels (default: 0)\n"
@@ -67,6 +71,7 @@ int main(int argc, char *argv[]) {
     bool with_outline = false;
     bool reverse = false;
     const char *host = NULL;
+    std::string textfilename;
 
     Color fg(0xff, 0xff, 0xff);
     Color bg(0, 0, 0);
@@ -75,7 +80,7 @@ int main(int argc, char *argv[]) {
 
     ft::Font text_font;
     int opt;
-    while ((opt = getopt(argc, argv, "f:g:h:s:vo:c:b:l:OS:")) != -1) {
+    while ((opt = getopt(argc, argv, "f:g:h:s:vo:c:b:l:OS:i:")) != -1) {
         switch (opt) {
         case 'g':
             if (sscanf(optarg, "%dx%d%d%d%d", &width, &height, &off_x, &off_y, &off_z)
@@ -86,6 +91,9 @@ int main(int argc, char *argv[]) {
             break;
         case 'h':
             host = strdup(optarg); // leaking. Ignore.
+            break;
+        case 'i':
+            textfilename = optarg;
             break;
         case 'f':
             if (!text_font.LoadFont(optarg)) {
@@ -186,8 +194,19 @@ int main(int argc, char *argv[]) {
     UDPFlaschenTaschen display(fd, width, height);
     display.SetOffset(off_x, off_y, off_z);
 
-    // Assemble all non-option arguments to one text.
     std::string str;
+    if (textfilename == "-") textfilename = "/dev/stdin";
+    if (!textfilename.empty()) {
+        int fd = open(textfilename.c_str(), O_RDONLY);
+        if (fd < 0) { perror("Opening textfile"); return 1; }
+        char buf[1024];
+        int r;
+        while ((r = read(fd, buf, sizeof(buf))) > 0) {
+            str.append(buf, r);
+        }
+        close(fd);
+    }
+    // Assemble all non-option arguments to one text.
     for (int i = optind; i < argc; ++i) {
         str.append(argv[i]).append(" ");
     }
