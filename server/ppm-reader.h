@@ -16,18 +16,8 @@
 // only has width/height but also offset information in x,y and z (=layer)
 // direction.
 
-#include <stdlib.h>
-
-struct ImageMetaInfo {
-    int width;
-    int height;
-    int range;      // Range of gray-levels. We only handle 255 correctly(=1byte)
-
-    // FlaschenTaschen extensions
-    int offset_x;   // display image at this x-offset
-    int offset_y;   // .. y-offset
-    int layer;      // stacked layer
-};
+#ifndef PMMREADER_H
+#define PMMREADER_H
 
 // Given an input buffer + size with a PPM file, extract the image
 // meta information and return it in "info_out".
@@ -38,5 +28,8 @@ struct ImageMetaInfo {
 // information.
 // This also extracts the FlaschenTaschen extension to the PPM image format
 // that contains the offset.
-const char *ReadImageData(const char *in_buffer, size_t buf_len,
+const bool CheckPMMSignature(const char* in_buffer);
+const char *ReadPPMImageData(const char *in_buffer, size_t buf_len,
 			  struct ImageMetaInfo *info_out);
+
+#endif // PMMREADER_H

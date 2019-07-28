@@ -96,6 +96,13 @@ int main(int argc, char *argv[]) {
     int width = 45;
     int height = 35;
     int layer_timeout = 15;
+
+#if PROTOCOL == 0
+    Server* server = (Server*)new UDPServer();
+#elif PROTOCOL == 1
+    Server* server = (Server*)new TCPServer();
+#endif
+
 #if FT_BACKEND != 2
     bool as_daemon = false;
 #endif
@@ -118,7 +125,6 @@ int main(int argc, char *argv[]) {
         return usage(argv[0]);
     }
 #endif
-
     enum LongOptionsOnly {
         OPT_LAYER_TIMEOUT = 1002,
         OPT_HD_TERMINAL = 1003,
@@ -205,7 +211,17 @@ int main(int argc, char *argv[]) {
 
     // Start all the services and report problems (such as sockets already
     // bound to) before we become a daemon
-    if (!udp_server_init(1337)) {
+#if PROTOCOL == 0
+    //if (!udp_server_init(1337)) {
+    //    return 1;
+    //}
+#elif PROTOCOL == 1
+    //if (!tcp_server_multi_init(1337)) {
+    //    return 1;
+    //}
+#endif
+
+    if (!server->init_server(1337)){
         return 1;
     }
 
@@ -237,7 +253,13 @@ int main(int argc, char *argv[]) {
     if (!drop_privs(DROP_PRIV_USER, DROP_PRIV_GROUP))
         return 1;
 #endif
+#if PROTOCOL == 0
+    //udp_server_run_blocking(&layered_display, &mutex);  // last server blocks.
+#elif PROTOCOL == 1
+    //tcp_server_multi_run_blocking(&layered_display, &mutex);
+#endif
+    server->run_thread(&layered_display, &mutex);
 
-    udp_server_run_blocking(&layered_display, &mutex);  // last server blocks.
+    delete server;
     delete display;
 }

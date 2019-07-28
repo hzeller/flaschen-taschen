@@ -5,7 +5,7 @@
 #
 # You can set the backend to use with
 #
-#  make FT_BACKEND=ft
+#  make FT_BACKEND=ft PROTOCOL=udp CONSTANT_FPS=0
 #
 # The default is 'terminal', as this is typically what you'd do. On the
 # 'real' FT machine, we can set the FT_BACKEND=ft to interact with the
@@ -28,7 +28,16 @@
 #    This requires the project to be checked out with submodules
 #    (git clone --recursive)
 #
+# PROTOCOL can be udp or tcp. If tcp is chosen, every new socket connection
+#    creates a new thread
+#
+# CONSTANT_FPS can be any positive number. Its recommended to use if multiple
+#    clients sending images to the server at once. If 0 the server tries to
+#    show every images received. (Can lead to artifacts)
+
 FT_BACKEND=terminal
+PROTOCOL=udp
+CONSTANT_FPS=0
 
 # Spixel related. It is checked out as as submodule in spixels/
 SPIXELS_INCDIR=spixels/include
@@ -43,7 +52,7 @@ RGB_LIBRARY=$(RGB_LIBDIR)/lib$(RGB_LIBRARY_NAME).a
 RGB_LDFLAGS=-lrt -lm -lpthread
 
 INCLUDES=-I../api/include
-OBJECTS=ft-thread.o udp-server.o composite-flaschen-taschen.o ppm-reader.o
+OBJECTS=ft-thread.o composite-flaschen-taschen.o image-reader.o servers.o ppm-reader.o png-reader.o
 
 # Nested if/else are very awkward, so we just compare each possible outcome
 ifeq ($(FT_BACKEND), ft)
@@ -66,14 +75,29 @@ ifeq ($(FT_BACKEND), terminal)
    OBJECTS+=terminal-flaschen-taschen.o hd-terminal-flaschen-taschen.o
 endif
 
+ifeq ($(PROTOCOL), udp)
+   DEFINES+=-DPROTOCOL=0
+   OBJECTS+=udp-server.o
+endif
+
+ifeq ($(PROTOCOL), tcp)
+   DEFINES+=-DPROTOCOL=1
+   OBJECTS+=tcp-server.o
+endif
+
 CFLAGS=-Wall -O3 $(INCLUDES) $(DEFINES)
 CXXFLAGS=$(CFLAGS)
-LDFLAGS+=-lpthread
+LDFLAGS+=-lpthread -lpng
+DEFINES+=-DCONSTANT_FPS=$(CONSTANT_FPS)
+
+debug: CXXFLAGS += -DDEBUG -g -O0
+debug: CCFLAGS += -DDEBUG -g -O0
+debug: ft-server
 
 all : ft-server
 
 ft-server: main.o $(OBJECTS) $(STATIC_LIBS)
-	$(CXX) -o $@ $^ $(LDFLAGS)
+	$(CXX) -o $@ $^ $(LDFLAGS) $(PKG_CPPFLAGS) $(PKG_CXXFLAGS) $(PKG_LIBS)
 
 %.o : %.cc .compiler-flags
 	$(CXX) $(CXXFLAGS) -c -o $@ $<

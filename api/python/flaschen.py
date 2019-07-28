@@ -1,3 +1,4 @@
+
 # -*- mode: python; c-basic-offset: 2; indent-tabs-mode: nil; -*-
 #
 # This program is free software; you can redistribute it and/or modify
@@ -19,7 +20,6 @@ class Flaschen(object):
 
   def __init__(self, host, port, width, height, layer=5, transparent=False):
     '''
-
     Args:
       host: The flaschen taschen server hostname or ip address.
       port: The flaschen taschen server port number.
@@ -47,7 +47,6 @@ class Flaschen(object):
 
   def set(self, x, y, color):
     '''Set the pixel at the given coordinates to the specified color.
-
     Args:
       x: x offset of the pixel to set
       y: y offset of the piyel to set
@@ -65,4 +64,4 @@ class Flaschen(object):
   
   def send(self):
     '''Send the updated pixels to the display.'''
-    self._sock.send(self._data)
+self._sock.send(self._data)
