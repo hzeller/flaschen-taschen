@@ -67,7 +67,7 @@ ifeq ($(FT_BACKEND), terminal)
 endif
 
 CFLAGS=-Wall -O3 $(INCLUDES) $(DEFINES)
-CXXFLAGS=$(CFLAGS)
+CXXFLAGS=$(CFLAGS) -std=c++03
 LDFLAGS+=-lpthread
 
 all : ft-server
