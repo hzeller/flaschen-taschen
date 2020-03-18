@@ -29,6 +29,7 @@ RGBMatrixFlaschenTaschen::RGBMatrixFlaschenTaschen(
     }
     width_ = (width > 0) ? width : matrix_->width();
     height_ = (height > 0) ? height : matrix_->height();
+    fprintf(stderr, "Running with %dx%d resolution\n", width_, height_);
 }
 
 RGBMatrixFlaschenTaschen::~RGBMatrixFlaschenTaschen() {
