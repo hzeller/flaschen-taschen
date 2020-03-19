@@ -20,16 +20,21 @@ there is a special comment that you can put in the header (because `#`-comments
 are allowed in the PPM header) that describe the offset of the image on the
 display in X, Y and Z-direction (=layer).
 
-The comment must start with exactly **`#FT:`**. In the following example, a 10x10
-image is sent with the (x,y) offset of (5,8), the layer (z-offset) is 13:
+The comment must start with exactly **`#FT:`**. In the following example,
+a 10x10 image is sent with the (x,y) offset of (5,8), the layer (z-offset)
+is 13; the full UDP packet combining header and data looks like this:
+
+------
 
 ```
-P6     # Magic number
+P6     # PPM binary Portable PixMap magic number
 10 10  # width height (decimal, number in ASCII)
 #FT: 5 8 13
 255    # values per color (fixed). After newline, 10 * 10 * 3 bytes RGB data follows
 ```
 ![](../img/udp.png) (300 bytes RGB data)<br/>
+
+------
 
 (the header is followed by the binary image data, three bytes per pixel RGB, so in this case 10x10x3 = 300 bytes)
 
@@ -41,10 +46,13 @@ standard PPM (as PPM just ignores additional data at the end).
 
 Here the same 10x10 image with (header + data + optional footer). The footer is
 similar formatted like the header: decimal numbers, separated by space).
-End-of-line comments in the header/footer are allowed with `#` character:
+End-of-line comments in the header/footer are allowed with `#` character. So
+the full UDP packet combining header, data and footer looks like this:
+
+------
 
 ```
-P6     # Magic number
+P6     # PPM binary Portable PixMap magic number
 10 10  # width height (decimal, number in ASCII)
 255    # values per color (fixed). After newline, 10 * 10 * 3 bytes RGB data follows
 ```
@@ -54,6 +62,8 @@ P6     # Magic number
 8      # optional y offset
 13     # optional z offset.
 ```
+
+------
 
 The optional offset determines where the image is displayed on the
 Flaschen Taschen display relative to the top left corner (provided in the
