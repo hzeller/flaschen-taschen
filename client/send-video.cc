@@ -223,14 +223,15 @@ bool PlayVideo(const char *filename, UDPFlaschenTaschen& display, int verbose, f
         return false;
 
     // Determine required buffer size and allocate buffer
-    int numBytes = avpicture_get_size(AV_PIX_FMT_RGB24, pCodecCtx->width, pCodecCtx->height);
+    int numBytes = avpicture_get_size(AV_PIX_FMT_RGB24,
+                                      display.width(), display.height());
     uint8_t* buffer = (uint8_t *)av_malloc(numBytes*sizeof(uint8_t));
 
     // Assign appropriate parts of buffer to image planes in pFrameRGB
     // Note that pFrameRGB is an AVFrame, but AVFrame is a superset
     // of AVPicture
     avpicture_fill((AVPicture *)pFrameRGB, buffer, AV_PIX_FMT_RGB24,
-                   pCodecCtx->width, pCodecCtx->height);
+                   display.width(), display.height());
 
     // initialize SWS context for software scaling
     struct SwsContext* sws_ctx = sws_getContext(pCodecCtx->width,
