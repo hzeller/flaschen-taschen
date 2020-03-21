@@ -30,6 +30,7 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <sys/types.h>
+#include <sys/uio.h>
 #include <unistd.h>
 
 #include <algorithm>
@@ -81,61 +82,80 @@ int OpenFlaschenTaschenSocket(const char *host) {
     return fd;
 }
 
-// Let's have a fixed-size footer for fixed buffer calculation.
-static const int kFooterLen = strlen("\n0001 0001 0001\n") + 1; // offsets.
-
 UDPFlaschenTaschen::UDPFlaschenTaschen(int socket, int width, int height)
-    : fd_(socket), width_(width), height_(height) {
-    char header[64];
-    int header_len = snprintf(header, sizeof(header),
-                              "P6\n%d %d\n255\n", width, height);
-    buf_size_ = header_len + width_ * height_ * sizeof(Color) + kFooterLen;
-    buffer_ = new char[buf_size_];
-    bzero(buffer_, buf_size_);
-    strcpy(buffer_, header);
-    pixel_buffer_start_ = reinterpret_cast<Color*>(buffer_ + header_len);
-    footer_start_ = buffer_ + buf_size_ - kFooterLen;
+    : fd_(socket), width_(width), height_(height),
+      pixel_buffer_(new Color [ width_ * height ]) {
+    Clear();
     SetOffset(0, 0, 0);
 }
-UDPFlaschenTaschen::~UDPFlaschenTaschen() { delete [] buffer_; }
+UDPFlaschenTaschen::UDPFlaschenTaschen(const UDPFlaschenTaschen& other)
+    : fd_(other.fd_), width_(other.width_), height_(other.height_),
+      pixel_buffer_(new Color [ width_ * height_ ]) {
+    SetOffset(other.off_x_, other.off_y_, other.off_z_);
+    memcpy(pixel_buffer_, other.pixel_buffer_, width_ * height_ * 3);
+}
+
+UDPFlaschenTaschen::~UDPFlaschenTaschen() { delete [] pixel_buffer_; }
 
 void UDPFlaschenTaschen::Clear() {
-    bzero(pixel_buffer_start_, width_ * height_ * sizeof(Color));
+    bzero(pixel_buffer_, width_ * height_ * sizeof(Color));
 }
 
 void UDPFlaschenTaschen::Fill(const Color &c) {
     if (c.is_black()) {
         Clear();  // cheaper
     } else {
-        std::fill(pixel_buffer_start_, pixel_buffer_start_ + width_*height_, c);
+        std::fill(pixel_buffer_, pixel_buffer_ + width_*height_, c);
     }
 }
 
 void UDPFlaschenTaschen::SetOffset(int off_x, int off_y, int off_z){
-    // Our extension to the PPM format adds footers after the image data.
-    snprintf(footer_start_, kFooterLen, "\n%4d %4d %4d\n", off_x, off_y, off_z);
+    off_x_ = off_x;
+    off_y_ = off_y;
+    off_z_ = off_z;
 }
 
 void UDPFlaschenTaschen::SetPixel(int x, int y, const Color &col) {
     if (x < 0 || x >= width_ || y < 0 || y >= height_) return;
-    pixel_buffer_start_[x + y * width_] = col;
+    pixel_buffer_[x + y * width_] = col;
 }
 
-const Color &UDPFlaschenTaschen::GetPixel(int x, int y) {
-    return pixel_buffer_start_[(x % width_) + (y % height_) * width_];
+const Color &UDPFlaschenTaschen::GetPixel(int x, int y) const {
+    return pixel_buffer_[(x % width_) + (y % height_) * width_];
 }
 
-void UDPFlaschenTaschen::Send(int fd) {
-    const int kMaxUdpPacket = 65507;
-    if (buf_size_ > kMaxUdpPacket) {
-        fprintf(stderr, "Attempting to send image larger than fits in a UDP packet (%d > %d bytes)\n", (int) buf_size_, kMaxUdpPacket);
+void UDPFlaschenTaschen::Send(int fd) const {
+    const int kMaxDataLen = 65507 - 64;  // Leave some space for header
+    const size_t row_size = 3 * width_;
+    const int max_send_height = kMaxDataLen / row_size;
+
+    char header_buffer[64];
+    char *send_buffer = (char*)pixel_buffer_;
+    int rows = height_;
+    int tile_offset = 0;
+    while (rows) {
+        const int send_h = (rows < max_send_height) ? rows : max_send_height;
+        int header_len = snprintf(header_buffer, sizeof(header_buffer),
+                                  "P6\n%d %d\n#FT: %d %d %d\n255\n",
+                                  width_, send_h,
+                                  off_x_, off_y_ + tile_offset, off_z_);
+
+        struct iovec iov[2];
+        iov[0].iov_base = header_buffer;
+        iov[0].iov_len = header_len;
+        iov[1].iov_base = send_buffer;
+        iov[1].iov_len = send_h * row_size;
+
+        if (writev(fd, iov, 2) < 0) {
+            perror("Error sending packet.");
+        }
+
+        rows -= send_h;
+        tile_offset += send_h;
+        send_buffer += send_h * row_size;
     }
-    // Some fudging to make the compiler shut up about non-used return value
-    if (write(fd, buffer_, buf_size_) < 0) return;
 }
 
 UDPFlaschenTaschen* UDPFlaschenTaschen::Clone() const {
-    UDPFlaschenTaschen *result = new UDPFlaschenTaschen(fd_, width_, height_);
-    memcpy(result->buffer_, buffer_, buf_size_);
-    return result;
+    return new UDPFlaschenTaschen(*this);
 }

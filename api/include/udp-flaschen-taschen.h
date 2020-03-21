@@ -34,6 +34,7 @@ public:
     // Create a canvas that can be sent to a FlaschenTaschen server.
     // Socket can be -1, but then you have to use the explicit Send(int fd).
     UDPFlaschenTaschen(int socket, int width, int height);
+    UDPFlaschenTaschen(const UDPFlaschenTaschen& other);
     ~UDPFlaschenTaschen();
 
     // -- FlaschenTaschen interface implementation
@@ -43,12 +44,12 @@ public:
     virtual void SetPixel(int x, int y, const Color &col);
 
     // Send to file-descriptor given in constructor.
-    virtual void Send() { Send(fd_); } 
+    virtual void Send() { Send(fd_); }
 
     // -- Additional features.
     UDPFlaschenTaschen *Clone() const;  // Create new instance with same content.
-    void Send(int fd);     // Send to given file-descriptor.
-    void Clear();          // Clear screen (fill with black).
+    void Send(int fd) const;    // Send to given file-descriptor.
+    void Clear();               // Clear screen (fill with black).
     void Fill(const Color &c);  // Fill screen with color.
 
     // Set offset where this picture should be displayed on the remote
@@ -62,20 +63,17 @@ public:
 
     // Get pixel color at given position. Coordinates outside the range
     // are wrapped around.
-    const Color &GetPixel(int x, int y);
+    const Color &GetPixel(int x, int y) const;
 
 private:
     const int fd_;
     const int width_;
     const int height_;
+    Color *const pixel_buffer_;
 
-    // Raw transmit buffer
-    size_t buf_size_;
-    char *buffer_;
-
-    // pointers into the buffer.
-    Color *pixel_buffer_start_;
-    char *footer_start_;
+    int off_x_;
+    int off_y_;
+    int off_z_;
 };
 
 #endif  // UDP_FLASCHEN_TASCHEN_H
