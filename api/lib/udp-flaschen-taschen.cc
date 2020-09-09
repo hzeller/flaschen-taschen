@@ -37,6 +37,8 @@
 
 #define DEFAULT_FT_DISPLAY_HOST "ft.noise"
 
+static const int kFlaschenTaschenHeaderReserve = 64;  // PPM header
+
 int OpenFlaschenTaschenSocket(const char *host) {
     if (host == NULL) {
         host = getenv("FT_DISPLAY");     // Take from environment.
@@ -82,20 +84,49 @@ int OpenFlaschenTaschenSocket(const char *host) {
     return fd;
 }
 
-UDPFlaschenTaschen::UDPFlaschenTaschen(int socket, int width, int height)
+UDPFlaschenTaschen::UDPFlaschenTaschen(int socket, int width, int height,
+                                       size_t max_udp_size)
     : fd_(socket), width_(width), height_(height),
-      pixel_buffer_(new Color [ width_ * height ]) {
-    Clear();
+      pixel_buffer_(new Color [ width_ * height ]),
+      max_udp_size_(65507) {
+    SetMaxUDPPacketSize(max_udp_size);
+
+    // Allow override with environment variable.
+    if (getenv("FT_UDP_SIZE")) {
+        SetMaxUDPPacketSize(atoi(getenv("FT_UDP_SIZE")));
+    }
+
     SetOffset(0, 0, 0);
+    Clear();
 }
+
 UDPFlaschenTaschen::UDPFlaschenTaschen(const UDPFlaschenTaschen& other)
     : fd_(other.fd_), width_(other.width_), height_(other.height_),
-      pixel_buffer_(new Color [ width_ * height_ ]) {
+      pixel_buffer_(new Color [ width_ * height_ ]),
+      max_udp_size_(other.max_udp_size_) {
     SetOffset(other.off_x_, other.off_y_, other.off_z_);
     memcpy(pixel_buffer_, other.pixel_buffer_, width_ * height_ * 3);
 }
 
 UDPFlaschenTaschen::~UDPFlaschenTaschen() { delete [] pixel_buffer_; }
+
+bool UDPFlaschenTaschen::SetMaxUDPPacketSize(size_t packet_size) {
+    if (packet_size > 65507) {
+        fprintf(stderr, "Attempt to set UDP packet size beyond 65507 bytes "
+                "(%d).\n", (int) packet_size);
+        return false;
+    }
+    const size_t row_size = 3 * width_;
+    if ((packet_size - kFlaschenTaschenHeaderReserve) / row_size == 0) {
+        fprintf(stderr, "Attempt to set UDP packet size below minimum %d "
+                "bytes needed for this canvas. Keeping %d.\n",
+                (int) (row_size + kFlaschenTaschenHeaderReserve),
+                (int) max_udp_size_);
+        return false;
+    }
+    max_udp_size_ = packet_size;
+    return true;
+}
 
 void UDPFlaschenTaschen::Clear() {
     bzero(pixel_buffer_, width_ * height_ * sizeof(Color));
@@ -125,11 +156,12 @@ const Color &UDPFlaschenTaschen::GetPixel(int x, int y) const {
 }
 
 void UDPFlaschenTaschen::Send(int fd) const {
-    const int kMaxDataLen = 65507 - 64;  // Leave some space for header
+    const int kMaxDataLen = max_udp_size_ - kFlaschenTaschenHeaderReserve;
     const size_t row_size = 3 * width_;
     const int max_send_height = kMaxDataLen / row_size;
+    assert(max_send_height > 0);  // UDP needs to be able to fit at least 1 row
 
-    char header_buffer[64];
+    char header_buffer[kFlaschenTaschenHeaderReserve];
     char *send_buffer = (char*)pixel_buffer_;
     int rows = height_;
     int tile_offset = 0;

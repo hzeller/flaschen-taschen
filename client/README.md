@@ -28,6 +28,32 @@ variable for ease of playing.
 export FT_DISPLAY=localhost
 ```
 
+### UDP Size
+
+The images are sent via UDP, and if the size does not fit in a single packet,
+it will be split up into multiple stripes, so even large screens are supported.
+
+The default assumed size of a maxium UDP packet is
+65507 bytes (65535 - IP and UDP header), but note that on some operating
+systems (notably OSX), the default allowed size is smaller. If you try to send
+a large image or video and you get error messages, this might be the reason.
+
+To fix: Either tell the client tool such as `send-video` to use a smaller
+UDP size with the environment variable `FT_UDP_SIZE`. E.g.
+
+```
+FT_UDP_SIZE=8000 ./send-video -g320x200 ...
+```
+
+This will split the image into more stripes, so requies more network packets,
+but it will work.
+
+Or, if your operating sytem allows, set a larger limit. On OSX this would be:
+
+```
+sudo sysctl -w net.inet.udp.maxdgram=65535
+```
+
 ## Send-Text
 
 ### Compile

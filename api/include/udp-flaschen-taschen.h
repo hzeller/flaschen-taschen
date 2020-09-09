@@ -33,7 +33,15 @@ class UDPFlaschenTaschen : public FlaschenTaschen {
 public:
     // Create a canvas that can be sent to a FlaschenTaschen server.
     // Socket can be -1, but then you have to use the explicit Send(int fd).
-    UDPFlaschenTaschen(int socket, int width, int height);
+    //
+    // The UDP packet size is the maximum amount of data that is sent
+    // per Send() call. Usually, the maxiumum of 65507 is just fine except
+    // in OSX, which has a limit of about 9000.
+    //
+    // The UDP size can be overwritten with the FT_UDP_SIZE environment
+    // variable.
+    UDPFlaschenTaschen(int socket, int width, int height,
+                       size_t max_udp_size = 65507);
     UDPFlaschenTaschen(const UDPFlaschenTaschen& other);
     ~UDPFlaschenTaschen();
 
@@ -48,6 +56,16 @@ public:
 
     // -- Additional features.
     UDPFlaschenTaschen *Clone() const;  // Create new instance with same content.
+
+    // Set maximum UDP packet size to be used without IP/UDP header.
+    // The maxium allowable size is 65507 (65535 minus UDP and IP header).
+    // The minium depends on the width of the canvas and requires at least one
+    // line to fit.
+    //
+    // Some operating systems (e.g. OSX) have smaller limits by default.
+    // Returns boolean if setting the value was successful.
+    bool SetMaxUDPPacketSize(size_t packet_size);
+
     void Send(int fd) const;    // Send to given file-descriptor.
     void Clear();               // Clear screen (fill with black).
     void Fill(const Color &c);  // Fill screen with color.
@@ -74,6 +92,8 @@ private:
     int off_x_;
     int off_y_;
     int off_z_;
+
+    size_t max_udp_size_;
 };
 
 #endif  // UDP_FLASCHEN_TASCHEN_H
