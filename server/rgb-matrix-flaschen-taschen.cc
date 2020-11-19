@@ -15,11 +15,9 @@
 #include "led-flaschen-taschen.h"
 
 #include "led-matrix.h"
-#include "gpio.h"
+
 #include <stdio.h>
 #include <stdlib.h>
-
-static rgb_matrix::GPIO gpio_s;
 
 RGBMatrixFlaschenTaschen::RGBMatrixFlaschenTaschen(
     rgb_matrix::RGBMatrix *matrix, int width, int height) : matrix_(matrix) {
