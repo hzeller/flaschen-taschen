@@ -45,6 +45,21 @@ class Flaschen(object):
     self._data[-1 * len(footer):] = footer
     self._header_len = len(header)
 
+  @property
+  def __array_interface__(self):
+    '''An array interface to directly access the framebuffer pixel data.
+    
+    Direct writes to pixel data will ignore the transparent parameter.
+    '''
+    return {
+      "shape": (self.height, self.width, 3),
+      "typestr": "|u1",
+      "data": memoryview(self._data)[
+        self._header_len : self._header_len + (self.height * self.width * 3)
+      ],
+      "version": 3,
+    }
+
   def set(self, x, y, color):
     '''Set the pixel at the given coordinates to the specified color.
 
