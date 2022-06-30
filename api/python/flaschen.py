@@ -11,8 +11,11 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://gnu.org/licenses/gpl-2.0.txt>
+'''A Python API client for Flaschen Taschen.'''
 
 import socket
+
+__version__ = "0.1.0"
 
 # Netpbm header with Flaschen Taschen offset included.
 _HEADER_P6_FT = b"""\
