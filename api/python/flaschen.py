@@ -14,10 +14,32 @@
 
 import socket
 
+# Netpbm raw RGB header.
+_HEADER_P6 = b"""\
+P6
+%(width)d %(height)d
+255
+"""
+
+# Flaschen Taschen footer holding the offset.
+_FOOTER_FT = b"""\
+%(x)d
+%(y)d
+%(z)d
+"""
+
+# Netpbm header with Flaschen Taschen offset included.
+_HEADER_P6_FT = b"""\
+P6
+%(width)d %(height)d
+#FT: %(x)d %(y)d %(z)d
+255
+"""
+
 class Flaschen(object):
   '''A Framebuffer display interface that sends a frame via UDP.'''
 
-  def __init__(self, host, port, width, height, layer=5, transparent=False):
+  def __init__(self, host, port, width=0, height=0, layer=5, transparent=False):
     '''
 
     Args:
@@ -34,12 +56,8 @@ class Flaschen(object):
     self.transparent = transparent
     self._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     self._sock.connect((host, port))
-    header = ''.join(["P6\n",
-                      "%d %d\n" % (self.width, self.height),
-                      "255\n"]).encode('utf-8')
-    footer = ''.join(["0\n",
-                      "0\n",
-                      "%d\n" % self.layer]).encode('utf-8')
+    header = _HEADER_P6 % {b"width": self.width, b"height": self.height}
+    footer = _FOOTER_FT % {b"x": 0, b"y": 0, b"z": self.layer}
     self._data = bytearray(width * height * 3 + len(header) + len(footer))
     self._data[0:len(header)] = header
     self._data[-1 * len(footer):] = footer
@@ -81,3 +99,36 @@ class Flaschen(object):
   def send(self):
     '''Send the updated pixels to the display.'''
     self._sock.send(self._data)
+
+  def send_array(self, pixels, offset):
+    # (numpy.typing.ArrayLike, tuple[int, int, int]) -> None
+    '''Send an array of pixels to the given offset.
+
+    Can be used as an alternative to the send method.
+    The initial transparent option is respected.
+    The initial width, height, and layer is ignored.
+
+    Args:
+      pixels: An array-like of RGB pixels, shaped as (height, width, RGB)
+              Color values are expected to be from 0 to 255.
+      offset: The (x, y, layer) offset.
+              X and Y begin at the top-left pixel.
+    '''
+    import numpy as np
+    array = np.asarray(pixels, dtype=np.uint8)
+    if len(array.shape) != 3 or array.shape[2] != 3:
+      raise TypeError(
+        "Pixel array must be shape (height, width, 3), got %r" % (array.shape,)
+      )
+    if not self.transparent:
+      array = array.copy(order="C")  # Prevent modifying the original array.
+      array[(array == (0, 0, 0)).all(axis=-1)] = (1, 1, 1)
+
+    header = _HEADER_P6_FT % {
+      b"width": array.shape[1],
+      b"height": array.shape[0],
+      b"x": offset[0],
+      b"y": offset[1],
+      b"z": offset[2],
+    }
+    self._sock.send(header + array.tobytes())
