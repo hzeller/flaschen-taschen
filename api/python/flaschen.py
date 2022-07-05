@@ -63,7 +63,7 @@ class Flaschen(object):
       b"y": 0,
       b"z": self.layer,
     }
-    self._data = bytearray(width * height * 3 + len(header))
+    self._data = bytearray(len(header) + (width * height * 3))
     self._data[0:len(header)] = header
     self._header_len = len(header)
 
