@@ -14,20 +14,6 @@
 
 import socket
 
-# Netpbm raw RGB header.
-_HEADER_P6 = b"""\
-P6
-%(width)d %(height)d
-255
-"""
-
-# Flaschen Taschen footer holding the offset.
-_FOOTER_FT = b"""\
-%(x)d
-%(y)d
-%(z)d
-"""
-
 # Netpbm header with Flaschen Taschen offset included.
 _HEADER_P6_FT = b"""\
 P6
