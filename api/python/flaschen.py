@@ -56,11 +56,15 @@ class Flaschen(object):
     self.transparent = transparent
     self._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     self._sock.connect((host, port))
-    header = _HEADER_P6 % {b"width": self.width, b"height": self.height}
-    footer = _FOOTER_FT % {b"x": 0, b"y": 0, b"z": self.layer}
-    self._data = bytearray(width * height * 3 + len(header) + len(footer))
+    header = _HEADER_P6_FT % {
+      b"width": self.width,
+      b"height": self.height,
+      b"x": 0,
+      b"y": 0,
+      b"z": self.layer,
+    }
+    self._data = bytearray(width * height * 3 + len(header))
     self._data[0:len(header)] = header
-    self._data[-1 * len(footer):] = footer
     self._header_len = len(header)
 
   @property
