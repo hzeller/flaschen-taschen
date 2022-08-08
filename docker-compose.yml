@@ -1,0 +1,7 @@
+# Example run:
+#     sudo docker-compose run --rm flaschen make all
+#     sudo docker-compose run --rm flaschen ./send-text -f fonts/6x10.bdf -o "Nice work"
+flaschen:
+  build: .
+  volumes:
+    - '.:/code/'
