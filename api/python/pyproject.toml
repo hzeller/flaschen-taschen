@@ -1,0 +1,15 @@
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "flaschen"
+authors = [{ name = "Henner Zeller", email = "h.zeller@acm.org" }]
+license = { file = "../../LICENSE" }
+classifiers = [
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+]
+dynamic = ["version", "description"]
+
+[project.urls]
+Home = "https://github.com/hzeller/flaschen-taschen"
