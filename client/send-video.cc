@@ -12,7 +12,9 @@
 // libav: "U NO extern C in header ?"
 extern "C" {
 #  include <libavcodec/avcodec.h>
+#  include <libavdevice/avdevice.h>
 #  include <libavformat/avformat.h>
+#  include <libavutil/imgutils.h>
 #  include <libswscale/swscale.h>
 }
 
@@ -62,10 +64,49 @@ static int usage(const char *progname) {
             "\t-g <width>x<height>[+<off_x>+<off_y>[+<layer>]] : Output geometry. Default 20x20+0+0\n"
             "\t-h <host>          : Flaschen-Taschen display hostname.\n"
             "\t-l <layer>         : Layer 0..15. Default 0 (note if also given in -g, then last counts)\n"
-            "\t-t <repeat-secs>   : Repeat for at least n seconds\n"
+            "\t-t <repeat-secs>   : Loop until at least n seconds passed.\n"
             "\t-c                 : clear display/layer before close\n"
-            "\t-v                 : verbose.\n");
+            "\t-v                 : verbose (multiple: more verbose).\n");
     return 1;
+}
+
+// Convert deprecated color formats to new and manually set the color range.
+// YUV has funny ranges (16-235), while the YUVJ are 0-255. SWS prefers to
+// deal with the YUV range, but then requires to set the output range.
+// https://libav.org/documentation/doxygen/master/pixfmt_8h.html#a9a8e335cf3be472042bc9f0cf80cd4c5
+SwsContext *CreateSWSContext(const AVCodecContext *codec_ctx,
+                             int display_width, int display_height) {
+  AVPixelFormat pix_fmt;
+  bool src_range_extended_yuvj = true;
+  // Remap deprecated to new pixel format.
+  switch (codec_ctx->pix_fmt) {
+  case AV_PIX_FMT_YUVJ420P: pix_fmt = AV_PIX_FMT_YUV420P; break;
+  case AV_PIX_FMT_YUVJ422P: pix_fmt = AV_PIX_FMT_YUV422P; break;
+  case AV_PIX_FMT_YUVJ444P: pix_fmt = AV_PIX_FMT_YUV444P; break;
+  case AV_PIX_FMT_YUVJ440P: pix_fmt = AV_PIX_FMT_YUV440P; break;
+  default:
+    src_range_extended_yuvj = false;
+    pix_fmt = codec_ctx->pix_fmt;
+  }
+  SwsContext *swsCtx = sws_getContext(codec_ctx->width, codec_ctx->height,
+                                      pix_fmt,
+                                      display_width, display_height,
+                                      AV_PIX_FMT_RGB24, SWS_BILINEAR,
+                                      NULL, NULL, NULL);
+  if (src_range_extended_yuvj) {
+    // Manually set the source range to be extended. Read modify write.
+    int dontcare[4];
+    int src_range, dst_range;
+    int brightness, contrast, saturation;
+    sws_getColorspaceDetails(swsCtx, (int**)&dontcare, &src_range,
+                             (int**)&dontcare, &dst_range, &brightness,
+                             &contrast, &saturation);
+    const int* coefs = sws_getCoefficients(SWS_CS_DEFAULT);
+    src_range = 1;  // New src range.
+    sws_setColorspaceDetails(swsCtx, coefs, src_range, coefs, dst_range,
+                             brightness, contrast, saturation);
+  }
+  return swsCtx;
 }
 
 int main(int argc, char *argv[]) {
@@ -120,14 +161,17 @@ int main(int argc, char *argv[]) {
 
     const int ft_socket = OpenFlaschenTaschenSocket(ft_host);
     if (ft_socket < 0) {
-        fprintf(stderr, "Couldn't open socket to FlaschenTaschen\n");
+        fprintf(stderr, "Couldn't open socket to FlaschenTaschen; did you provide correct hostname with -h <hostname> ?\n");
         return -1;
     }
     UDPFlaschenTaschen display(ft_socket, display_width, display_height);
     display.SetOffset(off_x, off_y, off_z);
 
     // Register all formats and codecs
+#if LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(58, 9, 100)
     av_register_all();
+#endif
+    avdevice_register_all();
     avformat_network_init();
 
     signal(SIGTERM, InterruptHandler);
@@ -158,124 +202,107 @@ int main(int argc, char *argv[]) {
 /// @returns true on video successfully played-through
 bool PlayVideo(const char *filename, UDPFlaschenTaschen& display, int verbose, float repeatTimeout) {
     // Open video file
-    AVFormatContext* pFormatCtx = NULL;
-    if (avformat_open_input(&pFormatCtx, filename, NULL, NULL) != 0) {
+    AVFormatContext *format_context = avformat_alloc_context();
+    if (avformat_open_input(&format_context, filename, NULL, NULL) != 0) {
         fprintf(stderr, "Can't open file %s\n", filename);
         return false;
     }
     fprintf(stderr, "Playing %s\n", filename);
 
     // Retrieve stream information
-    if (avformat_find_stream_info(pFormatCtx, NULL) < 0) {
+    if (avformat_find_stream_info(format_context, NULL) < 0) {
         fprintf(stderr, "Can't open stream for %s\n", filename);
         return false;
     }
 
     // Dump information about file onto standard error
     if (verbose > 1) {
-        av_dump_format(pFormatCtx, 0, filename, 0);
+        av_dump_format(format_context, 0, filename, 0);
     }
 
     // Find the first video stream
     int videoStream = -1;
-    for (int i=0; i < (int)pFormatCtx->nb_streams; ++i) {
-        if (pFormatCtx->streams[i]->codec->codec_type == AVMEDIA_TYPE_VIDEO) {
-            videoStream=i;
+    const AVCodecParameters *codec_parameters = NULL;
+    const AVCodec *av_codec = NULL;
+    for (int i=0; i < (int)format_context->nb_streams; ++i) {
+        codec_parameters = format_context->streams[i]->codecpar;
+        av_codec = avcodec_find_decoder(codec_parameters->codec_id);
+        if (!av_codec) continue;
+        if (codec_parameters->codec_type == AVMEDIA_TYPE_VIDEO) {
+            videoStream = i;
             break;
         }
     }
-    if (videoStream==-1){
+    if (videoStream == -1) {
         fprintf(stderr, "Can't open stream for %s\n", filename);
         return false;
     }
 
     // Get a pointer to the codec context for the video stream
-    AVCodecContext* pCodecCtxOrig = pFormatCtx->streams[videoStream]->codec;
-    double fps = av_q2d(pFormatCtx->streams[videoStream]->avg_frame_rate);
-    if (fps < 0) {
-        fps = 1.0 / av_q2d(pFormatCtx->streams[videoStream]->codec->time_base);
-    }
-    if (verbose > 1) fprintf(stderr, "FPS: %f\n", fps);
-
-    // Find the decoder for the video stream
-    AVCodec* pCodec = avcodec_find_decoder(pCodecCtxOrig->codec_id);
-    if (pCodec == NULL) {
-        fprintf(stderr, "Unsupported codec!\n");
-        return false; // Codec not found
-    }
-    // Copy context
-    AVCodecContext* pCodecCtx = avcodec_alloc_context3(pCodec);
-    if (avcodec_copy_context(pCodecCtx, pCodecCtxOrig) != 0) {
-        fprintf(stderr, "Couldn't copy codec context");
-        return false; // Error copying codec context
+    AVStream *const stream = format_context->streams[videoStream];
+    AVRational rate = av_guess_frame_rate(format_context, stream, NULL);
+    const long frame_wait_micros = 1e6 * rate.den / rate.num;
+    if (verbose > 1) {
+        fprintf(stderr, "FPS: %f\n", 1.0*rate.num / rate.den);
     }
 
-    // Open codec
-    if (avcodec_open2(pCodecCtx, pCodec, NULL) < 0)
-        return false; // Could not open codec
-
-    // Allocate video frame
-    AVFrame* pFrame = av_frame_alloc();
-
-    // Allocate an AVFrame structure
-    AVFrame* pFrameRGB = av_frame_alloc();
-    if (pFrameRGB == NULL)
+    AVCodecContext *codec_context = avcodec_alloc_context3(av_codec);
+    if (avcodec_parameters_to_context(codec_context, codec_parameters) < 0) {
         return false;
+    }
 
-    // Determine required buffer size and allocate buffer
-    int numBytes = avpicture_get_size(AV_PIX_FMT_RGB24,
-                                      display.width(), display.height());
-    uint8_t* buffer = (uint8_t *)av_malloc(numBytes*sizeof(uint8_t));
+    if (avcodec_open2(codec_context, av_codec, NULL) < 0) {
+        return false; // Could not open codec
+    }
 
-    // Assign appropriate parts of buffer to image planes in pFrameRGB
-    // Note that pFrameRGB is an AVFrame, but AVFrame is a superset
-    // of AVPicture
-    avpicture_fill((AVPicture *)pFrameRGB, buffer, AV_PIX_FMT_RGB24,
-                   display.width(), display.height());
+    // Allocate an AVFrame structure with data that we can send out.
+    AVFrame *output_frame = av_frame_alloc();
+    if (!output_frame ||
+        av_image_alloc(output_frame->data, output_frame->linesize,
+                       display.width(), display.height(), AV_PIX_FMT_RGB24,
+                       64) < 0) {
+      return false;
+    }
 
     // initialize SWS context for software scaling
-    struct SwsContext* sws_ctx = sws_getContext(pCodecCtx->width,
-                                                pCodecCtx->height,
-                                                pCodecCtx->pix_fmt,
-                                                display.width(), display.height(),
-                                                AV_PIX_FMT_RGB24,
-                                                SWS_BILINEAR,
-                                                NULL, NULL, NULL );
-    if (sws_ctx == 0) {
-        fprintf(stderr, "Trouble doing scaling to %dx%d :(\n", display.width(), display.height());
+    SwsContext* sws_ctx = CreateSWSContext(codec_context,
+                                           display.width(), display.height());
+    if (!sws_ctx) {
+        fprintf(stderr, "Trouble doing scaling to %dx%d :(\n",
+                display.width(), display.height());
         return false;
     }
 
     // Read frames and send to FlaschenTaschen.
-    const int frame_wait_micros = 1e6 / fps;
     const tmillis_t  startTime = GetTimeInMillis();
+    AVPacket *packet = av_packet_alloc();
+    AVFrame *decode_frame = av_frame_alloc();  // Decode video into this
     long frame_count = 0, repeated_count = 0;
     while (!interrupt_received) {
         frame_count = 0;
-        AVPacket packet;
-        while (!interrupt_received && av_read_frame(pFormatCtx, &packet) >= 0) {
+        while (!interrupt_received && av_read_frame(format_context, packet) >= 0) {
             // Is this a packet from the video stream?
-            if (packet.stream_index == videoStream) {
-                int frameFinished = 0;
+            if (packet->stream_index == videoStream) {
                 // Decode video frame
-                avcodec_decode_video2(pCodecCtx, pFrame, &frameFinished, &packet);
+                if (avcodec_send_packet(codec_context, packet) < 0)
+                    continue;
 
-                // Did we get a video frame?
-                if (frameFinished) {
-                    // Convert the image from its native format to RGB
-                    sws_scale(sws_ctx, (uint8_t const * const *)pFrame->data,
-                              pFrame->linesize, 0, pCodecCtx->height,
-                              pFrameRGB->data, pFrameRGB->linesize);
+                if (avcodec_receive_frame(codec_context, decode_frame) < 0)
+                    continue;
 
-                    // Save the frame to disk
-                    SendFrame(pFrameRGB, &display);
-                    frame_count++;
-                }
+                // Convert the image from its native format to RGB
+                sws_scale(sws_ctx, (uint8_t const * const *)decode_frame->data,
+                          decode_frame->linesize, 0, codec_context->height,
+                          output_frame->data, output_frame->linesize);
+
+                // Save the frame to disk
+                SendFrame(output_frame, &display);
+                frame_count++;
                 usleep(frame_wait_micros);
             }
 
             // Free the packet that was allocated by av_read_frame
-            av_free_packet(&packet);
+            av_packet_unref(packet);
         }
         repeated_count++; //if time allows- keep playing
 
@@ -283,25 +310,20 @@ bool PlayVideo(const char *filename, UDPFlaschenTaschen& display, int verbose, f
         if (elapsed >= repeatTimeout * 1000)
             break;
 
-        av_seek_frame(pFormatCtx, -1, 1, AVSEEK_FLAG_FRAME); //start playing from the beginning
+        av_seek_frame(format_context, -1, 1, AVSEEK_FLAG_FRAME); //start playing from the beginning
         if (verbose > 1)
             fprintf(stderr, "loop %ld done after %0.1fs (%ld frames)\n", repeated_count, elapsed / 1000.0, frame_count);
     }
 
-    // Free the RGB image
-    av_free(buffer);
-    av_frame_free(&pFrameRGB);
+    av_packet_free(&packet);
 
-    // Free the YUV frame
-    av_frame_free(&pFrame);
+    av_frame_free(&output_frame);
+    av_frame_free(&decode_frame);
+    avcodec_close(codec_context);
+    avformat_close_input(&format_context);
 
-    // Close the codecs
-    avcodec_close(pCodecCtx);
-    avcodec_close(pCodecCtxOrig);
-
-    // Close the video file
-    avformat_close_input(&pFormatCtx);
     if (verbose)
         fprintf(stderr, "Finished playing %ld frames %ld times for %0.1fs total\n", frame_count, repeated_count, (GetTimeInMillis() - startTime) / 1000.);
+
     return !interrupt_received;
 }
