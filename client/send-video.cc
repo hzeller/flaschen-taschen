@@ -18,11 +18,12 @@ extern "C" {
 #  include <libswscale/swscale.h>
 }
 
-#include <stdio.h>
-#include <unistd.h>
 #include <getopt.h>
 #include <signal.h>
+#include <stdio.h>
 #include <sys/time.h>
+#include <time.h>
+#include <unistd.h>
 
 #include "udp-flaschen-taschen.h"
 
@@ -32,6 +33,14 @@ static tmillis_t GetTimeInMillis() {
     struct timeval tp;
     gettimeofday(&tp, NULL);
     return tp.tv_sec * 1000 + tp.tv_usec / 1000;
+}
+
+static void add_nanos(struct timespec *accumulator, long nanoseconds) {
+  accumulator->tv_nsec += nanoseconds;
+  while (accumulator->tv_nsec > 1000000000) {
+    accumulator->tv_nsec -= 1000000000;
+    accumulator->tv_sec += 1;
+  }
 }
 
 volatile bool interrupt_received = false;
@@ -241,7 +250,7 @@ bool PlayVideo(const char *filename, UDPFlaschenTaschen& display, int verbose, f
     // Get a pointer to the codec context for the video stream
     AVStream *const stream = format_context->streams[videoStream];
     AVRational rate = av_guess_frame_rate(format_context, stream, NULL);
-    const long frame_wait_micros = 1e6 * rate.den / rate.num;
+    const long frame_wait_nanos = 1e9 * rate.den / rate.num;
     if (verbose > 1) {
         fprintf(stderr, "FPS: %f\n", 1.0*rate.num / rate.den);
     }
@@ -274,11 +283,15 @@ bool PlayVideo(const char *filename, UDPFlaschenTaschen& display, int verbose, f
     }
 
     // Read frames and send to FlaschenTaschen.
-    const tmillis_t  startTime = GetTimeInMillis();
+    const tmillis_t startTime = GetTimeInMillis();
+
+    struct timespec next_frame;
     AVPacket *packet = av_packet_alloc();
     AVFrame *decode_frame = av_frame_alloc();  // Decode video into this
     long frame_count = 0, repeated_count = 0;
     while (!interrupt_received) {
+        clock_gettime(CLOCK_MONOTONIC, &next_frame);
+
         frame_count = 0;
         while (!interrupt_received && av_read_frame(format_context, packet) >= 0) {
             // Is this a packet from the video stream?
@@ -290,6 +303,10 @@ bool PlayVideo(const char *filename, UDPFlaschenTaschen& display, int verbose, f
                 if (avcodec_receive_frame(codec_context, decode_frame) < 0)
                     continue;
 
+                // Absolute end of this frame now so that we don't include
+                // decoding and sending overhead.
+                add_nanos(&next_frame, frame_wait_nanos);
+
                 // Convert the image from its native format to RGB
                 sws_scale(sws_ctx, (uint8_t const * const *)decode_frame->data,
                           decode_frame->linesize, 0, codec_context->height,
@@ -298,7 +315,8 @@ bool PlayVideo(const char *filename, UDPFlaschenTaschen& display, int verbose, f
                 // Save the frame to disk
                 SendFrame(output_frame, &display);
                 frame_count++;
-                usleep(frame_wait_micros);
+                clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &next_frame,
+                                NULL);
             }
 
             // Free the packet that was allocated by av_read_frame
@@ -322,8 +340,14 @@ bool PlayVideo(const char *filename, UDPFlaschenTaschen& display, int verbose, f
     avcodec_close(codec_context);
     avformat_close_input(&format_context);
 
-    if (verbose)
-        fprintf(stderr, "Finished playing %ld frames %ld times for %0.1fs total\n", frame_count, repeated_count, (GetTimeInMillis() - startTime) / 1000.);
+    if (verbose) {
+      const float total_time = (GetTimeInMillis() - startTime) / 1000.0;
+      fprintf(stderr,
+              "Finished playing %ld frames %ld times for %0.1fs total (%.1f "
+              "fps avg)\n",
+              frame_count, repeated_count, total_time,
+              repeated_count * frame_count / total_time);
+    }
 
     return !interrupt_received;
 }
