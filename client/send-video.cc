@@ -56,7 +56,8 @@ static void InterruptHandler(int) {
 
 bool PlayVideo(const char *filename, UDPFlaschenTaschen& display, int verbose, float repeatTimeout);
 
-void SendFrame(AVFrame *pFrame, UDPFlaschenTaschen *display) {
+// SendFrame() and return number of bytes sent.
+size_t SendFrame(AVFrame *pFrame, UDPFlaschenTaschen *display) {
     // Write pixel data
     const int height = display->height();
     for(int y = 0; y < height; ++y) {
@@ -65,6 +66,7 @@ void SendFrame(AVFrame *pFrame, UDPFlaschenTaschen *display) {
                3 * display->width());
     }
     display->Send();
+    return display->height() * display->width() * 3;
 }
 
 static int usage(const char *progname) {
@@ -284,6 +286,7 @@ bool PlayVideo(const char *filename, UDPFlaschenTaschen& display, int verbose, f
 
     // Read frames and send to FlaschenTaschen.
     const tmillis_t startTime = GetTimeInMillis();
+    size_t total_bytes = 0;
 
     struct timespec next_frame;
     AVPacket *packet = av_packet_alloc();
@@ -313,13 +316,12 @@ bool PlayVideo(const char *filename, UDPFlaschenTaschen& display, int verbose, f
                           output_frame->data, output_frame->linesize);
 
                 // Save the frame to disk
-                SendFrame(output_frame, &display);
+                total_bytes += SendFrame(output_frame, &display);
                 frame_count++;
                 clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &next_frame,
                                 NULL);
             }
 
-            // Free the packet that was allocated by av_read_frame
             av_packet_unref(packet);
         }
         repeated_count++; //if time allows- keep playing
@@ -344,9 +346,10 @@ bool PlayVideo(const char *filename, UDPFlaschenTaschen& display, int verbose, f
       const float total_time = (GetTimeInMillis() - startTime) / 1000.0;
       fprintf(stderr,
               "Finished playing %ld frames %ld times for %0.1fs total (%.1f "
-              "fps avg)\n",
+              "fps avg). Avg %.1f kiB/s\n",
               frame_count, repeated_count, total_time,
-              repeated_count * frame_count / total_time);
+              repeated_count * frame_count / total_time,
+              total_bytes / total_time / 1024);
     }
 
     return !interrupt_received;
