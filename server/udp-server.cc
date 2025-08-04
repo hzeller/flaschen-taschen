@@ -46,6 +46,9 @@ bool udp_server_init(int port) {
     int opt = 0;   // Unset IPv6-only, in case it is set. Best effort.
     setsockopt(server_socket, IPPROTO_IPV6, IPV6_V6ONLY, &opt, sizeof(opt));
 
+    opt = 1;
+    setsockopt(server_socket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
+
     struct sockaddr_in6 addr = {0};
     addr.sin6_family = AF_INET6;
     addr.sin6_addr = in6addr_any;
@@ -64,6 +67,24 @@ void udp_server_run_blocking(CompositeFlaschenTaschen *display,
     static const int kBufferSize = 65535;  // maximum UDP has to offer.
     char *packet_buffer = new char[kBufferSize];
     bzero(packet_buffer, kBufferSize);
+
+    // Make sure the kernel keeps enough pending packets in case we have a
+    // large display.
+    const int kMinReceiveBuffer = 3 * 65535;
+    const int kBufferMinimumFullFrameCount = 3;
+    const int full_frame_data = display->width() * display->height() * 3 + 1024;
+    int recv_size = kBufferMinimumFullFrameCount * full_frame_data;
+    if (recv_size < kMinReceiveBuffer) {
+      recv_size = kMinReceiveBuffer; // Small displays should have a minimum.
+    }
+    if (setsockopt(server_socket, SOL_SOCKET, SO_RCVBUF, //
+                   &recv_size, sizeof(recv_size)) < 0) {
+      fprintf(stderr,
+              "Can not set a comfortable receive buffer size.\n"
+              "Consider setting at least\n"
+              "sudo sysctl -w net.core.rmem_max=%d\n",
+              recv_size);
+    }
 
     struct sigaction sa = {{0}};  // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53119
     sa.sa_handler = InterruptHandler;
