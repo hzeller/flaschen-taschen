@@ -295,16 +295,38 @@ bool PlayVideo(const char *filename, UDPFlaschenTaschen& display, int verbose, f
     while (!interrupt_received) {
         clock_gettime(CLOCK_MONOTONIC, &next_frame);
 
-        frame_count = 0;
-        while (!interrupt_received && av_read_frame(format_context, packet) >= 0) {
-            // Is this a packet from the video stream?
-            if (packet->stream_index == videoStream) {
-                // Decode video frame
-                if (avcodec_send_packet(codec_context, packet) < 0)
-                    continue;
+        int decode_in_flight = 0;
+        bool state_reading = true;
 
-                if (avcodec_receive_frame(codec_context, decode_frame) < 0)
-                    continue;
+        frame_count = 0;
+        while (!interrupt_received) {
+            if (state_reading && av_read_frame(format_context, packet) != 0) {
+                state_reading = false;  // ran out of packets from input.
+            }
+
+            if (!state_reading && decode_in_flight == 0) {
+                break;  // Decoder fully drained.
+            }
+
+            // Is this a packet from the video stream?
+            if (state_reading && packet->stream_index != videoStream) {
+                av_packet_unref(packet);
+                continue;  // Not interested in that.
+            }
+
+            if (state_reading) {
+                // Decode video frame
+                if (avcodec_send_packet(codec_context, packet) == 0) {
+                    ++decode_in_flight;
+                }
+                av_packet_unref(packet);
+            } else {
+                avcodec_send_packet(codec_context, NULL); // Trigger decode drain
+            }
+
+            while (decode_in_flight &&
+                   avcodec_receive_frame(codec_context, decode_frame) == 0) {
+                --decode_in_flight;
 
                 // Absolute end of this frame now so that we don't include
                 // decoding and sending overhead.
@@ -315,14 +337,11 @@ bool PlayVideo(const char *filename, UDPFlaschenTaschen& display, int verbose, f
                           decode_frame->linesize, 0, codec_context->height,
                           output_frame->data, output_frame->linesize);
 
-                // Save the frame to disk
                 total_bytes += SendFrame(output_frame, &display);
                 frame_count++;
                 clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &next_frame,
                                 NULL);
             }
-
-            av_packet_unref(packet);
         }
         repeated_count++; //if time allows- keep playing
 
