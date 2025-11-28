@@ -55,11 +55,12 @@ class Flaschen(object):
     self._data = bytearray(len(header) + (width * height * 3))
     self._data[0:len(header)] = header
     self._header_len = len(header)
+    self.max_udp_size = 65500 # TODO: let this be overridable by env var FT_UDP_SIZE
 
   @property
   def __array_interface__(self):
     '''An array interface to directly access the framebuffer pixel data.
-    
+
     Direct writes to pixel data will ignore the transparent parameter.
     '''
     return {
@@ -88,10 +89,13 @@ class Flaschen(object):
     self._data[offset] = color[0]
     self._data[offset + 1] = color[1]
     self._data[offset + 2] = color[2]
-  
+
   def send(self):
     '''Send the updated pixels to the display.'''
-    self._sock.send(self._data)
+    if len(self._data) > self.max_udp_size:
+        self._send_data(self._data[self._header_len:self._header_len + (self.height * self.width * 3)], self.width, self.height, (0, 0, self.layer))
+    else:
+        self._sock.send(self._data)
 
   def send_array(self, pixels, offset):
     # (numpy.typing.ArrayLike, tuple[int, int, int]) -> None
@@ -117,11 +121,32 @@ class Flaschen(object):
       array = array.copy(order="C")  # Prevent modifying the original array.
       array[(array == (0, 0, 0)).all(axis=-1)] = (1, 1, 1)
 
-    header = _HEADER_P6_FT % {
-      b"width": array.shape[1],
-      b"height": array.shape[0],
-      b"x": offset[0],
-      b"y": offset[1],
-      b"z": offset[2],
-    }
-    self._sock.send(header + array.tobytes())
+    w = array.shape[1]
+    h = array.shape[0]
+    self._send_data(array.tobytes(), cols, rows, offset)
+
+  def _send_data(self, data, cols, rows, offset):
+    # Fixes issue #77
+    x = offset[0]
+    y = offset[1]
+    z = offset[2]
+    row_size = cols * 3
+    max_send_height = self.max_udp_size // row_size
+    tile_offset = 0
+    sendbuf_offset = 0
+    while rows > 0:
+        send_rows = min(rows, max_send_height)
+        header = _HEADER_P6_FT % {
+          b"width": cols,
+          b"height": send_rows,
+          b"x": x,
+          b"y": y + tile_offset,
+          b"z": z,
+        }
+        data_len = send_rows * row_size
+        data_chunk = data[sendbuf_offset:sendbuf_offset + data_len]
+        packet = header + data_chunk
+        self._sock.send(packet)
+        rows -= send_rows
+        tile_offset += send_rows
+        sendbuf_offset += data_len
