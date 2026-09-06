@@ -114,3 +114,20 @@ This runs on a Raspberry Pi; see the
 [ft-rgb-vid]: ../img/rgb-matrix-sample-vid.jpg
 [term-color]: https://gist.github.com/XVilka/8346728
 [led-flags]: https://github.com/hzeller/rpi-rgb-led-matrix#changing-parameters-via-command-line-flags
+
+### Colorlight E120 / 5A-75B
+
+If you have HUB75 compatible RGB Matrixes connected to a Colorlight E120 or 
+Colorlight 5A-75B receiver card, you can run that as Flaschen Taschen backend:
+
+```bash
+  make FT_BACKEND=colorlight
+```
+
+Run it and pass the matrix size and outgoing ethernet interface. Here, we have
+a set-up with a panel with 64x64 pixels on interface ens33
+```bash
+  sudo ./ft-server -D 64x64 --interface ens33
+```
+
+If you pass the option `-d`, it will run as daemon in the background.
