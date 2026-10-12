@@ -134,13 +134,13 @@ Check out these repositories:
     to [compile VLC from git](https://wiki.videolan.org/UnixCompile/). That VLC
     version is >= `3.0.0-git Vetinari`.
     Then `sudo make install ; sudo ldconfig` and run it like so:
-
-   ```
+    ```
     # Here, ft.noise is the hostname of the flaschen taschen display:
     $ vlc --vout flaschen --flaschen-display=ft.noise \
           --flaschen-width=45 --flaschen-height=35 \
           <video-filename-or-YouTube-URL>
-   ```
+    ```
+  * https://codeberg.org/alxndr42/ft-neko - Neko for FlaschenTaschen
 
 ## Connecting LED strips to the Pi
 
