@@ -108,6 +108,34 @@ private:
     int height_;
 };
 
+class ColorlightFlaschenTaschen : public ServerFlaschenTaschen {
+public:
+    ColorlightFlaschenTaschen(const char* interface_name, int width, int height, uint8_t brightness = 255);
+    virtual ~ColorlightFlaschenTaschen();
+
+    int width() const { return width_; }
+    int height() const { return height_; }
+
+    void SetPixel(int x, int y, const Color &col);
+    void Send();
+
+    void SetBrightness(uint8_t brightness);
+
+private:
+    void send_sync_packet();
+    void send_row_data(int row, const uint8_t* frame_data);
+    void send_brightness_packet();
+    void build_frame_header(uint8_t* buf, uint8_t packet_type);
+    void raw_send(const uint8_t* data, size_t len);
+
+    int width_;
+    int height_;
+    uint8_t brightness_;
+    int sock_fd_;
+    int frame_count_;
+    uint8_t* frame_data_;
+};
+
 class TerminalFlaschenTaschen : public ServerFlaschenTaschen {
 public:
     TerminalFlaschenTaschen(int terminal_fd, int width, int heigh);

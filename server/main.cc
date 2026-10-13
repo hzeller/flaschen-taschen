@@ -84,6 +84,10 @@ static int usage(const char *progname) {
 #else
             "\t-d                  : Become daemon\n"
 #endif
+#if FT_BACKEND == 3
+            "\t--interface <iface> : Ethernet interface. (Default: ens33)\n"
+            "\t--brightness <b>    : Override brightness (0-255)\n"
+#endif
             "\t--layer-timeout <sec>: Layer timeout: clearing after non-activity (Default: 15)\n"
             );
 #if FT_BACKEND == 1
@@ -101,6 +105,10 @@ int main(int argc, char *argv[]) {
 #endif
 #if FT_BACKEND == 2
     bool hd_terminal = false;
+#endif
+#if FT_BACKEND == 3
+    const char* interface = "ens33";
+    uint8_t brightness = 255;
 #endif
 
 #if FT_BACKEND == 1
@@ -122,6 +130,8 @@ int main(int argc, char *argv[]) {
     enum LongOptionsOnly {
         OPT_LAYER_TIMEOUT = 1002,
         OPT_HD_TERMINAL = 1003,
+        OPT_INTERFACE = 1004,
+        OPT_BRIGHTNESS = 1005
     };
 
     static struct option long_options[] = {
@@ -132,6 +142,10 @@ int main(int argc, char *argv[]) {
         { "layer-timeout",      required_argument, NULL,  OPT_LAYER_TIMEOUT },
 #if FT_BACKEND == 2
         { "hd-terminal",        no_argument,       NULL,  OPT_HD_TERMINAL },
+#endif
+#if FT_BACKEND == 3
+        { "interface",          required_argument, NULL, OPT_INTERFACE },
+        { "brightness",         required_argument, NULL, OPT_BRIGHTNESS },
 #endif
         { 0,                    0,                 0,    0  },
     };
@@ -156,6 +170,14 @@ int main(int argc, char *argv[]) {
 #if FT_BACKEND == 2
         case OPT_HD_TERMINAL:
             hd_terminal = true;
+            break;
+#endif
+#if FT_BACKEND == 3
+        case OPT_INTERFACE:
+            interface = strdup(optarg);
+            break;
+        case OPT_BRIGHTNESS:
+            brightness = atoi(optarg);
             break;
 #endif
         default:
@@ -201,6 +223,12 @@ int main(int argc, char *argv[]) {
         hd_terminal
         ? new HDTerminalFlaschenTaschen(STDOUT_FILENO, width, height)
         : new TerminalFlaschenTaschen(STDOUT_FILENO, width, height);
+#elif FT_BACKEND == 3
+    ServerFlaschenTaschen *display
+        = new ColorlightFlaschenTaschen(
+            interface,
+            width, height, brightness
+        );
 #endif
 
     // Start all the services and report problems (such as sockets already

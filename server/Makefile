@@ -28,6 +28,9 @@
 #    This requires the project to be checked out with submodules
 #    (git clone --recursive)
 #
+# colorlight
+#    Output things to a Colorlight E120 or 5A-75B receiver card
+#
 FT_BACKEND=terminal
 
 # Spixel related. It is checked out as as submodule in spixels/
@@ -64,6 +67,11 @@ endif
 ifeq ($(FT_BACKEND), terminal)
    DEFINES=-DFT_BACKEND=2
    OBJECTS+=terminal-flaschen-taschen.o hd-terminal-flaschen-taschen.o
+endif
+
+ifeq ($(FT_BACKEND), colorlight)
+    DEFINES=-DFT_BACKEND=3
+    OBJECTS+=colorlight-flaschen-taschen.o
 endif
 
 CFLAGS=-Wall -O3 $(INCLUDES) $(DEFINES)
